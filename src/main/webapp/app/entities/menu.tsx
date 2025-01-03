@@ -1,3 +1,4 @@
+import MenuItem from 'app/shared/layout/menus/menu-item';
 import React from 'react';
 
 const EntitiesMenu = () => {
