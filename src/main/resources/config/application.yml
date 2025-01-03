@@ -95,7 +95,7 @@ spring:
     name: statistics
   docker:
     compose:
-      enabled: true
+      enabled: false
       lifecycle-management: start-only
       file: src/main/docker/services.yml
   profiles:
@@ -115,7 +115,17 @@ spring:
     jpa:
       repositories:
         bootstrap-mode: deferred
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://c9mq4861d16jlm.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d14moh8b5h9sa4
+    username: u9mqrec7pl3fd6
+    password: p3b0e812a0b3882c68f01476ee65cbc6f767675e0674cd19d2d41bc5acde1ee9d
+    hikari:
+      poolName: Hikari
+      auto-commit: false
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
     properties:
       hibernate.jdbc.time_zone: UTC

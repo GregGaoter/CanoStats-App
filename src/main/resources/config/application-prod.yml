@@ -31,14 +31,14 @@ spring:
       enabled: false
     livereload:
       enabled: false
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/statistics
-    username: statistics
-    password: password
-    hikari:
-      poolName: Hikari
-      auto-commit: false
+  # datasource:
+  #   type: com.zaxxer.hikari.HikariDataSource
+  #   url: jdbc:postgresql://c9mq4861d16jlm.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d14moh8b5h9sa4
+  #   username: u9mqrec7pl3fd6
+  #   password: p3b0e812a0b3882c68f01476ee65cbc6f767675e0674cd19d2d41bc5acde1ee9d
+  #   hikari:
+  #     poolName: Hikari
+  #     auto-commit: false
   # Replace by 'prod, faker' to add the faker context and have sample data loaded in production
   liquibase:
     contexts: prod
