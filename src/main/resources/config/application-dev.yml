@@ -32,15 +32,15 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/statistics
-    username: statistics
-    password: password
+    url: jdbc:postgresql://c9mq4861d16jlm.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d14moh8b5h9sa4
+    username: u9mqrec7pl3fd6
+    password: p3b0e812a0b3882c68f01476ee65cbc6f767675e0674cd19d2d41bc5acde1ee9d
     hikari:
       poolName: Hikari
       auto-commit: false
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
-    contexts: dev, faker
+    contexts: dev
   mail:
     host: localhost
     port: 25
