@@ -2,8 +2,15 @@ package ch.epicerielacanopee.statistics.service;
 
 import ch.epicerielacanopee.statistics.domain.MouvementsStock;
 import ch.epicerielacanopee.statistics.repository.MouvementsStockRepository;
+import ch.epicerielacanopee.statistics.service.dto.EpicerioMouvementsStockDTO;
 import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
 import ch.epicerielacanopee.statistics.service.mapper.MouvementsStockMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -12,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Service Implementation for managing {@link ch.epicerielacanopee.statistics.domain.MouvementsStock}.
@@ -21,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class MouvementsStockService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MouvementsStockService.class);
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final MouvementsStockRepository mouvementsStockRepository;
 
@@ -109,5 +119,65 @@ public class MouvementsStockService {
     public void delete(UUID id) {
         LOG.debug("Request to delete MouvementsStock : {}", id);
         mouvementsStockRepository.deleteById(id);
+    }
+
+    /**
+     * Imports a file containing a list of {@link EpicerioMouvementsStockDTO} objects.
+     * The method reads the content of the file, converts it to a list of {@link EpicerioMouvementsStockDTO},
+     * and then processes each item to create and save {@link MouvementsStock} entities.
+     *
+     * @param file the {@link MultipartFile} to be imported
+     * @throws IOException if an I/O error occurs while reading the file
+     */
+    public void importFile(MultipartFile file) throws IOException {
+        String content = new String(file.getBytes());
+        List<EpicerioMouvementsStockDTO> epicerioMouvementsStocks = objectMapper.readValue(
+            content,
+            new TypeReference<List<EpicerioMouvementsStockDTO>>() {}
+        );
+        int mouvementsStocksTotal = epicerioMouvementsStocks.size();
+        List<MouvementsStock> mouvementsStocks = new ArrayList<>(mouvementsStocksTotal);
+        int i = 1;
+        Instant now = Instant.now();
+        for (EpicerioMouvementsStockDTO epicerioMouvementsStock : epicerioMouvementsStocks) {
+            MouvementsStock mouvementsStock = create(epicerioMouvementsStock);
+            mouvementsStock.setImportedDate(now);
+            mouvementsStocks.add(mouvementsStock);
+            LOG.info("{} / {}", i++, mouvementsStocksTotal);
+        }
+        mouvementsStockRepository.saveAll(mouvementsStocks);
+    }
+
+    /**
+     * Creates a new MouvementsStock object from the given EpicerioMouvementsStockDTO.
+     *
+     * @param epicerioMouvementsStocks the DTO containing the data for the new MouvementsStock
+     * @return the newly created MouvementsStock object
+     */
+    public MouvementsStock create(EpicerioMouvementsStockDTO epicerioMouvementsStocks) {
+        Instant now = Instant.now();
+        MouvementsStock mouvementsStock = new MouvementsStock();
+        mouvementsStock.setEpicerioId(epicerioMouvementsStocks.getId());
+        mouvementsStock.setCreatedDate(now);
+        mouvementsStock.setLastUpdatedDate(now);
+        mouvementsStock.setImportedDate(now);
+        mouvementsStock.setDate(epicerioMouvementsStocks.getDate());
+        mouvementsStock.setUtilisateur(epicerioMouvementsStocks.getUtilisateur());
+        mouvementsStock.setType(epicerioMouvementsStocks.getType());
+        mouvementsStock.setEpicerioMouvement(epicerioMouvementsStocks.getMouvement());
+        mouvementsStock.setMouvement(epicerioMouvementsStocks.getMouvement());
+        mouvementsStock.setSolde(epicerioMouvementsStocks.getSolde());
+        mouvementsStock.setVente(epicerioMouvementsStocks.getVente());
+        mouvementsStock.setCodeProduit(epicerioMouvementsStocks.getCodeProduit());
+        mouvementsStock.setProduit(epicerioMouvementsStocks.getProduit());
+        mouvementsStock.setResponsableProduit(epicerioMouvementsStocks.getResponsableProduit());
+        mouvementsStock.setFournisseurProduit(epicerioMouvementsStocks.getFournisseurProduit());
+        mouvementsStock.setCodeFournisseur(epicerioMouvementsStocks.getCodeFournisseur());
+        mouvementsStock.setReduction(epicerioMouvementsStocks.getReduction());
+        mouvementsStock.setPonderation(epicerioMouvementsStocks.getPonderation());
+        mouvementsStock.setVenteChf(epicerioMouvementsStocks.getVenteChf());
+        mouvementsStock.setValeurChf(epicerioMouvementsStocks.getValeurChf());
+        mouvementsStock.setRemarques(epicerioMouvementsStocks.getRemarques());
+        return mouvementsStock;
     }
 }
