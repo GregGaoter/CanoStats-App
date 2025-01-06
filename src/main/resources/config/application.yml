@@ -17,6 +17,8 @@
 ---
 # Conditionally disable springdoc on missing api-docs profile
 spring:
+  application:
+    name: statistics
   config:
     activate:
       on-profile: '!api-docs'
@@ -91,8 +93,6 @@ management:
       application: ${spring.application.name}
 
 spring:
-  application:
-    name: statistics
   docker:
     compose:
       enabled: false
@@ -178,6 +178,7 @@ spring:
       console-available: true
 
 server:
+  port: 8080
   servlet:
     session:
       cookie:
