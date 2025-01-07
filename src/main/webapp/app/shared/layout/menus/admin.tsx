@@ -6,13 +6,16 @@ import { NavDropdown } from './menu-components';
 const adminMenuItems = () => (
   <>
     <MenuItem icon="users" to="/admin/user-management">
-      User management
+      Gestion des utilisateurs
+    </MenuItem>
+    <MenuItem icon="file-import" to="/admin/file-import">
+      Importation des données
     </MenuItem>
     <MenuItem icon="tachometer-alt" to="/admin/metrics">
-      Metrics
+      Métriques
     </MenuItem>
     <MenuItem icon="heart" to="/admin/health">
-      Health
+      Santé
     </MenuItem>
     <MenuItem icon="cogs" to="/admin/configuration">
       Configuration

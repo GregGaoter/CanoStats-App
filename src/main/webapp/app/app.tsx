@@ -1,9 +1,9 @@
 import 'react-toastify/dist/ReactToastify.css';
 import './app.scss';
 import 'app/config/dayjs';
-import 'primereact/resources/primereact.min.css';
-import 'primereact/resources/themes/lara-light-blue/theme.css';
-import 'primeicons/primeicons.css';
+// import 'primereact/resources/primereact.min.css';
+// import 'primereact/resources/themes/lara-light-blue/theme.css';
+// import 'primeicons/primeicons.css';
 
 import React, { useEffect } from 'react';
 import { Card } from 'reactstrap';
@@ -42,7 +42,7 @@ export const App = () => {
     <PrimeReactProvider>
       <BrowserRouter basename={baseHref}>
         <div className="app-container" style={{ paddingTop }}>
-          <ToastContainer position="top-left" className="toastify-container" toastClassName="toastify-toast" />
+          <ToastContainer position="top-right" className="toastify-container" toastClassName="toastify-toast" />
           <ErrorBoundary>
             <Header
               isAuthenticated={isAuthenticated}
@@ -58,7 +58,7 @@ export const App = () => {
                 <AppRoutes />
               </ErrorBoundary>
             </Card>
-            <Footer />
+            {/* <Footer /> */}
           </div>
         </div>
       </BrowserRouter>
