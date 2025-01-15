@@ -1,12 +1,7 @@
 import 'react-toastify/dist/ReactToastify.css';
-// import './app.scss';
 import 'app/config/dayjs';
 import 'primeflex/primeflex.css';
 import 'primereact/resources/themes/vela-green/theme.css';
-// import 'primereact/resources/themes/lara-light-indigo/theme.css';
-// import 'primereact/resources/primereact.min.css';
-// import 'primereact/resources/themes/lara-light-blue/theme.css';
-// import 'primeicons/primeicons.css';
 
 import React, { useEffect } from 'react';
 import { BrowserRouter } from 'react-router-dom';
