@@ -1,25 +1,28 @@
 import 'react-toastify/dist/ReactToastify.css';
-import './app.scss';
+// import './app.scss';
 import 'app/config/dayjs';
+import 'primeflex/primeflex.css';
+import 'primereact/resources/themes/vela-green/theme.css';
+// import 'primereact/resources/themes/lara-light-indigo/theme.css';
 // import 'primereact/resources/primereact.min.css';
 // import 'primereact/resources/themes/lara-light-blue/theme.css';
 // import 'primeicons/primeicons.css';
 
 import React, { useEffect } from 'react';
-import { Card } from 'reactstrap';
 import { BrowserRouter } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 
+import { AUTHORITIES } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { getSession } from 'app/shared/reducers/authentication';
-import { getProfile } from 'app/shared/reducers/application-profile';
-import Header from 'app/shared/layout/header/header';
-import Footer from 'app/shared/layout/footer/footer';
 import { hasAnyAuthority } from 'app/shared/auth/private-route';
 import ErrorBoundary from 'app/shared/error/error-boundary';
-import { AUTHORITIES } from 'app/config/constants';
-import AppRoutes from 'app/routes';
+import Header from 'app/shared/layout/header/header';
+import { getProfile } from 'app/shared/reducers/application-profile';
+import { getSession } from 'app/shared/reducers/authentication';
 import { PrimeReactProvider } from 'primereact/api';
+import { Card } from 'primereact/card';
+import AppRoutes from './routes';
+import { StatisticsMenu } from './shared/layout/header/statistics-menu';
 
 const baseHref = document.querySelector('base').getAttribute('href').replace(/\/$/, '');
 
@@ -37,13 +40,12 @@ export const App = () => {
   const isInProduction = useAppSelector(state => state.applicationProfile.inProduction);
   const isOpenAPIEnabled = useAppSelector(state => state.applicationProfile.isOpenAPIEnabled);
 
-  const paddingTop = '60px';
   return (
     <PrimeReactProvider>
       <BrowserRouter basename={baseHref}>
-        <div className="app-container" style={{ paddingTop }}>
-          <ToastContainer position="top-right" className="toastify-container" toastClassName="toastify-toast" />
-          <ErrorBoundary>
+        <ToastContainer position="top-right" className="toastify-container" toastClassName="toastify-toast" />
+        <ErrorBoundary>
+          <div className="flex gap-0 absolute top-0 left-0 w-full">
             <Header
               isAuthenticated={isAuthenticated}
               isAdmin={isAdmin}
@@ -51,19 +53,43 @@ export const App = () => {
               isInProduction={isInProduction}
               isOpenAPIEnabled={isOpenAPIEnabled}
             />
-          </ErrorBoundary>
-          <div className="container-fluid view-container" id="app-view-container">
-            <Card className="jh-card">
-              <ErrorBoundary>
+            <div className="flex flex-column flex-grow-1">
+              <StatisticsMenu />
+              <Card className="mx-2 mt-2 mb-0">
                 <AppRoutes />
-              </ErrorBoundary>
-            </Card>
-            {/* <Footer /> */}
+              </Card>
+            </div>
           </div>
-        </div>
+        </ErrorBoundary>
       </BrowserRouter>
     </PrimeReactProvider>
   );
+
+  // return (
+  //   <PrimeReactProvider>
+  //     <BrowserRouter basename={baseHref}>
+  //       <div className="absolute top-0 left-0">
+  //         <ToastContainer position="top-right" className="toastify-container" toastClassName="toastify-toast" />
+  //         <ErrorBoundary>
+  //           <Header
+  //             isAuthenticated={isAuthenticated}
+  //             isAdmin={isAdmin}
+  //             ribbonEnv={ribbonEnv}
+  //             isInProduction={isInProduction}
+  //             isOpenAPIEnabled={isOpenAPIEnabled}
+  //           />
+  //         </ErrorBoundary>
+  //         <div className="container-fluid view-container" id="app-view-container">
+  //           <Card className="jh-card">
+  //             <ErrorBoundary>
+  //               <AppRoutes />
+  //             </ErrorBoundary>
+  //           </Card>
+  //         </div>
+  //       </div>
+  //     </BrowserRouter>
+  //   </PrimeReactProvider>
+  // );
 };
 
 export default App;

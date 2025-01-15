@@ -37,6 +37,10 @@ import {
   faXmark,
   faImage,
   faCloudArrowUp,
+  faTableList,
+  faGauge,
+  faArrowTrendDown,
+  faHandHoldingDollar,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -81,5 +85,9 @@ export const loadIcons = () => {
     faXmark,
     faImage,
     faCloudArrowUp,
+    faTableList,
+    faGauge,
+    faArrowTrendDown,
+    faHandHoldingDollar,
   );
 };

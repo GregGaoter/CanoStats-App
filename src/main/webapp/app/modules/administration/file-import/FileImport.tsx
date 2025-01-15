@@ -1,5 +1,3 @@
-import 'primereact/resources/themes/lara-light-indigo/theme.css';
-import 'primereact/resources/primereact.min.css';
 import { Button } from 'primereact/button';
 import {
   FileUpload,
@@ -15,6 +13,7 @@ import { Toast } from 'primereact/toast';
 import React, { useRef, useState } from 'react';
 import { Tooltip } from 'primereact/tooltip';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Knob } from 'primereact/knob';
 
 export const FileImport = () => {
   const toast = useRef<Toast>(null);
@@ -125,7 +124,7 @@ export const FileImport = () => {
 
   return (
     <>
-      <h2 className="mb-3">Importer des données de mouvements de stock</h2>
+      <div className="text-4xl mb-4">Importer des données de mouvements de stock</div>
       <Toast ref={toast}></Toast>
 
       <Tooltip target=".custom-choose-btn" content="Choose" position="bottom" />

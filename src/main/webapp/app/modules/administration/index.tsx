@@ -14,7 +14,7 @@ const AdministrationRoutes = () => (
   <div>
     <ErrorBoundaryRoutes>
       <Route path="user-management/*" element={<UserManagement />} />
-      <Route path="file-import" element={<FileImport />} />
+      {/* <Route path="file-import" element={<FileImport />} /> */}
       <Route path="health" element={<Health />} />
       <Route path="metrics" element={<Metrics />} />
       <Route path="configuration" element={<Configuration />} />

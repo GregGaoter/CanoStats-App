@@ -1,9 +1,6 @@
-import './home.scss';
-
 import React from 'react';
-import { Link } from 'react-router-dom';
 
-import { Alert, Col, Row } from 'reactstrap';
+import { Alert } from 'reactstrap';
 
 import { useAppSelector } from 'app/config/store';
 
@@ -11,12 +8,12 @@ export const Home = () => {
   const account = useAppSelector(state => state.authentication.account);
 
   return (
-    <Row>
-      <Col md="3" className="pad">
+    <div className="grid">
+      <div className="col-3">
         <img src="content/images/logo-canopee.svg" alt="Logo" />
-      </Col>
-      <Col md="9" className="d-flex flex-column align-items-center">
-        <h1 className="display-4 mb-4">Bienvenue, statistiques de la Canopée !</h1>
+      </div>
+      <div className="col flex flex-column align-items-center">
+        <div className="text-5xl mb-4">Bienvenue, statistiques de La Canopée !</div>
         {account?.login && (
           <div>
             <Alert color="success">{`Tu es connecté en tant qu'utilisateur "${account.login}".`}</Alert>
@@ -48,8 +45,8 @@ export const Home = () => {
             </Alert>
           </div>
         )} */}
-      </Col>
-    </Row>
+      </div>
+    </div>
   );
 };
 
