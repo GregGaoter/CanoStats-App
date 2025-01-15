@@ -1,11 +1,9 @@
-import 'react-toastify/dist/ReactToastify.css';
 import 'app/config/dayjs';
 import 'primeflex/primeflex.css';
 import 'primereact/resources/themes/vela-green/theme.css';
 
 import React, { useEffect } from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
 
 import { AUTHORITIES } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
@@ -17,6 +15,7 @@ import { getSession } from 'app/shared/reducers/authentication';
 import { PrimeReactProvider } from 'primereact/api';
 import { Card } from 'primereact/card';
 import AppRoutes from './routes';
+import { ToastProvider } from './shared/component/ToastContext';
 import { StatisticsMenu } from './shared/layout/header/statistics-menu';
 
 const baseHref = document.querySelector('base').getAttribute('href').replace(/\/$/, '');
@@ -37,26 +36,27 @@ export const App = () => {
 
   return (
     <PrimeReactProvider>
-      <BrowserRouter basename={baseHref}>
-        <ToastContainer position="top-right" className="toastify-container" toastClassName="toastify-toast" />
-        <ErrorBoundary>
-          <div className="flex gap-0 absolute top-0 left-0 w-full">
-            <Header
-              isAuthenticated={isAuthenticated}
-              isAdmin={isAdmin}
-              ribbonEnv={ribbonEnv}
-              isInProduction={isInProduction}
-              isOpenAPIEnabled={isOpenAPIEnabled}
-            />
-            <div className="flex flex-column flex-grow-1">
-              <StatisticsMenu />
-              <Card className="mx-2 mt-2 mb-0">
-                <AppRoutes />
-              </Card>
+      <ToastProvider>
+        <BrowserRouter basename={baseHref}>
+          <ErrorBoundary>
+            <div className="flex gap-0 absolute top-0 left-0 w-full">
+              <Header
+                isAuthenticated={isAuthenticated}
+                isAdmin={isAdmin}
+                ribbonEnv={ribbonEnv}
+                isInProduction={isInProduction}
+                isOpenAPIEnabled={isOpenAPIEnabled}
+              />
+              <div className="flex flex-column flex-grow-1">
+                <StatisticsMenu />
+                <Card className="mx-2 mt-2 mb-0">
+                  <AppRoutes />
+                </Card>
+              </div>
             </div>
-          </div>
-        </ErrorBoundary>
-      </BrowserRouter>
+          </ErrorBoundary>
+        </BrowserRouter>
+      </ToastProvider>
     </PrimeReactProvider>
   );
 

@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ValidatedField, ValidatedForm } from 'react-jhipster';
 import { Button, Col, Row } from 'reactstrap';
-import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getSession } from 'app/shared/reducers/authentication';
 import PasswordStrengthBar from 'app/shared/layout/password/password-strength-bar';
 import { reset, savePassword } from './password.reducer';
+import { ToastContext } from 'app/shared/component/ToastContext';
 
 export const PasswordPage = () => {
   const [password, setPassword] = useState('');
   const dispatch = useAppDispatch();
+  const toast = useContext(ToastContext);
 
   useEffect(() => {
     dispatch(reset());
@@ -32,9 +33,9 @@ export const PasswordPage = () => {
 
   useEffect(() => {
     if (successMessage) {
-      toast.success(successMessage);
+      toast.current?.show({ severity: 'success', summary: 'Succès', detail: `${successMessage}` });
     } else if (errorMessage) {
-      toast.error(errorMessage);
+      toast.current?.show({ severity: 'danger', summary: 'Erreur', detail: `${errorMessage}` });
     }
     dispatch(reset());
   }, [successMessage, errorMessage]);

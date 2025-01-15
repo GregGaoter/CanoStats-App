@@ -1,15 +1,17 @@
-import { toast } from 'react-toastify';
+import { ToastContext } from 'app/shared/component/ToastContext';
+import { getMessageFromHeaders } from 'app/shared/jhipster/headers';
+import { FieldErrorVM, isProblemWithMessage } from 'app/shared/jhipster/problem-details';
 import { isFulfilledAction, isRejectedAction } from 'app/shared/reducers/reducer.utils';
 import { isAxiosError } from 'axios';
-import { FieldErrorVM, isProblemWithMessage } from 'app/shared/jhipster/problem-details';
-import { getMessageFromHeaders } from 'app/shared/jhipster/headers';
+import { useContext } from 'react';
 
 type TostMessage = {
   message?: string;
 };
 
 const addErrorAlert = (message: TostMessage) => {
-  toast.error(message.message);
+  const toast = useContext(ToastContext);
+  toast.current?.show({ severity: 'danger', summary: 'Erreur', detail: `${message.message}` });
 };
 
 const getFieldErrorsTosts = (fieldErrors: FieldErrorVM[]): TostMessage[] =>
@@ -23,7 +25,9 @@ const getFieldErrorsTosts = (fieldErrors: FieldErrorVM[]): TostMessage[] =>
     return { message: `Error on field "${fieldName}"` };
   });
 
+// eslint-disable-next-line complexity
 export default () => next => action => {
+  const toast = useContext(ToastContext);
   const { error, payload } = action;
 
   /**
@@ -33,7 +37,7 @@ export default () => next => action => {
   if (isFulfilledAction(action) && payload?.headers) {
     const { alert } = getMessageFromHeaders(payload.headers);
     if (alert) {
-      toast.success(alert);
+      toast.current?.show({ severity: 'success', summary: 'Succès', detail: `${alert}` });
     }
   }
 
@@ -65,7 +69,11 @@ export default () => next => action => {
           } else if (typeof data === 'string' && data !== '') {
             addErrorAlert({ message: data });
           } else {
-            toast.error(data?.detail ?? data?.message ?? data?.error ?? data?.title ?? 'Unknown error!');
+            toast.current?.show({
+              severity: 'danger',
+              summary: 'Erreur',
+              detail: `${data?.detail ?? data?.message ?? data?.error ?? data?.title ?? 'Unknown error!'}`,
+            });
           }
         }
       }
