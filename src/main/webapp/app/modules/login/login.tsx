@@ -3,7 +3,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { login } from 'app/shared/reducers/authentication';
-import LoginModal from './login-modal';
+import LoginForm from './login-form';
 
 export const Login = () => {
   const dispatch = useAppDispatch();
@@ -29,7 +29,7 @@ export const Login = () => {
   if (isAuthenticated) {
     return <Navigate to={from} replace />;
   }
-  return <LoginModal showModal={showModal} handleLogin={handleLogin} handleClose={handleClose} loginError={loginError} />;
+  return <LoginForm showModal={showModal} handleLogin={handleLogin} handleClose={handleClose} loginError={loginError} />;
 };
 
 export default Login;

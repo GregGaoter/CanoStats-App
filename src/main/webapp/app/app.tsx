@@ -1,6 +1,6 @@
 import 'app/config/dayjs';
 import 'primeflex/primeflex.css';
-import 'primereact/resources/themes/vela-green/theme.css';
+import 'primereact/resources/themes/lara-dark-blue/theme.css';
 
 import React, { useEffect } from 'react';
 import { BrowserRouter } from 'react-router-dom';
@@ -14,6 +14,7 @@ import { getProfile } from 'app/shared/reducers/application-profile';
 import { getSession } from 'app/shared/reducers/authentication';
 import { PrimeReactProvider } from 'primereact/api';
 import { Card } from 'primereact/card';
+import Login from './modules/login/login';
 import AppRoutes from './routes';
 import { ToastProvider } from './shared/component/ToastContext';
 import { StatisticsMenu } from './shared/layout/header/statistics-menu';
@@ -39,21 +40,25 @@ export const App = () => {
       <ToastProvider>
         <BrowserRouter basename={baseHref}>
           <ErrorBoundary>
-            <div className="flex gap-0 absolute top-0 left-0 w-full">
-              <Header
-                isAuthenticated={isAuthenticated}
-                isAdmin={isAdmin}
-                ribbonEnv={ribbonEnv}
-                isInProduction={isInProduction}
-                isOpenAPIEnabled={isOpenAPIEnabled}
-              />
-              <div className="flex flex-column flex-grow-1">
-                <StatisticsMenu />
-                <Card className="mx-2 mt-2 mb-0">
-                  <AppRoutes />
-                </Card>
+            {isAuthenticated ? (
+              <div className="flex gap-0 absolute top-0 left-0 w-full">
+                <Header
+                  isAuthenticated={isAuthenticated}
+                  isAdmin={isAdmin}
+                  ribbonEnv={ribbonEnv}
+                  isInProduction={isInProduction}
+                  isOpenAPIEnabled={isOpenAPIEnabled}
+                />
+                <div className="flex flex-column flex-grow-1">
+                  <StatisticsMenu />
+                  <Card className="mx-2 mt-2 mb-0">
+                    <AppRoutes />
+                  </Card>
+                </div>
               </div>
-            </div>
+            ) : (
+              <Login />
+            )}
           </ErrorBoundary>
         </BrowserRouter>
       </ToastProvider>

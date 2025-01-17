@@ -41,6 +41,7 @@ import {
   faGauge,
   faArrowTrendDown,
   faHandHoldingDollar,
+  faEnvelope,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -89,5 +90,6 @@ export const loadIcons = () => {
     faGauge,
     faArrowTrendDown,
     faHandHoldingDollar,
+    faEnvelope,
   );
 };
