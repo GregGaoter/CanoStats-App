@@ -29,7 +29,15 @@ export const Login = () => {
   if (isAuthenticated) {
     return <Navigate to={from} replace />;
   }
-  return <LoginForm showModal={showModal} handleLogin={handleLogin} handleClose={handleClose} loginError={loginError} />;
+
+  return (
+    <div
+      className="absolute top-0 left-0 w-full h-full bg-center bg-no-repeat bg-cover"
+      style={{ backgroundImage: 'url("content/images/login-background.jpg")' }}
+    >
+      <LoginForm showModal={showModal} handleLogin={handleLogin} handleClose={handleClose} loginError={loginError} />
+    </div>
+  );
 };
 
 export default Login;
