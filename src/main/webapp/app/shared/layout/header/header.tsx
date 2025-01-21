@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Icon } from 'app/shared/component/Icon';
-import { Menu } from 'primereact/menu';
+import { Menubar } from 'primereact/menubar';
 import { MenuItem } from 'primereact/menuitem';
 
 export interface IHeaderProps {
@@ -37,22 +37,10 @@ const Header = (props: IHeaderProps) => {
   //   </div>
   // );
 
-  const menuItems: MenuItem[] = [
-    {
-      template: () => (
-        <div className="flex align-items-center gap-2 ml-2">
-          <img src="content/images/logo-canopee.svg" height="49"></img>
-          <div className="font-medium text-xl">STATISTIQUES</div>
-        </div>
-      ),
-      url: '/',
-    },
-    {
-      separator: true,
-    },
-    { label: 'Accueil', icon: <Icon icon="home" />, url: '/' },
+  const items: MenuItem[] = [
     {
       label: 'Tables',
+      icon: <Icon icon="table-list" />,
       items: [
         {
           label: 'Mouvements stock',
@@ -62,6 +50,7 @@ const Header = (props: IHeaderProps) => {
     },
     {
       label: 'Administration',
+      icon: <Icon icon="users-cog" />,
       items: [
         {
           label: 'Utilisateurs',
@@ -92,6 +81,7 @@ const Header = (props: IHeaderProps) => {
     },
     {
       label: 'Compte',
+      icon: <Icon icon="user" />,
       items: [
         {
           label: 'Paramètres',
@@ -101,15 +91,29 @@ const Header = (props: IHeaderProps) => {
           label: 'Mot de passe',
           icon: <Icon icon="lock" />,
         },
-        {
-          label: 'Se déconnecter',
-          icon: <Icon icon="sign-out-alt" />,
-        },
       ],
+    },
+    {
+      label: 'Se déconnecter',
+      icon: <Icon icon="sign-out-alt" />,
     },
   ];
 
-  return <Menu model={menuItems} />;
+  const start = (
+    <div className="flex align-items-center gap-2">
+      <img src="content/images/logo-canopee.svg" height="50" className="my-0"></img>
+      <div className="font-medium text-xl">CanoStats</div>
+    </div>
+  );
+
+  return (
+    <Menubar
+      model={items}
+      start={start}
+      className="border-noround py-0 surface-card"
+      pt={{ root: { className: 'flex justify-content-between' }, submenu: { className: 'surface-card' } }}
+    />
+  );
 };
 
 export default Header;

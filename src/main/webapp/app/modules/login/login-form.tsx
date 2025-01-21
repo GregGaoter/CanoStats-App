@@ -55,9 +55,13 @@ const LoginForm = (props: LoginFormProps) => {
           {loginError && <Message severity="error" content={loginErrorMessage} />}
           <div className="p-inputgroup">
             <span className="p-inputgroup-addon">
-              <Icon icon="envelope" marginRight={false} />
+              <Icon icon="user" marginRight={false} />
             </span>
-            <Controller name="username" control={control} render={({ field }) => <InputText {...field} placeholder="Adresse email" />} />
+            <Controller
+              name="username"
+              control={control}
+              render={({ field }) => <InputText {...field} placeholder="Nom d'utilisateur" />}
+            />
           </div>
           <div className="p-inputgroup">
             <span className="p-inputgroup-addon">
@@ -79,7 +83,7 @@ const LoginForm = (props: LoginFormProps) => {
             />
             <Link to="/account/reset/request">Mot de passe oublié ?</Link>
           </div>
-          <Button type="submit" label="Se connecter" />
+          <Button type="submit" icon={<Icon icon="right-to-bracket" />} label="Se connecter" />
         </div>
       </form>
     </Card>

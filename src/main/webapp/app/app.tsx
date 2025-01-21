@@ -41,7 +41,7 @@ export const App = () => {
         <BrowserRouter basename={baseHref}>
           <ErrorBoundary>
             {isAuthenticated ? (
-              <div className="flex gap-0 absolute top-0 left-0 w-full">
+              <div className="flex flex-column gap-3 absolute top-0 left-0 w-full surface-ground">
                 <Header
                   isAuthenticated={isAuthenticated}
                   isAdmin={isAdmin}
@@ -49,9 +49,9 @@ export const App = () => {
                   isInProduction={isInProduction}
                   isOpenAPIEnabled={isOpenAPIEnabled}
                 />
-                <div className="flex flex-column flex-grow-1">
+                <div className="flex gap-3 ml-3">
                   <StatisticsMenu />
-                  <Card className="mx-2 mt-2 mb-0">
+                  <Card className="mb-0">
                     <AppRoutes />
                   </Card>
                 </div>
