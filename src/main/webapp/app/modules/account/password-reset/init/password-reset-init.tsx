@@ -1,14 +1,13 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { ValidatedField, ValidatedForm, isEmail } from 'react-jhipster';
 import { Alert, Button, Col, Row } from 'reactstrap';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { toast } from 'app/shared/component/ToastContext';
 import { handlePasswordResetInit, reset } from '../password-reset.reducer';
-import { ToastContext } from 'app/shared/component/ToastContext';
 
 export const PasswordResetInit = () => {
   const dispatch = useAppDispatch();
-  const toast = useContext(ToastContext);
 
   useEffect(
     () => () => {
@@ -25,7 +24,7 @@ export const PasswordResetInit = () => {
 
   useEffect(() => {
     if (successMessage) {
-      toast.current?.show({ severity: 'success', summary: 'Succès', detail: `${successMessage}` });
+      toast().show({ severity: 'success', summary: 'Succès', detail: `${successMessage}` });
     }
   }, [successMessage]);
 

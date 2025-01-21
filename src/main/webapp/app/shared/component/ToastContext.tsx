@@ -1,9 +1,9 @@
 import { Toast } from 'primereact/toast';
-import React, { createContext, useRef } from 'react';
+import React, { createContext, useContext, useRef } from 'react';
 
 const ToastContext = createContext(null);
 
-const ToastProvider = ({ children }) => {
+export const ToastProvider = ({ children }) => {
   const toast = useRef<Toast>(null);
 
   return (
@@ -14,4 +14,4 @@ const ToastProvider = ({ children }) => {
   );
 };
 
-export { ToastContext, ToastProvider };
+export const toast = () => useContext(ToastContext).current;

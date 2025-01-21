@@ -1,17 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ValidatedField, ValidatedForm, isEmail } from 'react-jhipster';
-import { Alert, Button, Col, Row } from 'reactstrap';
 import { Link } from 'react-router-dom';
+import { Alert, Button, Col, Row } from 'reactstrap';
 
-import PasswordStrengthBar from 'app/shared/layout/password/password-strength-bar';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { toast } from 'app/shared/component/ToastContext';
+import PasswordStrengthBar from 'app/shared/layout/password/password-strength-bar';
 import { handleRegister, reset } from './register.reducer';
-import { ToastContext } from 'app/shared/component/ToastContext';
 
 export const RegisterPage = () => {
   const [password, setPassword] = useState('');
   const dispatch = useAppDispatch();
-  const toast = useContext(ToastContext);
 
   useEffect(
     () => () => {
@@ -30,7 +29,7 @@ export const RegisterPage = () => {
 
   useEffect(() => {
     if (successMessage) {
-      toast.current?.show({ severity: 'success', summary: 'Succès', detail: `${successMessage}` });
+      toast().show({ severity: 'success', summary: 'Succès', detail: `${successMessage}` });
     }
   }, [successMessage]);
 
