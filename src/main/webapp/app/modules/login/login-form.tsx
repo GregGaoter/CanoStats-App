@@ -1,12 +1,12 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Controller, type FieldError, useForm } from 'react-hook-form';
-import { Card } from 'primereact/card';
-import { InputText } from 'primereact/inputtext';
+import { Checkbox } from 'app/shared/component/Checkbox';
 import { Icon } from 'app/shared/component/Icon';
 import { Button } from 'primereact/button';
+import { Card } from 'primereact/card';
+import { InputText } from 'primereact/inputtext';
 import { Message } from 'primereact/message';
-import { Checkbox } from 'app/shared/component/Checkbox';
+import React from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
 
 export interface LoginFormProps {
   loginError: boolean;
@@ -73,7 +73,7 @@ const LoginForm = (props: LoginFormProps) => {
               render={({ field }) => <InputText {...field} placeholder="Mot de passe" type="password" />}
             />
           </div>
-          <div className="flex justify-content-between align-items-center my-3">
+          <div className="flex justify-content-between align-items-center mt-3">
             <Controller
               name="rememberMe"
               control={control}
@@ -82,6 +82,9 @@ const LoginForm = (props: LoginFormProps) => {
               )}
             />
             <Link to="/account/reset/request">Mot de passe oublié ?</Link>
+          </div>
+          <div className="flex justify-content-center mb-3">
+            <Link to="/account/register">Créer un compte</Link>
           </div>
           <Button type="submit" icon={<Icon icon="right-to-bracket" />} label="Se connecter" />
         </div>
