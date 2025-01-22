@@ -1,3 +1,4 @@
+import { Text } from 'app/shared/component/Text';
 import { Checkbox as PrimeReactCheckbox } from 'primereact/checkbox';
 import React from 'react';
 
@@ -10,6 +11,6 @@ interface CheckboxProps {
 export const Checkbox = ({ label, checked, onChange }: CheckboxProps) => (
   <div className="flex align-items-center gap-2">
     <PrimeReactCheckbox checked={checked} onChange={e => onChange(e.checked)} />
-    {label}
+    <Text>{label}</Text>
   </div>
 );

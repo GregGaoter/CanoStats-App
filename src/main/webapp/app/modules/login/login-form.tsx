@@ -1,5 +1,6 @@
 import { Checkbox } from 'app/shared/component/Checkbox';
 import { Icon } from 'app/shared/component/Icon';
+import { Text } from 'app/shared/component/Text';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { InputText } from 'primereact/inputtext';
@@ -33,7 +34,7 @@ const LoginForm = (props: LoginFormProps) => {
 
   const title = (
     <div className="flex justify-content-between align-items-end">
-      <div className="p-card-title">CanoStats</div>
+      <Text>CanoStats</Text>
       <img src="content/images/logo-canopee.svg" height="100" />
     </div>
   );

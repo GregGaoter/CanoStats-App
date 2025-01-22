@@ -110,8 +110,12 @@ const Header = (props: IHeaderProps) => {
     <Menubar
       model={items}
       start={start}
-      className="border-noround py-0 surface-card"
-      pt={{ root: { className: 'flex justify-content-between' }, submenu: { className: 'surface-card' } }}
+      className="fixed top-0 left-0 w-full border-noround border-none py-0 surface-card text-color-secondary"
+      pt={{
+        root: { className: 'flex justify-content-between' },
+        submenu: { className: 'surface-card border-none' },
+        label: { className: 'text-color-secondary' },
+      }}
     />
   );
 };

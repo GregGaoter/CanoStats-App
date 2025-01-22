@@ -43,6 +43,18 @@ import {
   faHandHoldingDollar,
   faEnvelope,
   faRightToBracket,
+  faCube,
+  faArrowTrendUp,
+  faMoneyCheckDollar,
+  faTruck,
+  faArrowsRotate,
+  faMedal,
+  faDollarSign,
+  faSackDollar,
+  faFileInvoiceDollar,
+  faBoxesStacked,
+  faPallet,
+  faWarehouse,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -93,5 +105,17 @@ export const loadIcons = () => {
     faHandHoldingDollar,
     faEnvelope,
     faRightToBracket,
+    faCube,
+    faArrowTrendUp,
+    faMoneyCheckDollar,
+    faTruck,
+    faArrowsRotate,
+    faMedal,
+    faDollarSign,
+    faSackDollar,
+    faFileInvoiceDollar,
+    faBoxesStacked,
+    faPallet,
+    faWarehouse,
   );
 };

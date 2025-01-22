@@ -13,11 +13,11 @@ import Header from 'app/shared/layout/header/header';
 import { getProfile } from 'app/shared/reducers/application-profile';
 import { getSession } from 'app/shared/reducers/authentication';
 import { PrimeReactProvider } from 'primereact/api';
-import { Card } from 'primereact/card';
 import Login from './modules/login/login';
 import AppRoutes from './routes';
 import { ToastProvider } from './shared/component/ToastContext';
 import { StatisticsMenu } from './shared/layout/header/statistics-menu';
+import Footer from './shared/layout/footer/footer';
 
 const baseHref = document.querySelector('base').getAttribute('href').replace(/\/$/, '');
 
@@ -41,7 +41,7 @@ export const App = () => {
         <BrowserRouter basename={baseHref}>
           <ErrorBoundary>
             {isAuthenticated ? (
-              <div className="flex flex-column gap-3 absolute top-0 left-0 w-full surface-ground">
+              <div className="absolute top-0 left-0 w-full surface-ground">
                 <Header
                   isAuthenticated={isAuthenticated}
                   isAdmin={isAdmin}
@@ -49,11 +49,13 @@ export const App = () => {
                   isInProduction={isInProduction}
                   isOpenAPIEnabled={isOpenAPIEnabled}
                 />
-                <div className="flex gap-3 ml-3">
-                  <StatisticsMenu />
-                  <Card className="mb-0">
-                    <AppRoutes />
-                  </Card>
+                <StatisticsMenu />
+                <div
+                  className="flex flex-column justify-content-between surface-ground min-h-screen"
+                  style={{ marginTop: '4rem', marginLeft: '14.35rem', marginRight: '0rem' }}
+                >
+                  <AppRoutes />
+                  <Footer />
                 </div>
               </div>
             ) : (
@@ -64,6 +66,37 @@ export const App = () => {
       </ToastProvider>
     </PrimeReactProvider>
   );
+
+  // return (
+  //   <PrimeReactProvider>
+  //     <ToastProvider>
+  //       <BrowserRouter basename={baseHref}>
+  //         <ErrorBoundary>
+  //           {isAuthenticated ? (
+  //             <div className="flex flex-column gap-3 absolute top-0 left-0 w-full surface-ground">
+  //               <Header
+  //                 isAuthenticated={isAuthenticated}
+  //                 isAdmin={isAdmin}
+  //                 ribbonEnv={ribbonEnv}
+  //                 isInProduction={isInProduction}
+  //                 isOpenAPIEnabled={isOpenAPIEnabled}
+  //               />
+  //               <div className="flex gap-3 ml-3">
+  //                 <StatisticsMenu />
+  //                 {/* <Card className="mb-0">
+  //                   <AppRoutes />
+  //                 </Card> */}
+  //                 <AppRoutes />
+  //               </div>
+  //             </div>
+  //           ) : (
+  //             <Login />
+  //           )}
+  //         </ErrorBoundary>
+  //       </BrowserRouter>
+  //     </ToastProvider>
+  //   </PrimeReactProvider>
+  // );
 
   // return (
   //   <PrimeReactProvider>

@@ -8,4 +8,8 @@ interface IconProps {
 }
 
 export const Icon = ({ icon, marginRight = true }: IconProps) =>
-  marginRight ? <FontAwesomeIcon icon={icon} className="mr-2" /> : <FontAwesomeIcon icon={icon} />;
+  marginRight ? (
+    <FontAwesomeIcon icon={icon} className="mr-2 text-color-secondary" />
+  ) : (
+    <FontAwesomeIcon icon={icon} className="text-color-secondary" />
+  );
