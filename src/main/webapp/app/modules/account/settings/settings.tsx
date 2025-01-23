@@ -3,7 +3,7 @@ import { ValidatedField, ValidatedForm, isEmail } from 'react-jhipster';
 import { Button, Col, Row } from 'reactstrap';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { toast } from 'app/shared/component/ToastContext';
+import { useToast } from 'app/shared/component/ToastContext';
 import { getSession } from 'app/shared/reducers/authentication';
 import { reset, saveAccountSettings } from './settings.reducer';
 
@@ -21,7 +21,7 @@ export const SettingsPage = () => {
 
   useEffect(() => {
     if (successMessage) {
-      toast().show({ severity: 'success', summary: 'Succès', detail: `${successMessage}` });
+      useToast().show({ severity: 'success', summary: 'Succès', detail: `${successMessage}` });
     }
   }, [successMessage]);
 

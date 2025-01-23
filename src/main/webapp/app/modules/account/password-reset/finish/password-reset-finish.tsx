@@ -6,7 +6,7 @@ import { useSearchParams } from 'react-router-dom';
 import PasswordStrengthBar from 'app/shared/layout/password/password-strength-bar';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { handlePasswordResetFinish, reset } from '../password-reset.reducer';
-import { toast } from 'app/shared/component/ToastContext';
+import { useToast } from 'app/shared/component/ToastContext';
 
 export const PasswordResetFinishPage = () => {
   const dispatch = useAppDispatch();
@@ -68,7 +68,7 @@ export const PasswordResetFinishPage = () => {
 
   useEffect(() => {
     if (successMessage) {
-      toast().show({ severity: 'success', summary: 'Succès', detail: `${successMessage}` });
+      useToast().show({ severity: 'success', summary: 'Succès', detail: `${successMessage}` });
     }
   }, [successMessage]);
 

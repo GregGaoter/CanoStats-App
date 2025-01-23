@@ -14,4 +14,4 @@ export const ToastProvider = ({ children }) => {
   );
 };
 
-export const toast = () => useContext(ToastContext).current;
+export const useToast = () => useContext(ToastContext).current;

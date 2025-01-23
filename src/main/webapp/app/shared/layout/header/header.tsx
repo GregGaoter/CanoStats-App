@@ -96,6 +96,7 @@ const Header = (props: IHeaderProps) => {
     {
       label: 'Se déconnecter',
       icon: <Icon icon="sign-out-alt" colorSecondary />,
+      url: '/logout',
     },
   ];
 

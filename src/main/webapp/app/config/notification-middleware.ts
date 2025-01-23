@@ -1,4 +1,4 @@
-import { toast } from 'app/shared/component/ToastContext';
+import { useToast } from 'app/shared/component/ToastContext';
 import { getMessageFromHeaders } from 'app/shared/jhipster/headers';
 import { FieldErrorVM, isProblemWithMessage } from 'app/shared/jhipster/problem-details';
 import { isFulfilledAction, isRejectedAction } from 'app/shared/reducers/reducer.utils';
@@ -9,7 +9,7 @@ type TostMessage = {
 };
 
 const addErrorAlert = (message: TostMessage) => {
-  toast().show({ severity: 'danger', summary: 'Erreur', detail: `${message.message}` });
+  useToast().show({ severity: 'danger', summary: 'Erreur', detail: `${message.message}` });
 };
 
 const getFieldErrorsTosts = (fieldErrors: FieldErrorVM[]): TostMessage[] =>
@@ -33,7 +33,7 @@ export default () => next => action => {
   if (isFulfilledAction(action) && payload?.headers) {
     const { alert } = getMessageFromHeaders(payload.headers);
     if (alert) {
-      toast().show({ severity: 'success', summary: 'Succès', detail: `${alert}` });
+      useToast().show({ severity: 'success', summary: 'Succès', detail: `${alert}` });
     }
   }
 
@@ -65,7 +65,7 @@ export default () => next => action => {
           } else if (typeof data === 'string' && data !== '') {
             addErrorAlert({ message: data });
           } else {
-            toast().show({
+            useToast().show({
               severity: 'danger',
               summary: 'Erreur',
               detail: `${data?.detail ?? data?.message ?? data?.error ?? data?.title ?? 'Unknown error!'}`,

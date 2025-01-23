@@ -3,7 +3,7 @@ import { ValidatedField, ValidatedForm } from 'react-jhipster';
 import { Button, Col, Row } from 'reactstrap';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { toast } from 'app/shared/component/ToastContext';
+import { useToast } from 'app/shared/component/ToastContext';
 import PasswordStrengthBar from 'app/shared/layout/password/password-strength-bar';
 import { getSession } from 'app/shared/reducers/authentication';
 import { reset, savePassword } from './password.reducer';
@@ -32,9 +32,9 @@ export const PasswordPage = () => {
 
   useEffect(() => {
     if (successMessage) {
-      toast().show({ severity: 'success', summary: 'Succès', detail: `${successMessage}` });
+      useToast().show({ severity: 'success', summary: 'Succès', detail: `${successMessage}` });
     } else if (errorMessage) {
-      toast().show({ severity: 'danger', summary: 'Erreur', detail: `${errorMessage}` });
+      useToast().show({ severity: 'danger', summary: 'Erreur', detail: `${errorMessage}` });
     }
     dispatch(reset());
   }, [successMessage, errorMessage]);

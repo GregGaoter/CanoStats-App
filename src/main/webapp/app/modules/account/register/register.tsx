@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Alert, Button, Col, Row } from 'reactstrap';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { toast } from 'app/shared/component/ToastContext';
+import { useToast } from 'app/shared/component/ToastContext';
 import PasswordStrengthBar from 'app/shared/layout/password/password-strength-bar';
 import { handleRegister, reset } from './register.reducer';
 
@@ -29,7 +29,7 @@ export const RegisterPage = () => {
 
   useEffect(() => {
     if (successMessage) {
-      toast().show({ severity: 'success', summary: 'Succès', detail: `${successMessage}` });
+      useToast().show({ severity: 'success', summary: 'Succès', detail: `${successMessage}` });
     }
   }, [successMessage]);
 
