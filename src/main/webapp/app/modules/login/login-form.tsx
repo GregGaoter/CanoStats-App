@@ -56,7 +56,7 @@ const LoginForm = (props: LoginFormProps) => {
           {loginError && <Message severity="error" content={loginErrorMessage} />}
           <div className="p-inputgroup">
             <span className="p-inputgroup-addon">
-              <Icon icon="user" marginRight={false} />
+              <Icon icon="user" marginRight={false} colorSecondary />
             </span>
             <Controller
               name="username"
@@ -66,7 +66,7 @@ const LoginForm = (props: LoginFormProps) => {
           </div>
           <div className="p-inputgroup">
             <span className="p-inputgroup-addon">
-              <Icon icon="lock" marginRight={false} />
+              <Icon icon="lock" marginRight={false} colorSecondary />
             </span>
             <Controller
               name="password"

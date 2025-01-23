@@ -5,45 +5,45 @@ import React from 'react';
 
 export const StatisticsMenu = () => {
   const items: MenuItem[] = [
-    { label: 'Tableau de bord', icon: <Icon icon="gauge" /> },
+    { label: 'Tableau de bord', icon: <Icon icon="gauge" colorSecondary /> },
     { separator: true },
     {
       label: 'Ventes',
       items: [
-        { label: `Chiffre d'affaires`, icon: <Icon icon="sack-dollar" /> },
-        { label: 'Volume', icon: <Icon icon="cube" /> },
-        { label: 'Tendances', icon: <Icon icon="arrow-trend-up" /> },
+        { label: `Chiffre d'affaires`, icon: <Icon icon="sack-dollar" colorSecondary /> },
+        { label: 'Volume', icon: <Icon icon="cube" colorSecondary /> },
+        { label: 'Tendances', icon: <Icon icon="arrow-trend-up" colorSecondary /> },
       ],
     },
     { separator: true },
     {
       label: 'Achats',
       items: [
-        { label: 'Coût', icon: <Icon icon="file-invoice-dollar" /> },
-        { label: 'Fournisseurs', icon: <Icon icon="truck" /> },
+        { label: 'Coût', icon: <Icon icon="file-invoice-dollar" colorSecondary /> },
+        { label: 'Fournisseurs', icon: <Icon icon="truck" colorSecondary /> },
       ],
     },
     { separator: true },
     {
       label: 'Stocks',
       items: [
-        { label: 'Rotation', icon: <Icon icon="arrows-rotate" /> },
-        { label: 'Stock moyen', icon: <Icon icon="warehouse" /> },
-        { label: 'Prévisions', icon: <Icon icon="boxes-stacked" /> },
+        { label: 'Rotation', icon: <Icon icon="arrows-rotate" colorSecondary /> },
+        { label: 'Stock moyen', icon: <Icon icon="warehouse" colorSecondary /> },
+        { label: 'Prévisions', icon: <Icon icon="boxes-stacked" colorSecondary /> },
       ],
     },
     { separator: true },
     {
       label: 'Rentabilité',
       items: [
-        { label: 'Marge brute', icon: <Icon icon="hand-holding-dollar" /> },
-        { label: 'Produits les plus rentables', icon: <Icon icon="medal" /> },
+        { label: 'Marge brute', icon: <Icon icon="hand-holding-dollar" colorSecondary /> },
+        { label: 'Produits les plus rentables', icon: <Icon icon="medal" colorSecondary /> },
       ],
     },
     { separator: true },
     {
       label: 'Tendances',
-      items: [{ label: 'Évolution des prix', icon: <Icon icon="arrow-trend-up" /> }],
+      items: [{ label: 'Évolution des prix', icon: <Icon icon="arrow-trend-up" colorSecondary /> }],
     },
   ];
 

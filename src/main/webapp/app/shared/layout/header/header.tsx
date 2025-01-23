@@ -40,62 +40,62 @@ const Header = (props: IHeaderProps) => {
   const items: MenuItem[] = [
     {
       label: 'Tables',
-      icon: <Icon icon="table-list" />,
+      icon: <Icon icon="table-list" colorSecondary />,
       items: [
         {
           label: 'Mouvements stock',
-          icon: <Icon icon="chart-line" />,
+          icon: <Icon icon="chart-line" colorSecondary />,
         },
       ],
     },
     {
       label: 'Administration',
-      icon: <Icon icon="users-cog" />,
+      icon: <Icon icon="users-cog" colorSecondary />,
       items: [
         {
           label: 'Utilisateurs',
-          icon: <Icon icon="users" />,
+          icon: <Icon icon="users" colorSecondary />,
         },
         {
           label: 'Importation',
-          icon: <Icon icon="file-import" />,
+          icon: <Icon icon="file-import" colorSecondary />,
           url: '/file-import',
         },
         {
           label: 'Métriques',
-          icon: <Icon icon="tachometer-alt" />,
+          icon: <Icon icon="tachometer-alt" colorSecondary />,
         },
         {
           label: 'Santé',
-          icon: <Icon icon="heart" />,
+          icon: <Icon icon="heart" colorSecondary />,
         },
         {
           label: 'Configuration',
-          icon: <Icon icon="cogs" />,
+          icon: <Icon icon="cogs" colorSecondary />,
         },
         {
           label: 'Logs',
-          icon: <Icon icon="tasks" />,
+          icon: <Icon icon="tasks" colorSecondary />,
         },
       ],
     },
     {
       label: 'Compte',
-      icon: <Icon icon="user" />,
+      icon: <Icon icon="user" colorSecondary />,
       items: [
         {
           label: 'Paramètres',
-          icon: <Icon icon="wrench" />,
+          icon: <Icon icon="wrench" colorSecondary />,
         },
         {
           label: 'Mot de passe',
-          icon: <Icon icon="lock" />,
+          icon: <Icon icon="lock" colorSecondary />,
         },
       ],
     },
     {
       label: 'Se déconnecter',
-      icon: <Icon icon="sign-out-alt" />,
+      icon: <Icon icon="sign-out-alt" colorSecondary />,
     },
   ];
 
