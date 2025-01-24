@@ -1,8 +1,10 @@
 import React from 'react';
-
+import { useAppDispatch } from 'app/config/store';
 import { Icon } from 'app/shared/component/Icon';
 import { Menubar } from 'primereact/menubar';
 import { MenuItem } from 'primereact/menuitem';
+import { useNavigate } from 'react-router-dom';
+import { logout } from 'app/shared/reducers/authentication';
 
 export interface IHeaderProps {
   isAuthenticated: boolean;
@@ -13,6 +15,13 @@ export interface IHeaderProps {
 }
 
 const Header = (props: IHeaderProps) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const callLogout = () => {
+    dispatch(logout());
+    navigate('/dashboard', { replace: true });
+  };
   // const [menuOpen, setMenuOpen] = useState(false);
 
   // const toggleMenu = () => setMenuOpen(!menuOpen);
@@ -96,7 +105,7 @@ const Header = (props: IHeaderProps) => {
     {
       label: 'Se déconnecter',
       icon: <Icon icon="sign-out-alt" colorSecondary />,
-      url: '/logout',
+      command: () => callLogout(),
     },
   ];
 

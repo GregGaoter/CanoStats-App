@@ -12,7 +12,6 @@ import { Link } from 'react-router-dom';
 export interface LoginFormProps {
   loginError: boolean;
   handleLogin: (username: string, password: string, rememberMe: boolean) => void;
-  handleClose: () => void;
 }
 
 const LoginForm = (props: LoginFormProps) => {
