@@ -1,4 +1,3 @@
-import { useToast } from 'app/shared/component/ToastContext';
 import { getMessageFromHeaders } from 'app/shared/jhipster/headers';
 import { FieldErrorVM, isProblemWithMessage } from 'app/shared/jhipster/problem-details';
 import { isFulfilledAction, isRejectedAction } from 'app/shared/reducers/reducer.utils';
@@ -9,7 +8,7 @@ type TostMessage = {
 };
 
 const addErrorAlert = (message: TostMessage) => {
-  useToast().show({ severity: 'danger', summary: 'Erreur', detail: `${message.message}` });
+  window.showToast('error', 'Toast', 'Test utilisation Toast réussi !');
 };
 
 const getFieldErrorsTosts = (fieldErrors: FieldErrorVM[]): TostMessage[] =>
@@ -33,7 +32,7 @@ export default () => next => action => {
   if (isFulfilledAction(action) && payload?.headers) {
     const { alert } = getMessageFromHeaders(payload.headers);
     if (alert) {
-      useToast().show({ severity: 'success', summary: 'Succès', detail: `${alert}` });
+      window.showToast('success', 'Succès', `${alert}`);
     }
   }
 
@@ -65,11 +64,7 @@ export default () => next => action => {
           } else if (typeof data === 'string' && data !== '') {
             addErrorAlert({ message: data });
           } else {
-            useToast().show({
-              severity: 'danger',
-              summary: 'Erreur',
-              detail: `${data?.detail ?? data?.message ?? data?.error ?? data?.title ?? 'Unknown error!'}`,
-            });
+            window.showToast('error', 'Erreur', `${data?.detail ?? data?.message ?? data?.error ?? data?.title ?? 'Unknown error!'}`);
           }
         }
       }
