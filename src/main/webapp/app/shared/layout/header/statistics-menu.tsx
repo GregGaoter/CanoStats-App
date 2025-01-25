@@ -48,11 +48,6 @@ export const StatisticsMenu = () => {
   ];
 
   return (
-    <Menu
-      model={items}
-      className="fixed border-none surface-card overflow-auto"
-      style={{ top: '4rem', bottom: '1rem', left: '1rem' }}
-      pt={{ submenuHeader: { className: 'surface-card text-color-secondary' }, label: { className: 'text-color-secondary' } }}
-    />
+    <Menu model={items} className="fixed border-none surface-card overflow-auto" style={{ top: '4rem', bottom: '1rem', left: '1rem' }} />
   );
 };

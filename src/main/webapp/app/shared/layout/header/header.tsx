@@ -1,10 +1,10 @@
-import React from 'react';
 import { useAppDispatch } from 'app/config/store';
 import { Icon } from 'app/shared/component/Icon';
+import { logout } from 'app/shared/reducers/authentication';
 import { Menubar } from 'primereact/menubar';
 import { MenuItem } from 'primereact/menuitem';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { logout } from 'app/shared/reducers/authentication';
 
 export interface IHeaderProps {
   isAdmin: boolean;
@@ -117,11 +117,6 @@ const Header = (props: IHeaderProps) => {
       model={items}
       start={start}
       className="fixed top-0 left-0 w-full border-noround border-none py-0 surface-card text-color-secondary"
-      pt={{
-        root: { className: 'flex justify-content-between' },
-        submenu: { className: 'surface-card border-none' },
-        label: { className: 'text-color-secondary' },
-      }}
     />
   );
 };

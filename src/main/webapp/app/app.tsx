@@ -7,7 +7,7 @@ import Header from 'app/shared/layout/header/header';
 import { getProfile } from 'app/shared/reducers/application-profile';
 import { getSession } from 'app/shared/reducers/authentication';
 import 'primeflex/primeflex.css';
-import { PrimeReactProvider } from 'primereact/api';
+import { PrimeReactProvider, PrimeReactPTOptions } from 'primereact/api';
 import 'primereact/resources/themes/lara-dark-blue/theme.css';
 import React, { CSSProperties, useEffect } from 'react';
 import { BrowserRouter } from 'react-router-dom';
@@ -34,8 +34,26 @@ export const App = () => {
 
   const appRoutesStyle: CSSProperties = isAuthenticated ? { marginTop: '4rem', marginLeft: '14.35rem', marginRight: '0rem' } : {};
 
+  /**
+   * Defines the shared global pass through properties per component type.
+   */
+  const pt: PrimeReactPTOptions = {
+    menubar: {
+      root: { className: 'flex justify-content-between' },
+      submenu: { className: 'surface-card border-none' },
+      label: { className: 'text-color-secondary' },
+    },
+    menu: {
+      submenuHeader: { className: 'surface-card text-color-secondary' },
+      label: { className: 'text-color-secondary' },
+    },
+    inputtext: {
+      root: { className: 'text-color-secondary' },
+    },
+  };
+
   return (
-    <PrimeReactProvider>
+    <PrimeReactProvider value={{ pt }}>
       <ToastProvider>
         <BrowserRouter basename={baseHref}>
           <ErrorBoundary>
