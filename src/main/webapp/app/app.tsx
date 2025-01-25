@@ -29,9 +29,7 @@ export const App = () => {
   const isAuthenticated = useAppSelector(state => state.authentication.isAuthenticated);
   const isAdmin = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.ADMIN]));
 
-  const appRoutesClass: string = 'flex-grow-1';
-  if (isAuthenticated) appRoutesClass.concat(' flex flex-column justify-content-between surface-ground min-h-screen');
-
+  const appRoutesClass: string = isAuthenticated ? 'flex flex-column justify-content-between min-h-screen' : '';
   const appRoutesStyle: CSSProperties = isAuthenticated ? { marginTop: '4rem', marginLeft: '14.35rem', marginRight: '0rem' } : {};
 
   /**
@@ -57,14 +55,14 @@ export const App = () => {
       <ToastProvider>
         <BrowserRouter basename={baseHref}>
           <ErrorBoundary>
-            {isAuthenticated && <Header isAdmin={isAdmin} />}
-            <div className="flex surface-ground">
-              {isAuthenticated && <StatisticsMenu />}
+            <div className="surface-ground">
               <div className={appRoutesClass} style={appRoutesStyle}>
                 <AppRoutes isAuthenticated={isAuthenticated} />
                 {isAuthenticated && <Footer />}
               </div>
+              {isAuthenticated && <StatisticsMenu />}
             </div>
+            {isAuthenticated && <Header isAdmin={isAdmin} />}
           </ErrorBoundary>
         </BrowserRouter>
       </ToastProvider>
