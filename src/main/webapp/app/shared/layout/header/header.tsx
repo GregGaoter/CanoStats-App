@@ -7,11 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { logout } from 'app/shared/reducers/authentication';
 
 export interface IHeaderProps {
-  isAuthenticated: boolean;
   isAdmin: boolean;
-  ribbonEnv: string;
-  isInProduction: boolean;
-  isOpenAPIEnabled: boolean;
 }
 
 const Header = (props: IHeaderProps) => {
@@ -20,7 +16,7 @@ const Header = (props: IHeaderProps) => {
 
   const callLogout = () => {
     dispatch(logout());
-    navigate('/dashboard', { replace: true });
+    navigate('/login', { replace: true });
   };
   // const [menuOpen, setMenuOpen] = useState(false);
 

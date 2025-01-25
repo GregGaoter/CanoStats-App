@@ -1,23 +1,20 @@
-import 'app/config/dayjs';
-import 'primeflex/primeflex.css';
-import 'primereact/resources/themes/lara-dark-blue/theme.css';
-
-import React, { useEffect } from 'react';
-import { BrowserRouter } from 'react-router-dom';
-
 import { AUTHORITIES } from 'app/config/constants';
+import 'app/config/dayjs';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { hasAnyAuthority } from 'app/shared/auth/private-route';
 import ErrorBoundary from 'app/shared/error/error-boundary';
 import Header from 'app/shared/layout/header/header';
 import { getProfile } from 'app/shared/reducers/application-profile';
 import { getSession } from 'app/shared/reducers/authentication';
+import 'primeflex/primeflex.css';
 import { PrimeReactProvider } from 'primereact/api';
-import Login from './modules/login/login';
+import 'primereact/resources/themes/lara-dark-blue/theme.css';
+import React, { CSSProperties, useEffect } from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import AppRoutes from './routes';
 import { ToastProvider } from './shared/component/ToastContext';
-import { StatisticsMenu } from './shared/layout/header/statistics-menu';
 import Footer from './shared/layout/footer/footer';
+import { StatisticsMenu } from './shared/layout/header/statistics-menu';
 
 const baseHref = document.querySelector('base').getAttribute('href').replace(/\/$/, '');
 
@@ -31,36 +28,25 @@ export const App = () => {
 
   const isAuthenticated = useAppSelector(state => state.authentication.isAuthenticated);
   const isAdmin = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.ADMIN]));
-  const ribbonEnv = useAppSelector(state => state.applicationProfile.ribbonEnv);
-  const isInProduction = useAppSelector(state => state.applicationProfile.inProduction);
-  const isOpenAPIEnabled = useAppSelector(state => state.applicationProfile.isOpenAPIEnabled);
+
+  const appRoutesClass: string = 'flex-grow-1';
+  if (isAuthenticated) appRoutesClass.concat(' flex flex-column justify-content-between surface-ground min-h-screen');
+
+  const appRoutesStyle: CSSProperties = isAuthenticated ? { marginTop: '4rem', marginLeft: '14.35rem', marginRight: '0rem' } : {};
 
   return (
     <PrimeReactProvider>
       <ToastProvider>
         <BrowserRouter basename={baseHref}>
           <ErrorBoundary>
-            {isAuthenticated ? (
-              <div className="absolute top-0 left-0 w-full surface-ground">
-                <Header
-                  isAuthenticated={isAuthenticated}
-                  isAdmin={isAdmin}
-                  ribbonEnv={ribbonEnv}
-                  isInProduction={isInProduction}
-                  isOpenAPIEnabled={isOpenAPIEnabled}
-                />
-                <StatisticsMenu />
-                <div
-                  className="flex flex-column justify-content-between surface-ground min-h-screen"
-                  style={{ marginTop: '4rem', marginLeft: '14.35rem', marginRight: '0rem' }}
-                >
-                  <AppRoutes />
-                  <Footer />
-                </div>
+            {isAuthenticated && <Header isAdmin={isAdmin} />}
+            <div className="flex surface-ground">
+              {isAuthenticated && <StatisticsMenu />}
+              <div className={appRoutesClass} style={appRoutesStyle}>
+                <AppRoutes isAuthenticated={isAuthenticated} />
+                {isAuthenticated && <Footer />}
               </div>
-            ) : (
-              <Login />
-            )}
+            </div>
           </ErrorBoundary>
         </BrowserRouter>
       </ToastProvider>
@@ -73,7 +59,7 @@ export const App = () => {
   //       <BrowserRouter basename={baseHref}>
   //         <ErrorBoundary>
   //           {isAuthenticated ? (
-  //             <div className="flex flex-column gap-3 absolute top-0 left-0 w-full surface-ground">
+  //             <div className="absolute top-0 left-0 w-full surface-ground">
   //               <Header
   //                 isAuthenticated={isAuthenticated}
   //                 isAdmin={isAdmin}
@@ -81,12 +67,13 @@ export const App = () => {
   //                 isInProduction={isInProduction}
   //                 isOpenAPIEnabled={isOpenAPIEnabled}
   //               />
-  //               <div className="flex gap-3 ml-3">
-  //                 <StatisticsMenu />
-  //                 {/* <Card className="mb-0">
-  //                   <AppRoutes />
-  //                 </Card> */}
+  //               <StatisticsMenu />
+  //               <div
+  //                 className="flex flex-column justify-content-between surface-ground min-h-screen"
+  //                 style={{ marginTop: '4rem', marginLeft: '14.35rem', marginRight: '0rem' }}
+  //               >
   //                 <AppRoutes />
+  //                 <Footer />
   //               </div>
   //             </div>
   //           ) : (
@@ -95,32 +82,6 @@ export const App = () => {
   //         </ErrorBoundary>
   //       </BrowserRouter>
   //     </ToastProvider>
-  //   </PrimeReactProvider>
-  // );
-
-  // return (
-  //   <PrimeReactProvider>
-  //     <BrowserRouter basename={baseHref}>
-  //       <div className="absolute top-0 left-0">
-  //         <ToastContainer position="top-right" className="toastify-container" toastClassName="toastify-toast" />
-  //         <ErrorBoundary>
-  //           <Header
-  //             isAuthenticated={isAuthenticated}
-  //             isAdmin={isAdmin}
-  //             ribbonEnv={ribbonEnv}
-  //             isInProduction={isInProduction}
-  //             isOpenAPIEnabled={isOpenAPIEnabled}
-  //           />
-  //         </ErrorBoundary>
-  //         <div className="container-fluid view-container" id="app-view-container">
-  //           <Card className="jh-card">
-  //             <ErrorBoundary>
-  //               <AppRoutes />
-  //             </ErrorBoundary>
-  //           </Card>
-  //         </div>
-  //       </div>
-  //     </BrowserRouter>
   //   </PrimeReactProvider>
   // );
 };

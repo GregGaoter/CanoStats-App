@@ -6,13 +6,16 @@ import PasswordResetInit from 'app/modules/account/password-reset/init/password-
 import Register from 'app/modules/account/register/register';
 import Home from 'app/modules/home/home';
 import Login from 'app/modules/login/login';
-import Logout from 'app/modules/login/logout';
 import PrivateRoute from 'app/shared/auth/private-route';
 import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
 import PageNotFound from 'app/shared/error/page-not-found';
 import React from 'react';
 import Loadable from 'react-loadable';
 import { Route } from 'react-router-dom';
+
+interface AppRoutesProps {
+  isAuthenticated: boolean;
+}
 
 const loading = <div>loading ...</div>;
 
@@ -25,12 +28,11 @@ const Admin = Loadable({
   loader: () => import(/* webpackChunkName: "administration" */ 'app/modules/administration'),
   loading: () => loading,
 });
-const AppRoutes = () => {
+const AppRoutes = (props: AppRoutesProps) => {
   return (
     <ErrorBoundaryRoutes>
-      {/* <Route index element={<Home />} /> */}
-      {/* <Route path="login" element={<Login />} /> */}
-      {/* <Route path="logout" element={<Logout />} /> */}
+      <Route index element={props.isAuthenticated ? <Home /> : <Login />} />
+      <Route path="login" element={<Login />} />
       <Route path="dashboard" element={<Home />} />
       <Route path="account">
         <Route
