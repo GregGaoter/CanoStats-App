@@ -29,7 +29,7 @@ export const App = () => {
   const isAuthenticated = useAppSelector(state => state.authentication.isAuthenticated);
   const isAdmin = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.ADMIN]));
 
-  const appRoutesClass: string = isAuthenticated ? 'flex flex-column justify-content-between min-h-screen' : '';
+  const appRoutesClass: string = isAuthenticated ? 'flex flex-column justify-content-between surface-ground min-h-screen' : '';
   const appRoutesStyle: CSSProperties = isAuthenticated ? { marginTop: '4rem', marginLeft: '14.35rem', marginRight: '0rem' } : {};
 
   /**
@@ -68,38 +68,6 @@ export const App = () => {
       </ToastProvider>
     </PrimeReactProvider>
   );
-
-  // return (
-  //   <PrimeReactProvider>
-  //     <ToastProvider>
-  //       <BrowserRouter basename={baseHref}>
-  //         <ErrorBoundary>
-  //           {isAuthenticated ? (
-  //             <div className="absolute top-0 left-0 w-full surface-ground">
-  //               <Header
-  //                 isAuthenticated={isAuthenticated}
-  //                 isAdmin={isAdmin}
-  //                 ribbonEnv={ribbonEnv}
-  //                 isInProduction={isInProduction}
-  //                 isOpenAPIEnabled={isOpenAPIEnabled}
-  //               />
-  //               <StatisticsMenu />
-  //               <div
-  //                 className="flex flex-column justify-content-between surface-ground min-h-screen"
-  //                 style={{ marginTop: '4rem', marginLeft: '14.35rem', marginRight: '0rem' }}
-  //               >
-  //                 <AppRoutes />
-  //                 <Footer />
-  //               </div>
-  //             </div>
-  //           ) : (
-  //             <Login />
-  //           )}
-  //         </ErrorBoundary>
-  //       </BrowserRouter>
-  //     </ToastProvider>
-  //   </PrimeReactProvider>
-  // );
 };
 
 export default App;
