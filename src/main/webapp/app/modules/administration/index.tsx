@@ -1,20 +1,20 @@
 import React from 'react';
 
-import { Route } from 'react-router-dom';
 import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
-import UserManagement from './user-management';
-import Logs from './logs/logs';
-import Health from './health/health';
-import Metrics from './metrics/metrics';
+import { Route } from 'react-router-dom';
 import Configuration from './configuration/configuration';
 import Docs from './docs/docs';
 import { FileImport } from './file-import/FileImport';
+import Health from './health/health';
+import Logs from './logs/logs';
+import Metrics from './metrics/metrics';
+import UserManagement from './user-management';
 
 const AdministrationRoutes = () => (
   <div>
     <ErrorBoundaryRoutes>
       <Route path="user-management/*" element={<UserManagement />} />
-      {/* <Route path="file-import" element={<FileImport />} /> */}
+      <Route path="file-import" element={<FileImport />} />
       <Route path="health" element={<Health />} />
       <Route path="metrics" element={<Metrics />} />
       <Route path="configuration" element={<Configuration />} />

@@ -58,6 +58,9 @@ const AppRoutes = (props: AppRoutesProps) => {
           </PrivateRoute>
         }
       />
+      <Route path="statistics">
+        <Route path="dashboard" element={<Home />} />
+      </Route>
       <Route
         path="*"
         element={

@@ -39,16 +39,20 @@ export const App = () => {
    */
   const pt: PrimeReactPTOptions = {
     menubar: {
-      root: { className: 'flex justify-content-between' },
-      submenu: { className: 'surface-card border-none' },
+      root: { className: 'flex justify-content-between shadow-4' },
+      submenu: { className: 'surface-card border-none shadow-4' },
       label: { className: 'text-color-secondary' },
     },
     menu: {
+      root: { className: 'surface-card text-color-secondary shadow-4' },
       submenuHeader: { className: 'surface-card text-color-secondary' },
       label: { className: 'text-color-secondary' },
     },
     inputtext: {
       root: { className: 'text-color-secondary' },
+    },
+    card: {
+      root: { className: 'text-color-secondary shadow-4' },
     },
   };
 

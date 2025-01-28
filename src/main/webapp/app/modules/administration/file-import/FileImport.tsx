@@ -1,4 +1,7 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Icon } from 'app/shared/component/Icon';
 import { Button } from 'primereact/button';
+import { Card } from 'primereact/card';
 import {
   FileUpload,
   FileUploadHeaderTemplateOptions,
@@ -9,14 +12,10 @@ import {
 } from 'primereact/fileupload';
 import { ProgressBar } from 'primereact/progressbar';
 import { Tag } from 'primereact/tag';
-import { Toast } from 'primereact/toast';
-import React, { useRef, useState } from 'react';
 import { Tooltip } from 'primereact/tooltip';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Knob } from 'primereact/knob';
+import React, { useRef, useState } from 'react';
 
 export const FileImport = () => {
-  const toast = useRef<Toast>(null);
   const [totalSize, setTotalSize] = useState<number>(0);
   const fileUploadRef = useRef<FileUpload>(null);
 
@@ -35,7 +34,7 @@ export const FileImport = () => {
       _totalSize += file.size || 0;
     });
     setTotalSize(_totalSize);
-    toast.current?.show({ severity: 'info', summary: 'Succès !', detail: 'Fichier téléchargé' });
+    window.showToast('info', 'Information', 'Fichier téléchargé');
   };
 
   const onTemplateRemove = (file: File, callback: any) => {
@@ -49,17 +48,17 @@ export const FileImport = () => {
 
   const headerTemplate = (options: FileUploadHeaderTemplateOptions) => {
     const { className, chooseButton, uploadButton, cancelButton } = options;
-    const value = totalSize / 50000000;
-    const formatedValue = fileUploadRef && fileUploadRef.current ? fileUploadRef.current.formatSize(totalSize) : '0 B';
+    const value: number = fileUploadRef && fileUploadRef.current ? parseFloat(`${fileUploadRef.current.formatSize(totalSize)}`) : 0;
+    const formatedValue: string = value === 0 ? '0 B' : value.toFixed(1).concat(' MB');
 
     return (
       <div className={className} style={{ backgroundColor: 'transparent', display: 'flex', alignItems: 'center' }}>
         {chooseButton}
         {uploadButton}
         {cancelButton}
-        <div className="flex align-items-center gap-3 ml-auto">
+        <div className="flex align-items-center gap-3 ml-auto text-color-secondary">
           <span>{formatedValue} / 50 MB</span>
-          <ProgressBar value={value} showValue={false} style={{ width: '10rem', height: '12px' }}></ProgressBar>
+          <ProgressBar value={2 * value} showValue={false} style={{ width: '10rem', height: '12px' }}></ProgressBar>
         </div>
       </div>
     );
@@ -68,15 +67,12 @@ export const FileImport = () => {
   const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
     const file = inFile as File;
     return (
-      <div className="flex align-items-center flex-wrap">
-        <div className="flex align-items-center" style={{ width: '40%' }}>
-          <img alt={file.name} role="presentation" src={file.webkitRelativePath} width={100} />
-          <span className="flex flex-column text-left ml-3">
-            {file.name}
-            <small>{new Date().toLocaleDateString()}</small>
-          </span>
+      <div className="flex align-items-center justify-content-between text-color-secondary">
+        <div className="flex align-items-center gap-3">
+          <img src="content/images/fichier-json.png" height="40"></img>
+          {file.name}
+          <Tag value={props.formatSize} severity="info" />
         </div>
-        <Tag value={props.formatSize} severity="warning" className="px-3 py-2" />
         <Button
           type="button"
           icon={<FontAwesomeIcon icon="xmark" />}
@@ -95,10 +91,6 @@ export const FileImport = () => {
           className="mt-3 p-5"
           style={{ fontSize: '5em', borderRadius: '50%', backgroundColor: 'var(--surface-b)', color: 'var(--surface-d)' }}
         />
-        {/* <i
-          className="pi pi-image mt-3 p-5"
-          style={{ fontSize: '5em', borderRadius: '50%', backgroundColor: 'var(--surface-b)', color: 'var(--surface-d)' }}
-        ></i> */}
         <span style={{ fontSize: '1.2em', color: 'var(--text-color-secondary)' }} className="my-5">
           Glissez et déposez le fichier JSON ici
         </span>
@@ -107,30 +99,26 @@ export const FileImport = () => {
   };
 
   const chooseOptions: FileUploadOptions = {
-    icon: <FontAwesomeIcon icon="image" />,
+    icon: <Icon icon="image" marginRight={false} />,
     iconOnly: true,
     className: 'custom-choose-btn p-button-rounded p-button-outlined',
   };
   const uploadOptions = {
-    icon: <FontAwesomeIcon icon="cloud-arrow-up" />,
+    icon: <Icon icon="cloud-arrow-up" marginRight={false} />,
     iconOnly: true,
     className: 'custom-upload-btn p-button-success p-button-rounded p-button-outlined',
   };
   const cancelOptions = {
-    icon: <FontAwesomeIcon icon="xmark" />,
+    icon: <Icon icon="xmark" marginRight={false} />,
     iconOnly: true,
     className: 'custom-cancel-btn p-button-danger p-button-rounded p-button-outlined',
   };
 
   return (
-    <>
-      <div className="text-4xl mb-4">Importer des données de mouvements de stock</div>
-      <Toast ref={toast}></Toast>
-
-      <Tooltip target=".custom-choose-btn" content="Choose" position="bottom" />
-      <Tooltip target=".custom-upload-btn" content="Upload" position="bottom" />
-      <Tooltip target=".custom-cancel-btn" content="Clear" position="bottom" />
-
+    <Card title="Importer des données de mouvements de stock">
+      <Tooltip target=".custom-choose-btn" content="Choisir" position="bottom" />
+      <Tooltip target=".custom-upload-btn" content="Télécharger" position="bottom" />
+      <Tooltip target=".custom-cancel-btn" content="Effacer" position="bottom" />
       <FileUpload
         ref={fileUploadRef}
         name="mouvements-stock"
@@ -149,6 +137,6 @@ export const FileImport = () => {
         uploadOptions={uploadOptions}
         cancelOptions={cancelOptions}
       />
-    </>
+    </Card>
   );
 };

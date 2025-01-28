@@ -5,7 +5,7 @@ import React from 'react';
 
 export const StatisticsMenu = () => {
   const items: MenuItem[] = [
-    { label: 'Tableau de bord', icon: <Icon icon="gauge" colorSecondary /> },
+    { label: 'Tableau de bord', icon: <Icon icon="gauge" colorSecondary />, url: 'statistics/dashboard' },
     { separator: true },
     {
       label: 'Ventes',

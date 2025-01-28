@@ -64,7 +64,7 @@ const Header = (props: IHeaderProps) => {
         {
           label: 'Importation',
           icon: <Icon icon="file-import" colorSecondary />,
-          url: '/file-import',
+          url: 'admin/file-import',
         },
         {
           label: 'Métriques',
