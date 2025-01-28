@@ -26,3 +26,5 @@ export interface IMouvementsStock {
 }
 
 export const defaultValue: Readonly<IMouvementsStock> = {};
+
+export type MouvementsStockField = keyof IMouvementsStock;

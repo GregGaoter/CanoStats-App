@@ -50,6 +50,7 @@ const Header = (props: IHeaderProps) => {
         {
           label: 'Mouvements stock',
           icon: <Icon icon="chart-line" colorSecondary />,
+          url: 'table/mouvements-stock',
         },
       ],
     },
