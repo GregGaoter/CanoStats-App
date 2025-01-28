@@ -30,7 +30,9 @@ export const App = () => {
   const isAdmin = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.ADMIN]));
 
   const appRoutesClass: string = isAuthenticated ? 'flex flex-column justify-content-between surface-ground min-h-screen' : '';
-  const appRoutesStyle: CSSProperties = isAuthenticated ? { marginTop: '4rem', marginLeft: '14.35rem', marginRight: '0rem' } : {};
+  const appRoutesStyle: CSSProperties = isAuthenticated
+    ? { marginTop: '0rem', marginLeft: '0rem', marginRight: '0rem', paddingTop: '3.6rem', paddingLeft: '14rem', paddingRight: '0rem' }
+    : {};
 
   /**
    * Defines the shared global pass through properties per component type.
@@ -55,13 +57,13 @@ export const App = () => {
       <ToastProvider>
         <BrowserRouter basename={baseHref}>
           <ErrorBoundary>
-            <div className="surface-ground">
+            <>
               <div className={appRoutesClass} style={appRoutesStyle}>
                 <AppRoutes isAuthenticated={isAuthenticated} />
                 {isAuthenticated && <Footer />}
               </div>
               {isAuthenticated && <StatisticsMenu />}
-            </div>
+            </>
             {isAuthenticated && <Header isAdmin={isAdmin} />}
           </ErrorBoundary>
         </BrowserRouter>
