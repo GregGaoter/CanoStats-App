@@ -21,6 +21,7 @@ entity MouvementsStock {
   venteChf Float
   valeurChf Float
   remarques TextBlob
+  active Boolean required
 }
 
 use mapstruct, pagination, filter for *

@@ -198,6 +198,7 @@ export const MouvementsStockUpdate = () => {
               <ValidatedField label="Vente Chf" id="mouvements-stock-venteChf" name="venteChf" data-cy="venteChf" type="text" />
               <ValidatedField label="Valeur Chf" id="mouvements-stock-valeurChf" name="valeurChf" data-cy="valeurChf" type="text" />
               <ValidatedField label="Remarques" id="mouvements-stock-remarques" name="remarques" data-cy="remarques" type="textarea" />
+              <ValidatedField label="Active" id="mouvements-stock-active" name="active" data-cy="active" check type="checkbox" />
               <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/mouvements-stock" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;

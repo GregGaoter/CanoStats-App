@@ -61,6 +61,9 @@ public class MouvementsStockDTO implements Serializable {
     @Lob
     private String remarques;
 
+    @NotNull
+    private Boolean active;
+
     public UUID getId() {
         return id;
     }
@@ -237,6 +240,14 @@ public class MouvementsStockDTO implements Serializable {
         this.remarques = remarques;
     }
 
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -284,6 +295,7 @@ public class MouvementsStockDTO implements Serializable {
             ", venteChf=" + getVenteChf() +
             ", valeurChf=" + getValeurChf() +
             ", remarques='" + getRemarques() + "'" +
+            ", active='" + getActive() + "'" +
             "}";
     }
 }

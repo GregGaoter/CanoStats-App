@@ -126,6 +126,10 @@ export const MouvementsStockDetail = () => {
             <span id="remarques">Remarques</span>
           </dt>
           <dd>{mouvementsStockEntity.remarques}</dd>
+          <dt>
+            <span id="active">Active</span>
+          </dt>
+          <dd>{mouvementsStockEntity.active ? 'true' : 'false'}</dd>
         </dl>
         <Button tag={Link} to="/mouvements-stock" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" /> <span className="d-none d-md-inline">Back</span>

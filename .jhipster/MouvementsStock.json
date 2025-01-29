@@ -95,6 +95,11 @@
     {
       "fieldName": "remarques",
       "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "active",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
     }
   ],
   "name": "MouvementsStock",

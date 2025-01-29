@@ -67,7 +67,8 @@ public class MouvementsStockAsserts {
             .satisfies(e -> assertThat(e.getPonderation()).as("check ponderation").isEqualTo(actual.getPonderation()))
             .satisfies(e -> assertThat(e.getVenteChf()).as("check venteChf").isEqualTo(actual.getVenteChf()))
             .satisfies(e -> assertThat(e.getValeurChf()).as("check valeurChf").isEqualTo(actual.getValeurChf()))
-            .satisfies(e -> assertThat(e.getRemarques()).as("check remarques").isEqualTo(actual.getRemarques()));
+            .satisfies(e -> assertThat(e.getRemarques()).as("check remarques").isEqualTo(actual.getRemarques()))
+            .satisfies(e -> assertThat(e.getActive()).as("check active").isEqualTo(actual.getActive()));
     }
 
     /**

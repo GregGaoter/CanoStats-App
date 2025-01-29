@@ -77,6 +77,9 @@
             <column name="remarques" type="${clobType}">
                 <constraints nullable="true" />
             </column>
+            <column name="active" type="boolean">
+                <constraints nullable="false" />
+            </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
         <dropDefaultValue tableName="mouvements_stock" columnName="created_date" columnDataType="${datetimeType}"/>
@@ -84,8 +87,6 @@
         <dropDefaultValue tableName="mouvements_stock" columnName="imported_date" columnDataType="${datetimeType}"/>
         <dropDefaultValue tableName="mouvements_stock" columnName="date" columnDataType="${datetimeType}"/>
     </changeSet>
-
-    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
 
     <!--
         Load sample data generated with Faker.js
@@ -123,7 +124,7 @@
             <column name="vente_chf" type="numeric"/>
             <column name="valeur_chf" type="numeric"/>
             <column name="remarques" type="clob"/>
-            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
+            <column name="active" type="boolean"/>
         </loadData>
     </changeSet>
 </databaseChangeLog>

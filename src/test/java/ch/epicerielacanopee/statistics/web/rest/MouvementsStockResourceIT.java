@@ -98,6 +98,9 @@ class MouvementsStockResourceIT {
     private static final String DEFAULT_REMARQUES = "AAAAAAAAAA";
     private static final String UPDATED_REMARQUES = "BBBBBBBBBB";
 
+    private static final Boolean DEFAULT_ACTIVE = false;
+    private static final Boolean UPDATED_ACTIVE = true;
+
     private static final String ENTITY_API_URL = "/api/mouvements-stocks";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
@@ -148,7 +151,8 @@ class MouvementsStockResourceIT {
             .ponderation(DEFAULT_PONDERATION)
             .venteChf(DEFAULT_VENTE_CHF)
             .valeurChf(DEFAULT_VALEUR_CHF)
-            .remarques(DEFAULT_REMARQUES);
+            .remarques(DEFAULT_REMARQUES)
+            .active(DEFAULT_ACTIVE);
     }
 
     /**
@@ -179,7 +183,8 @@ class MouvementsStockResourceIT {
             .ponderation(UPDATED_PONDERATION)
             .venteChf(UPDATED_VENTE_CHF)
             .valeurChf(UPDATED_VALEUR_CHF)
-            .remarques(UPDATED_REMARQUES);
+            .remarques(UPDATED_REMARQUES)
+            .active(UPDATED_ACTIVE);
     }
 
     @BeforeEach
@@ -290,6 +295,23 @@ class MouvementsStockResourceIT {
 
     @Test
     @Transactional
+    void checkActiveIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        mouvementsStock.setActive(null);
+
+        // Create the MouvementsStock, which fails.
+        MouvementsStockDTO mouvementsStockDTO = mouvementsStockMapper.toDto(mouvementsStock);
+
+        restMouvementsStockMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(mouvementsStockDTO)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
     void getAllMouvementsStocks() throws Exception {
         // Initialize the database
         insertedMouvementsStock = mouvementsStockRepository.saveAndFlush(mouvementsStock);
@@ -320,7 +342,8 @@ class MouvementsStockResourceIT {
             .andExpect(jsonPath("$.[*].ponderation").value(hasItem(DEFAULT_PONDERATION.doubleValue())))
             .andExpect(jsonPath("$.[*].venteChf").value(hasItem(DEFAULT_VENTE_CHF.doubleValue())))
             .andExpect(jsonPath("$.[*].valeurChf").value(hasItem(DEFAULT_VALEUR_CHF.doubleValue())))
-            .andExpect(jsonPath("$.[*].remarques").value(hasItem(DEFAULT_REMARQUES.toString())));
+            .andExpect(jsonPath("$.[*].remarques").value(hasItem(DEFAULT_REMARQUES.toString())))
+            .andExpect(jsonPath("$.[*].active").value(hasItem(DEFAULT_ACTIVE.booleanValue())));
     }
 
     @Test
@@ -355,7 +378,8 @@ class MouvementsStockResourceIT {
             .andExpect(jsonPath("$.ponderation").value(DEFAULT_PONDERATION.doubleValue()))
             .andExpect(jsonPath("$.venteChf").value(DEFAULT_VENTE_CHF.doubleValue()))
             .andExpect(jsonPath("$.valeurChf").value(DEFAULT_VALEUR_CHF.doubleValue()))
-            .andExpect(jsonPath("$.remarques").value(DEFAULT_REMARQUES.toString()));
+            .andExpect(jsonPath("$.remarques").value(DEFAULT_REMARQUES.toString()))
+            .andExpect(jsonPath("$.active").value(DEFAULT_ACTIVE.booleanValue()));
     }
 
     @Test
@@ -398,7 +422,8 @@ class MouvementsStockResourceIT {
             .ponderation(UPDATED_PONDERATION)
             .venteChf(UPDATED_VENTE_CHF)
             .valeurChf(UPDATED_VALEUR_CHF)
-            .remarques(UPDATED_REMARQUES);
+            .remarques(UPDATED_REMARQUES)
+            .active(UPDATED_ACTIVE);
         MouvementsStockDTO mouvementsStockDTO = mouvementsStockMapper.toDto(updatedMouvementsStock);
 
         restMouvementsStockMockMvc
@@ -553,7 +578,8 @@ class MouvementsStockResourceIT {
             .ponderation(UPDATED_PONDERATION)
             .venteChf(UPDATED_VENTE_CHF)
             .valeurChf(UPDATED_VALEUR_CHF)
-            .remarques(UPDATED_REMARQUES);
+            .remarques(UPDATED_REMARQUES)
+            .active(UPDATED_ACTIVE);
 
         restMouvementsStockMockMvc
             .perform(

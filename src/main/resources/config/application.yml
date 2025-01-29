@@ -18,7 +18,7 @@
 # Conditionally disable springdoc on missing api-docs profile
 spring:
   application:
-    name: statistics
+    name: CanoStats
   config:
     activate:
       on-profile: '!api-docs'
