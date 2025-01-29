@@ -1,8 +1,11 @@
 import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { Icon } from 'app/shared/component/Icon';
+import { Text } from 'app/shared/component/Text';
 import { MouvementsStockField } from 'app/shared/model/mouvements-stock.model';
 import { IQueryParams } from 'app/shared/reducers/reducer.utils';
 import { ITEMS_PER_PAGE } from 'app/shared/util/pagination.constants';
 import { Pagination, PaginationOrder } from 'app/shared/util/PaginationUtils';
+import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
@@ -58,9 +61,16 @@ export const MouvementsStock = () => {
     if (type === 'sort') setPagination({ ...pagination, sort: sortField, order: sortOrder });
   };
 
+  const cardTitle = (
+    <div className="flex align-items-center justify-content-between">
+      <Text>Mouvements de stock</Text>
+      <Button icon={<Icon icon="ban" />} label="Désactiver" severity="danger" />
+    </div>
+  );
+
   return (
-    <Card title="Mouvements de stock">
-      <DataTable value={mouvementsStocks}>
+    <Card title={cardTitle}>
+      <DataTable value={mouvementsStocks} emptyMessage="Aucun mouvement de stock trouvé">
         <Column field="epicerioId" header="ID"></Column>
         <Column field="date" header="Date"></Column>
         <Column field="type" header="Type"></Column>

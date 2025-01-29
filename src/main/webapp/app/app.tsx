@@ -54,6 +54,9 @@ export const App = () => {
     card: {
       root: { className: 'text-color-secondary shadow-4' },
     },
+    column: {
+      root: { className: 'text-color-secondary' },
+    },
   };
 
   return (
