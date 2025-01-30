@@ -4,6 +4,7 @@ import {
   faArrowTrendDown,
   faArrowTrendUp,
   faAsterisk,
+  faAt,
   faBan,
   faBell,
   faBook,
@@ -118,5 +119,6 @@ export const loadIcons = () => {
     faPallet,
     faWarehouse,
     faBan,
+    faAt,
   );
 };

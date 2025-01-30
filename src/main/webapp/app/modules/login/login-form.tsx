@@ -32,9 +32,9 @@ const LoginForm = (props: LoginFormProps) => {
   };
 
   const title = (
-    <div className="flex justify-content-between align-items-end">
-      <Text>CanoStats</Text>
+    <div className="flex justify-content-center align-items-center gap-2">
       <img src="content/images/logo-canopee.svg" height="100" />
+      <Text>CanoStats</Text>
     </div>
   );
 

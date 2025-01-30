@@ -1,4 +1,5 @@
 import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { UnauthenticatedContainer } from 'app/shared/component/UnauthenticatedContainer';
 import { login } from 'app/shared/reducers/authentication';
 import React from 'react';
 import { Navigate } from 'react-router-dom';
@@ -16,12 +17,9 @@ export const Login = () => {
   }
 
   return (
-    <div
-      className="absolute top-0 left-0 w-full h-full bg-center bg-no-repeat bg-cover"
-      style={{ backgroundImage: 'url("content/images/login-background.jpg")' }}
-    >
+    <UnauthenticatedContainer>
       <LoginForm handleLogin={handleLogin} loginError={loginError} />
-    </div>
+    </UnauthenticatedContainer>
   );
 };
 
