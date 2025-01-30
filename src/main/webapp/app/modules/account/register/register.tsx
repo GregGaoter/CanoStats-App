@@ -1,28 +1,30 @@
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-import PasswordStrengthBar from 'app/shared/layout/password/password-strength-bar';
-import React, { useEffect, useState } from 'react';
-import { ValidatedField, ValidatedForm, isEmail } from 'react-jhipster';
-import { Link } from 'react-router-dom';
-import { handleRegister, reset } from './register.reducer';
-import { Card } from 'primereact/card';
-import { Message } from 'primereact/message';
 import { Icon } from 'app/shared/component/Icon';
 import { Text } from 'app/shared/component/Text';
-import { Controller, useForm, FieldErrors } from 'react-hook-form';
-import { InputText } from 'primereact/inputtext';
-import { Checkbox } from 'primereact/checkbox';
-import { Button } from 'primereact/button';
 import { UnauthenticatedContainer } from 'app/shared/component/UnauthenticatedContainer';
+import { Button } from 'primereact/button';
+import { Card } from 'primereact/card';
+import { InputText } from 'primereact/inputtext';
+import { Password } from 'primereact/password';
+import React, { useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { isEmail } from 'react-jhipster';
+import { Link, useNavigate } from 'react-router-dom';
+import { handleRegister, reset } from './register.reducer';
 
 export const RegisterPage = () => {
   const [password, setPassword] = useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  const [firstPasswordUpdated, setFirstPasswordUpdated] = useState<boolean>(false);
+  const [secondPasswordUpdated, setSecondPasswordUpdated] = useState<boolean>(false);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const {
     handleSubmit,
     control,
     formState: { errors, touchedFields },
-  } = useForm({ defaultValues: { username: '', email: '', firstPassword: '', secondPassword: '' }, mode: 'onTouched' });
+  } = useForm({ defaultValues: { username: '', email: '' }, mode: 'onTouched' });
 
   useEffect(
     () => () => {
@@ -31,21 +33,30 @@ export const RegisterPage = () => {
     [],
   );
 
-  const register = ({ username, email, firstPassword }) => {
-    dispatch(handleRegister({ login: username, email, password: firstPassword, langKey: 'fr' }));
+  const register = ({ username, email }) => {
+    dispatch(handleRegister({ login: username, email, password, langKey: 'fr' }));
   };
 
   const handleValidSubmit = e => {
     handleSubmit(register)(e);
   };
 
-  const updatePassword = event => setPassword(event.target.value);
+  const updatePassword = event => {
+    setPassword(event.target.value);
+    setFirstPasswordUpdated(true);
+  };
+
+  const updatePasswordConfirmation = event => {
+    setPasswordConfirmation(event.target.value);
+    setSecondPasswordUpdated(true);
+  };
 
   const successMessage = useAppSelector(state => state.register.successMessage);
 
   useEffect(() => {
     if (successMessage) {
       window.showToast('success', 'Succès', `${successMessage}`);
+      navigate('/login');
     }
   }, [successMessage]);
 
@@ -74,70 +85,133 @@ export const RegisterPage = () => {
                   name="username"
                   control={control}
                   rules={{
-                    required: true,
-                    pattern: /^[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$|^[_.@A-Za-z0-9-]+$/,
-                    min: 2,
-                    max: 50,
+                    required: "Votre nom d'utilisateur est requis.",
+                    pattern: {
+                      value: /^[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$|^[_.@A-Za-z0-9-]+$/,
+                      message: "Votre nom d'utilisateur est invalide.",
+                    },
+                    minLength: {
+                      value: 2,
+                      message: "Votre nom d'utilisateur doit comporter au moins 2 caractères.",
+                    },
+                    maxLength: {
+                      value: 50,
+                      message: "Votre nom d'utilisateur ne peut pas dépasser 50 caractères.",
+                    },
                   }}
                   render={({ field }) => <InputText {...field} placeholder="Nom d'utilisateur" invalid={!!errors.username} />}
                 />
               </div>
-              {errors.username?.type === 'required' && (
-                <Text color="text-red-300" className="text-sm">{`Votre nom d'utilisateur est requis.`}</Text>
-              )}
-              {errors.username?.type === 'pattern' && (
-                <Text color="text-red-300" className="text-sm">{`Votre nom d'utilisateur est invalide.`}</Text>
-              )}
-              {errors.username?.type === 'min' && (
-                <Text color="text-red-300" className="text-sm">{`Votre nom d'utilisateur doit comporter au moins 2 caractères.`}</Text>
-              )}
-              {errors.username?.type === 'max' && (
-                <Text color="text-red-300" className="text-sm">{`Votre nom d'utilisateur ne peut pas dépasser 50 caractères.`}</Text>
+              {!!errors.username && (
+                <Text color="text-red-300" className="text-sm">
+                  {errors.username.message}
+                </Text>
               )}
             </div>
-            <div className="p-inputgroup">
-              <span className="p-inputgroup-addon">
-                <Icon icon="at" marginRight={false} colorSecondary />
-              </span>
-              <Controller
-                name="email"
-                control={control}
-                render={({ field }) => <InputText {...field} placeholder="Email" type="email" invalid={!!errors.email} />}
-              />
+            <div className="flex flex-column gap-2">
+              <div className="p-inputgroup">
+                <span className="p-inputgroup-addon">
+                  <Icon icon="at" marginRight={false} colorSecondary />
+                </span>
+                <Controller
+                  name="email"
+                  control={control}
+                  rules={{
+                    required: 'Votre email est requis.',
+                    minLength: {
+                      value: 5,
+                      message: 'Votre email doit comporter au moins 5 caractères.',
+                    },
+                    maxLength: {
+                      value: 254,
+                      message: 'Votre email ne peut pas dépasser 254 caractères.',
+                    },
+                    validate: v => isEmail(v) || 'Votre email est invalide.',
+                  }}
+                  render={({ field }) => <InputText {...field} placeholder="Email" type="email" invalid={!!errors.email} />}
+                />
+              </div>
+              {!!errors.email && (
+                <Text color="text-red-300" className="text-sm">
+                  {errors.email.message}
+                </Text>
+              )}
             </div>
-            <div className="p-inputgroup">
-              <span className="p-inputgroup-addon">
-                <Icon icon="lock" marginRight={false} colorSecondary />
-              </span>
-              <Controller
-                name="firstPassword"
-                control={control}
-                render={({ field }) => (
-                  <InputText
-                    {...field}
-                    placeholder="Mot de passe"
-                    type="password"
-                    invalid={!!errors.firstPassword}
-                    onChange={updatePassword}
-                  />
-                )}
-              />
+            <div className="flex flex-column gap-2">
+              <div className="p-inputgroup">
+                <span className="p-inputgroup-addon">
+                  <Icon icon="lock" marginRight={false} colorSecondary />
+                </span>
+                <Password
+                  value={password}
+                  onChange={updatePassword}
+                  onBlur={() => setFirstPasswordUpdated(true)}
+                  placeholder="Mot de passe"
+                  invalid={(firstPasswordUpdated && !password) || (password && password.length < 4) || (password && password.length > 50)}
+                  promptLabel="Choisir un mot de passe"
+                  weakLabel="Faible"
+                  mediumLabel="Moyen"
+                  strongLabel="Fort"
+                />
+              </div>
+              {firstPasswordUpdated && !password && (
+                <Text color="text-red-300" className="text-sm">
+                  Votre mot de passe est requis.
+                </Text>
+              )}
+              {password && password.length < 4 && (
+                <Text color="text-red-300" className="text-sm">
+                  Votre mot de passe doit comporter au moins 4 caractères.
+                </Text>
+              )}
+              {password && password.length > 50 && (
+                <Text color="text-red-300" className="text-sm">
+                  Votre mot de passe ne peut pas dépasser 50 caractères.
+                </Text>
+              )}
             </div>
-            <PasswordStrengthBar password={password} />
-            <div className="p-inputgroup">
-              <span className="p-inputgroup-addon">
-                <Icon icon="lock" marginRight={false} colorSecondary />
-              </span>
-              <Controller
-                name="secondPassword"
-                control={control}
-                render={({ field }) => (
-                  <InputText {...field} placeholder="Confirmer le mot de passe" type="password" invalid={!!errors.secondPassword} />
-                )}
-              />
+            <div className="flex flex-column gap-2">
+              <div className="p-inputgroup">
+                <span className="p-inputgroup-addon">
+                  <Icon icon="lock" marginRight={false} colorSecondary />
+                </span>
+                <Password
+                  value={passwordConfirmation}
+                  onChange={updatePasswordConfirmation}
+                  onBlur={() => setSecondPasswordUpdated(true)}
+                  placeholder="Confirmation du mot de passe"
+                  invalid={
+                    (secondPasswordUpdated && !passwordConfirmation) ||
+                    (passwordConfirmation && passwordConfirmation.length < 4) ||
+                    (passwordConfirmation && passwordConfirmation.length > 50) ||
+                    password !== passwordConfirmation
+                  }
+                  feedback={false}
+                />
+              </div>
+              {secondPasswordUpdated && !passwordConfirmation && (
+                <Text color="text-red-300" className="text-sm">
+                  Votre confirmation mot de passe est requis.
+                </Text>
+              )}
+              {passwordConfirmation && passwordConfirmation.length < 4 && (
+                <Text color="text-red-300" className="text-sm">
+                  Votre confirmation mot de passe doit comporter au moins 4 caractères.
+                </Text>
+              )}
+              {passwordConfirmation && passwordConfirmation.length > 50 && (
+                <Text color="text-red-300" className="text-sm">
+                  Votre confirmation mot de passe ne peut pas dépasser 50 caractères.
+                </Text>
+              )}
+              {password !== passwordConfirmation && (
+                <Text color="text-red-300" className="text-sm">
+                  Le mot de passe et sa confirmation ne correspondent pas !
+                </Text>
+              )}
             </div>
-            <Button type="submit" icon={<Icon icon="user-plus" />} label="Créer un compte" />
-            <div className="flex justify-content-center mt-3">
+            <Button type="submit" icon={<Icon icon="user-plus" />} label="Créer un compte" className="my-3" />
+            <div className="flex justify-content-center">
               <Link to="/login">Déjà un compte ? Se connecter</Link>
             </div>
           </div>
