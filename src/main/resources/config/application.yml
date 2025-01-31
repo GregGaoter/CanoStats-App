@@ -200,7 +200,7 @@ info:
 
 jhipster:
   clientApp:
-    name: 'statisticsApp'
+    name: 'CanoStats'
   # By default CORS is disabled. Uncomment to enable.
   # cors:
   #   allowed-origins: "http://localhost:8100,http://localhost:9000"
@@ -210,7 +210,7 @@ jhipster:
   #   allow-credentials: true
   #   max-age: 1800
   mail:
-    from: statistics@localhost
+    from: greg.gautier@hotmail.com
   api-docs:
     default-include-pattern: /api/**
     management-include-pattern: /management/**

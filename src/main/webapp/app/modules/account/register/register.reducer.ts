@@ -1,5 +1,5 @@
-import axios from 'axios';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 import { serializeAxiosError } from 'app/shared/reducers/reducer.utils';
 
@@ -42,7 +42,7 @@ export const RegisterSlice = createSlice({
       .addCase(handleRegister.fulfilled, () => ({
         ...initialState,
         registrationSuccess: true,
-        successMessage: 'Création du compte réussi ! Vous pouvez maintenant vous connecter.',
+        successMessage: 'Inscription enregistrée ! Veuillez vérifier votre e-mail pour confirmation et activation de votre compte.',
       }));
   },
 });
