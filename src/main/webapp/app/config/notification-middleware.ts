@@ -8,7 +8,7 @@ type TostMessage = {
 };
 
 const addErrorAlert = (message: TostMessage) => {
-  window.showToast('error', 'Toast', 'Test utilisation Toast réussi !');
+  window.showToast('error', 'Erreur', message.message);
 };
 
 const getFieldErrorsTosts = (fieldErrors: FieldErrorVM[]): TostMessage[] =>
