@@ -11,27 +11,76 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "application", ignoreUnknownFields = false)
 public class ApplicationProperties {
 
-    private final Liquibase liquibase = new Liquibase();
+    private final Sendgrid sendgrid = new Sendgrid();
+    private final Api api = new Api();
+    private final From from = new From();
 
-    // jhipster-needle-application-properties-property
-
-    public Liquibase getLiquibase() {
-        return liquibase;
+    public Sendgrid getSendgrid() {
+        return sendgrid;
     }
 
-    // jhipster-needle-application-properties-property-getter
+    public Api getApi() {
+        return api;
+    }
 
-    public static class Liquibase {
+    public From getFrom() {
+        return from;
+    }
 
-        private Boolean asyncStart;
+    public static class Sendgrid {
 
-        public Boolean getAsyncStart() {
-            return asyncStart;
+        private Api api;
+        private From from;
+
+        public Api getApi() {
+            return api;
         }
 
-        public void setAsyncStart(Boolean asyncStart) {
-            this.asyncStart = asyncStart;
+        public void setApi(Api api) {
+            this.api = api;
+        }
+
+        public From getFrom() {
+            return from;
+        }
+
+        public void setFrom(From from) {
+            this.from = from;
         }
     }
-    // jhipster-needle-application-properties-property-class
+
+    public static class Api {
+
+        private String key;
+
+        public String getKey() {
+            return key;
+        }
+
+        public void setKey(String key) {
+            this.key = key;
+        }
+    }
+
+    public static class From {
+
+        private String email;
+        private String name;
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
 }

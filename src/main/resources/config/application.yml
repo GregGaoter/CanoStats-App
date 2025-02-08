@@ -118,9 +118,9 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://c9mq4861d16jlm.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d14moh8b5h9sa4
-    username: u9mqrec7pl3fd6
-    password: p3b0e812a0b3882c68f01476ee65cbc6f767675e0674cd19d2d41bc5acde1ee9d
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
     hikari:
       poolName: Hikari
       auto-commit: false
@@ -210,7 +210,7 @@ jhipster:
   #   allow-credentials: true
   #   max-age: 1800
   mail:
-    from: greg.gautier@hotmail.com
+    from:
   api-docs:
     default-include-pattern: /api/**
     management-include-pattern: /management/**
@@ -234,4 +234,10 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+  sendgrid:
+    api:
+      key: ${SENDGRID_API_KEY}
+    from:
+      email: ${SENDGRID_FROM_EMAIL}
+      name: Grégory Gautier
