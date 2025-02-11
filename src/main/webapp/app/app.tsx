@@ -57,6 +57,9 @@ export const App = () => {
     column: {
       root: { className: 'text-color-secondary' },
     },
+    paginator: {
+      root: { className: 'border-none' },
+    },
   };
 
   return (

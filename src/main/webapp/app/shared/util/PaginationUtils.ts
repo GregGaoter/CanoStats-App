@@ -1,4 +1,5 @@
 export interface Pagination<T> {
+  first: number;
   page: number;
   size: number;
   sort: T;
