@@ -4,12 +4,12 @@ import { Text } from 'app/shared/component/Text';
 import { IMouvementsStock, MouvementsStockField } from 'app/shared/model/mouvements-stock.model';
 import { IQueryParams } from 'app/shared/reducers/reducer.utils';
 import { ITEMS_PER_PAGE } from 'app/shared/util/pagination.constants';
-import { Pagination, PaginationOrder } from 'app/shared/util/PaginationUtils';
+import { getPaginationOrderValue, getValueOfOrder, Pagination, PaginationOrder } from 'app/shared/util/PaginationUtils';
 import dayjs from 'dayjs';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Column } from 'primereact/column';
-import { DataTable } from 'primereact/datatable';
+import { DataTable, DataTableStateEvent } from 'primereact/datatable';
 import { Paginator, PaginatorPageChangeEvent } from 'primereact/paginator';
 import React, { useEffect, useState } from 'react';
 import { getEntities as getMouvementsStocks } from './mouvements-stock.reducer';
@@ -59,6 +59,11 @@ export const MouvementsStock = () => {
     getAllMouvementsStocks();
   };
 
+  const handleSort = (event: DataTableStateEvent): void => {
+    setPagination({ ...pagination, sort: event.sortField as MouvementsStockField, order: getValueOfOrder(event.sortOrder) });
+    getAllMouvementsStocks();
+  };
+
   const cardTitle = (
     <div className="flex align-items-center justify-content-between">
       <Text>Mouvements de stock</Text>
@@ -70,13 +75,19 @@ export const MouvementsStock = () => {
 
   return (
     <Card title={cardTitle}>
-      <DataTable value={mouvementsStocks} emptyMessage="Aucun mouvement de stock trouvé">
-        <Column field="codeProduit" header="Code"></Column>
-        <Column field="produit" header="Produit"></Column>
-        <Column field="type" header="Type"></Column>
-        <Column field="mouvement" header="Mouvement"></Column>
-        <Column field="solde" header="Solde"></Column>
-        <Column field="date" header="Date" body={dateTemplate}></Column>
+      <DataTable
+        value={mouvementsStocks}
+        emptyMessage="Aucun mouvement de stock trouvé"
+        sortField={pagination.sort}
+        sortOrder={getPaginationOrderValue(pagination.order)}
+        onSort={handleSort}
+      >
+        <Column field="codeProduit" header="Code" sortable></Column>
+        <Column field="produit" header="Produit" sortable></Column>
+        <Column field="type" header="Type" sortable></Column>
+        <Column field="mouvement" header="Mouvement" sortable></Column>
+        <Column field="solde" header="Solde" sortable></Column>
+        <Column field="date" header="Date" body={dateTemplate} sortable></Column>
       </DataTable>
       <Paginator
         first={pagination.first}
