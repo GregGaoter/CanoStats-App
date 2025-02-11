@@ -185,16 +185,16 @@ public class MouvementsStockResource {
     }
 
     /**
-     * Imports a file containing stock movements.
+     * Handles the import of a file containing stock movements.
      *
-     * @param file the file to be imported
+     * @param mouvementsStocksFile the file to be imported
      * @return a ResponseEntity with a success message if the import is successful,
-     *         or an error message if there is an IOException
+     *         or an error message if there is an issue processing the file.
      */
     @PostMapping("/import")
-    public ResponseEntity<String> importFile(MultipartFile file) {
+    public ResponseEntity<String> importFile(@RequestParam MultipartFile mouvementsStocksFile) {
         try {
-            mouvementsStockService.importFile(file);
+            mouvementsStockService.importFile(mouvementsStocksFile);
             return ResponseEntity.ok("MouvementsStocks imported successfully!");
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing file!");

@@ -7,6 +7,7 @@ import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
 import ch.epicerielacanopee.statistics.service.mapper.MouvementsStockMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ public class MouvementsStockService {
     public MouvementsStockService(MouvementsStockRepository mouvementsStockRepository, MouvementsStockMapper mouvementsStockMapper) {
         this.mouvementsStockRepository = mouvementsStockRepository;
         this.mouvementsStockMapper = mouvementsStockMapper;
+        objectMapper.registerModule(new JavaTimeModule());
     }
 
     /**
@@ -178,6 +180,7 @@ public class MouvementsStockService {
         mouvementsStock.setVenteChf(epicerioMouvementsStocks.getVenteChf());
         mouvementsStock.setValeurChf(epicerioMouvementsStocks.getValeurChf());
         mouvementsStock.setRemarques(epicerioMouvementsStocks.getRemarques());
+        mouvementsStock.setActive(true);
         return mouvementsStock;
     }
 }

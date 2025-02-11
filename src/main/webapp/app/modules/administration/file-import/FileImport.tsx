@@ -121,7 +121,7 @@ export const FileImport = () => {
       <Tooltip target=".custom-cancel-btn" content="Effacer" position="bottom" />
       <FileUpload
         ref={fileUploadRef}
-        name="mouvements-stock"
+        name="mouvementsStocksFile"
         url="/api/mouvements-stocks/import"
         multiple={false}
         accept="application/json"
