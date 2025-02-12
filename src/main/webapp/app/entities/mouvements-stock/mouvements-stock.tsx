@@ -8,8 +8,9 @@ import { getPaginationOrderValue, getValueOfOrder, Pagination, PaginationOrder }
 import dayjs from 'dayjs';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
-import { Column } from 'primereact/column';
+import { Column, ColumnEditorOptions } from 'primereact/column';
 import { DataTable, DataTableStateEvent } from 'primereact/datatable';
+import { InputNumber, InputNumberValueChangeEvent } from 'primereact/inputnumber';
 import { Paginator, PaginatorPageChangeEvent } from 'primereact/paginator';
 import React, { useEffect, useState } from 'react';
 import { getEntities as getMouvementsStocks } from './mouvements-stock.reducer';
@@ -73,6 +74,17 @@ export const MouvementsStock = () => {
 
   const dateTemplate = (mouvementsStock: IMouvementsStock) => dayjs(mouvementsStock.date).format('DD-MM-YYYY HH:mm:ss');
 
+  const mouvementEditor = (options: ColumnEditorOptions) => {
+    return (
+      <InputNumber
+        value={options.value}
+        onValueChange={(e: InputNumberValueChangeEvent) => options.editorCallback(e.value)}
+        mode="decimal"
+        onKeyDown={e => e.stopPropagation()}
+      />
+    );
+  };
+
   return (
     <Card title={cardTitle}>
       <DataTable
@@ -86,13 +98,14 @@ export const MouvementsStock = () => {
         selectionMode="checkbox"
         selection={selectedMouvementsStock}
         onSelectionChange={e => setSelectedMouvementsStock(e.value)}
+        editMode="cell"
       >
         <Column selectionMode="multiple"></Column>
-        <Column field="epicerioId" header="ID" sortable filter></Column>
+        <Column field="epicerioId" header="Id" sortable filter></Column>
         <Column field="codeProduit" header="Code" sortable filter></Column>
         <Column field="produit" header="Produit" sortable filter></Column>
         <Column field="type" header="Type" sortable filter></Column>
-        <Column field="mouvement" header="Mouvement" sortable filter></Column>
+        <Column field="mouvement" header="Mouvement" sortable filter editor={options => mouvementEditor(options)}></Column>
         <Column field="solde" header="Solde" sortable filter></Column>
         <Column field="date" header="Date" body={dateTemplate} sortable filter></Column>
       </DataTable>
