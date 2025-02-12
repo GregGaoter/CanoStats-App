@@ -26,8 +26,8 @@ export const MouvementsStock = () => {
     total: 0,
   };
   const [pagination, setPagination] = useState<Pagination<MouvementsStockField>>(defaultPagination);
-
   const [isComponentMounting, setComponentMounting] = useState<boolean>(true);
+  const [selectedMouvementsStock, setSelectedMouvementsStock] = useState<IMouvementsStock[]>([]);
 
   const mouvementsStocks = useAppSelector(state => state.mouvementsStock.entities);
   const loading = useAppSelector(state => state.mouvementsStock.loading);
@@ -67,7 +67,7 @@ export const MouvementsStock = () => {
   const cardTitle = (
     <div className="flex align-items-center justify-content-between">
       <Text>Mouvements de stock</Text>
-      <Button icon={<Icon icon="ban" />} label="Désactiver" severity="danger" />
+      <Button icon={<Icon icon="ban" />} label="Désactiver" severity="danger" disabled={selectedMouvementsStock.length === 0} />
     </div>
   );
 
@@ -78,16 +78,23 @@ export const MouvementsStock = () => {
       <DataTable
         value={mouvementsStocks}
         emptyMessage="Aucun mouvement de stock trouvé"
+        loading={loading}
+        dataKey="id"
         sortField={pagination.sort}
         sortOrder={getPaginationOrderValue(pagination.order)}
         onSort={handleSort}
+        selectionMode="checkbox"
+        selection={selectedMouvementsStock}
+        onSelectionChange={e => setSelectedMouvementsStock(e.value)}
       >
-        <Column field="codeProduit" header="Code" sortable></Column>
-        <Column field="produit" header="Produit" sortable></Column>
-        <Column field="type" header="Type" sortable></Column>
-        <Column field="mouvement" header="Mouvement" sortable></Column>
-        <Column field="solde" header="Solde" sortable></Column>
-        <Column field="date" header="Date" body={dateTemplate} sortable></Column>
+        <Column selectionMode="multiple"></Column>
+        <Column field="epicerioId" header="ID" sortable filter></Column>
+        <Column field="codeProduit" header="Code" sortable filter></Column>
+        <Column field="produit" header="Produit" sortable filter></Column>
+        <Column field="type" header="Type" sortable filter></Column>
+        <Column field="mouvement" header="Mouvement" sortable filter></Column>
+        <Column field="solde" header="Solde" sortable filter></Column>
+        <Column field="date" header="Date" body={dateTemplate} sortable filter></Column>
       </DataTable>
       <Paginator
         first={pagination.first}
