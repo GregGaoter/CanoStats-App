@@ -99,6 +99,7 @@ export const MouvementsStock = () => {
         selection={selectedMouvementsStock}
         onSelectionChange={e => setSelectedMouvementsStock(e.value)}
         editMode="cell"
+        rowHover
       >
         <Column selectionMode="multiple"></Column>
         <Column field="epicerioId" header="Id" sortable filter></Column>

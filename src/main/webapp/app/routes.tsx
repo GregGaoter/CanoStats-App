@@ -4,7 +4,7 @@ import Activate from 'app/modules/account/activate/activate';
 import PasswordResetFinish from 'app/modules/account/password-reset/finish/password-reset-finish';
 import PasswordResetInit from 'app/modules/account/password-reset/init/password-reset-init';
 import Register from 'app/modules/account/register/register';
-import Home from 'app/modules/home/home';
+import { Dashboard } from 'app/modules/dashboard/dashboard';
 import Login from 'app/modules/login/login';
 import PrivateRoute from 'app/shared/auth/private-route';
 import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
@@ -31,9 +31,9 @@ const Admin = Loadable({
 const AppRoutes = (props: AppRoutesProps) => {
   return (
     <ErrorBoundaryRoutes>
-      <Route index element={props.isAuthenticated ? <Home /> : <Login />} />
+      <Route index element={props.isAuthenticated ? <Dashboard /> : <Login />} />
       <Route path="login" element={<Login />} />
-      <Route path="dashboard" element={<Home />} />
+      <Route path="dashboard" element={<Dashboard />} />
       <Route path="account">
         <Route
           path="*"
@@ -59,7 +59,7 @@ const AppRoutes = (props: AppRoutesProps) => {
         }
       />
       <Route path="statistics">
-        <Route path="dashboard" element={<Home />} />
+        <Route path="dashboard" element={<Dashboard />} />
       </Route>
       <Route
         path="*"

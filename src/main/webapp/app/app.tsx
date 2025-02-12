@@ -52,7 +52,7 @@ export const App = () => {
       root: { className: 'text-color-secondary' },
     },
     card: {
-      root: { className: 'text-color-secondary shadow-4' },
+      root: { className: 'text-color-secondary shadow-4 border-round-xl border-1 border-200' },
     },
     column: {
       root: { className: 'text-color-secondary' },
