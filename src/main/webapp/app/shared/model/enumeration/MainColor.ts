@@ -1,0 +1,15 @@
+export enum MainColor {
+  BLUE = 'blue',
+  GREEN = 'green',
+  YELLOW = 'yellow',
+  CYAN = 'cyan',
+  PINK = 'pink',
+  INDIGO = 'indigo',
+  TEAL = 'teal',
+  ORANGE = 'orange',
+  BLUEGRAY = 'bluegray',
+  PURPLE = 'purple',
+  RED = 'red',
+  GRAY = 'gray',
+  PRIMARY = 'primary',
+}

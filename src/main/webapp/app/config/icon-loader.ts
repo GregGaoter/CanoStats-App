@@ -1,8 +1,11 @@
 import {
+  faArrowDown,
   faArrowLeft,
+  faArrowRight,
   faArrowsRotate,
   faArrowTrendDown,
   faArrowTrendUp,
+  faArrowUp,
   faAsterisk,
   faAt,
   faBan,
@@ -120,5 +123,8 @@ export const loadIcons = () => {
     faWarehouse,
     faBan,
     faAt,
+    faArrowUp,
+    faArrowRight,
+    faArrowDown,
   );
 };
