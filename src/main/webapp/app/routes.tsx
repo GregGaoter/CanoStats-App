@@ -12,6 +12,8 @@ import PageNotFound from 'app/shared/error/page-not-found';
 import React from 'react';
 import Loadable from 'react-loadable';
 import { Route } from 'react-router-dom';
+import { Revenue } from './modules/statistics/sales/Revenue';
+import { SalesVolume } from './modules/statistics/sales/SalesVolume';
 
 interface AppRoutesProps {
   isAuthenticated: boolean;
@@ -60,6 +62,8 @@ const AppRoutes = (props: AppRoutesProps) => {
       />
       <Route path="statistics">
         <Route path="dashboard" element={<Dashboard />} />
+        <Route path="revenue" element={<Revenue />} />
+        <Route path="sales-volume" element={<SalesVolume />} />
       </Route>
       <Route
         path="*"

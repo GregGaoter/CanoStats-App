@@ -99,17 +99,17 @@ export const FileImport = () => {
   };
 
   const chooseOptions: FileUploadOptions = {
-    icon: <Icon icon="image" marginRight={false} />,
+    icon: <Icon icon="image" />,
     iconOnly: true,
     className: 'custom-choose-btn p-button-rounded p-button-outlined',
   };
   const uploadOptions = {
-    icon: <Icon icon="cloud-arrow-up" marginRight={false} />,
+    icon: <Icon icon="cloud-arrow-up" />,
     iconOnly: true,
     className: 'custom-upload-btn p-button-success p-button-rounded p-button-outlined',
   };
   const cancelOptions = {
-    icon: <Icon icon="xmark" marginRight={false} />,
+    icon: <Icon icon="xmark" />,
     iconOnly: true,
     className: 'custom-cancel-btn p-button-danger p-button-rounded p-button-outlined',
   };

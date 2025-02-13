@@ -87,7 +87,7 @@ export const RegisterPage = () => {
               <div className="flex flex-column gap-2">
                 <div className="p-inputgroup">
                   <span className="p-inputgroup-addon">
-                    <Icon icon="user" marginRight={false} colorSecondary />
+                    <Icon icon="user" colorSecondary />
                   </span>
                   <Controller
                     name="username"
@@ -119,7 +119,7 @@ export const RegisterPage = () => {
               <div className="flex flex-column gap-2">
                 <div className="p-inputgroup">
                   <span className="p-inputgroup-addon">
-                    <Icon icon="at" marginRight={false} colorSecondary />
+                    <Icon icon="at" colorSecondary />
                   </span>
                   <Controller
                     name="email"
@@ -148,7 +148,7 @@ export const RegisterPage = () => {
               <div className="flex flex-column gap-2">
                 <div className="p-inputgroup">
                   <span className="p-inputgroup-addon">
-                    <Icon icon="lock" marginRight={false} colorSecondary />
+                    <Icon icon="lock" colorSecondary />
                   </span>
                   <Password
                     value={password}
@@ -181,7 +181,7 @@ export const RegisterPage = () => {
               <div className="flex flex-column gap-2">
                 <div className="p-inputgroup">
                   <span className="p-inputgroup-addon">
-                    <Icon icon="lock" marginRight={false} colorSecondary />
+                    <Icon icon="lock" colorSecondary />
                   </span>
                   <Password
                     value={passwordConfirmation}

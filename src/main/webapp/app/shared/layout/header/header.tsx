@@ -45,63 +45,63 @@ const Header = (props: IHeaderProps) => {
   const items: MenuItem[] = [
     {
       label: 'Tables',
-      icon: <Icon icon="table-list" colorSecondary />,
+      icon: <Icon icon="table-list" colorSecondary marginRight />,
       items: [
         {
           label: 'Mouvements stock',
-          icon: <Icon icon="chart-line" colorSecondary />,
+          icon: <Icon icon="chart-line" colorSecondary marginRight />,
           url: 'table/mouvements-stock',
         },
       ],
     },
     {
       label: 'Administration',
-      icon: <Icon icon="users-cog" colorSecondary />,
+      icon: <Icon icon="users-cog" colorSecondary marginRight />,
       items: [
         {
           label: 'Utilisateurs',
-          icon: <Icon icon="users" colorSecondary />,
+          icon: <Icon icon="users" colorSecondary marginRight />,
         },
         {
           label: 'Importation',
-          icon: <Icon icon="file-import" colorSecondary />,
+          icon: <Icon icon="file-import" colorSecondary marginRight />,
           url: 'admin/file-import',
         },
         {
           label: 'Métriques',
-          icon: <Icon icon="tachometer-alt" colorSecondary />,
+          icon: <Icon icon="tachometer-alt" colorSecondary marginRight />,
         },
         {
           label: 'Santé',
-          icon: <Icon icon="heart" colorSecondary />,
+          icon: <Icon icon="heart" colorSecondary marginRight />,
         },
         {
           label: 'Configuration',
-          icon: <Icon icon="cogs" colorSecondary />,
+          icon: <Icon icon="cogs" colorSecondary marginRight />,
         },
         {
           label: 'Logs',
-          icon: <Icon icon="tasks" colorSecondary />,
+          icon: <Icon icon="tasks" colorSecondary marginRight />,
         },
       ],
     },
     {
       label: 'Compte',
-      icon: <Icon icon="user" colorSecondary />,
+      icon: <Icon icon="user" colorSecondary marginRight />,
       items: [
         {
           label: 'Paramètres',
-          icon: <Icon icon="wrench" colorSecondary />,
+          icon: <Icon icon="wrench" colorSecondary marginRight />,
         },
         {
           label: 'Mot de passe',
-          icon: <Icon icon="lock" colorSecondary />,
+          icon: <Icon icon="lock" colorSecondary marginRight />,
         },
       ],
     },
     {
       label: 'Se déconnecter',
-      icon: <Icon icon="sign-out-alt" colorSecondary />,
+      icon: <Icon icon="sign-out-alt" colorSecondary marginRight />,
       command: () => callLogout(),
     },
   ];

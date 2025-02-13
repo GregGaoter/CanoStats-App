@@ -1,5 +1,6 @@
 import { StatisticsCard } from 'app/shared/component/StatisticsCard';
 import { MainColor } from 'app/shared/model/enumeration/MainColor';
+import { Accordion, AccordionTab } from 'primereact/accordion';
 import { Card } from 'primereact/card';
 import { Chart } from 'primereact/chart';
 import React, { useEffect, useState } from 'react';
@@ -206,6 +207,56 @@ export const Dashboard = () => {
           <Card title="Panier moyen">
             <Chart type="bar" data={panierData} options={panierOptions}></Chart>
           </Card>
+        </div>
+      </div>
+      <div className="grid">
+        <div className="col">
+          <Accordion>
+            <AccordionTab header="Ventes" contentClassName="p-0">
+              <ul className="list-disc">
+                <li>{`Chiffre d'affaires quotidien/hebdomadaire/mensuel`}</li>
+                <li>{`Quantité de produits vendus`}</li>
+                <li>{`Produits les plus vendus`}</li>
+                <li>{`Tendances des ventes (par période, par produit)`}</li>
+              </ul>
+            </AccordionTab>
+            <AccordionTab header="Achats">
+              <ul className="list-disc">
+                <li>{`Coût total des achats`}</li>
+                <li>{`Quantité de produits achetés`}</li>
+                <li>{`Fournisseurs principaux`}</li>
+                <li>{`Délai moyen de livraison`}</li>
+              </ul>
+            </AccordionTab>
+            <AccordionTab header="Stocks">
+              <ul className="list-disc">
+                <li>{`Niveau de stock actuel pour chaque produit`}</li>
+                <li>{`Produits en rupture de stock`}</li>
+                <li>{`Produits en surstock`}</li>
+                <li>{`Rotation des stocks`}</li>
+              </ul>
+            </AccordionTab>
+            <AccordionTab header="Rentabilité">
+              <ul className="list-disc">
+                <li>{`Marge brute par produit`}</li>
+                <li>{`Produits les plus rentables`}</li>
+              </ul>
+            </AccordionTab>
+            <AccordionTab header="Clients">
+              <ul className="list-disc">
+                <li>{`Nombre de clients (quotidien, hebdomadaire, mensuel)`}</li>
+                <li>{`Panier moyen`}</li>
+                <li>{`Fidélité des clients (nombre de visites, achats récurrents)`}</li>
+              </ul>
+            </AccordionTab>
+            <AccordionTab header="Tendances et prévisions">
+              <ul className="list-disc">
+                <li>{`Évolution des prix (achat et vente)`}</li>
+                <li>{`Prévisions de ventes`}</li>
+                <li>{`Prévisions de stock`}</li>
+              </ul>
+            </AccordionTab>
+          </Accordion>
         </div>
       </div>
     </div>

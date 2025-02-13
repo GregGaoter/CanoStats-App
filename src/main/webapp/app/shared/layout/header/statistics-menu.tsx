@@ -4,46 +4,52 @@ import { MenuItem } from 'primereact/menuitem';
 import React from 'react';
 
 export const StatisticsMenu = () => {
+  const dashboardColor: string = 'var(--bluegray-600)';
+  const ventesColor: string = 'var(--blue-600)';
+  const achatsColor: string = 'var(--green-600)';
+  const stocksColor: string = 'var(--yellow-600)';
+  const rentabiliteColor: string = 'var(--purple-600)';
+  const tendancesColor: string = 'var(--red-600)';
   const items: MenuItem[] = [
-    { label: 'Tableau de bord', icon: <Icon icon="gauge" colorSecondary />, url: 'statistics/dashboard' },
+    { label: 'Tableau de bord', icon: <Icon icon="gauge" color={dashboardColor} marginRight />, url: 'statistics/dashboard' },
     { separator: true },
     {
       label: 'Ventes',
       items: [
-        { label: `Chiffre d'affaires`, icon: <Icon icon="sack-dollar" colorSecondary /> },
-        { label: 'Volume', icon: <Icon icon="cube" colorSecondary /> },
-        { label: 'Tendances', icon: <Icon icon="arrow-trend-up" colorSecondary /> },
+        { label: `Chiffre d'affaires`, icon: <Icon icon="sack-dollar" color={ventesColor} marginRight />, url: 'statistics/revenue' },
+        { label: 'Volume', icon: <Icon icon="cube" color={ventesColor} marginRight />, url: 'statistics/sales-volume' },
+        { label: 'Tendances', icon: <Icon icon="arrow-trend-up" color={ventesColor} marginRight /> },
       ],
     },
     { separator: true },
     {
       label: 'Achats',
       items: [
-        { label: 'Coût', icon: <Icon icon="file-invoice-dollar" colorSecondary /> },
-        { label: 'Fournisseurs', icon: <Icon icon="truck" colorSecondary /> },
+        { label: 'Coût', icon: <Icon icon="file-invoice-dollar" color={achatsColor} marginRight /> },
+        { label: 'Fournisseurs', icon: <Icon icon="truck" color={achatsColor} marginRight /> },
       ],
     },
     { separator: true },
     {
       label: 'Stocks',
       items: [
-        { label: 'Rotation', icon: <Icon icon="arrows-rotate" colorSecondary /> },
-        { label: 'Stock moyen', icon: <Icon icon="warehouse" colorSecondary /> },
-        { label: 'Prévisions', icon: <Icon icon="boxes-stacked" colorSecondary /> },
+        { label: 'Rotation', icon: <Icon icon="arrows-rotate" color={stocksColor} marginRight /> },
+        { label: 'Stock moyen', icon: <Icon icon="warehouse" color={stocksColor} marginRight /> },
+        { label: 'Prévisions', icon: <Icon icon="boxes-stacked" color={stocksColor} marginRight /> },
       ],
     },
     { separator: true },
     {
       label: 'Rentabilité',
       items: [
-        { label: 'Marge brute', icon: <Icon icon="hand-holding-dollar" colorSecondary /> },
-        { label: 'Produits les plus rentables', icon: <Icon icon="medal" colorSecondary /> },
+        { label: 'Marge brute', icon: <Icon icon="hand-holding-dollar" color={rentabiliteColor} marginRight /> },
+        { label: 'Produits les plus rentables', icon: <Icon icon="medal" color={rentabiliteColor} marginRight /> },
       ],
     },
     { separator: true },
     {
       label: 'Tendances',
-      items: [{ label: 'Évolution des prix', icon: <Icon icon="arrow-trend-up" colorSecondary /> }],
+      items: [{ label: 'Évolution des prix', icon: <Icon icon="arrow-trend-up" color={tendancesColor} marginRight /> }],
     },
   ];
 

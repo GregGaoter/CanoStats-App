@@ -60,6 +60,11 @@ export const App = () => {
     paginator: {
       root: { className: 'border-none' },
     },
+    accordiontab: {
+      headerIcon: { className: 'text-color-secondary' },
+      headerTitle: { className: 'text-color-secondary' },
+      content: { className: 'text-color-secondary p-1' },
+    },
   };
 
   return (

@@ -68,7 +68,7 @@ export const MouvementsStock = () => {
   const cardTitle = (
     <div className="flex align-items-center justify-content-between">
       <Text>Mouvements de stock</Text>
-      <Button icon={<Icon icon="ban" />} label="Désactiver" severity="danger" disabled={selectedMouvementsStock.length === 0} />
+      <Button icon={<Icon icon="ban" marginRight />} label="Désactiver" severity="danger" disabled={selectedMouvementsStock.length === 0} />
     </div>
   );
 
