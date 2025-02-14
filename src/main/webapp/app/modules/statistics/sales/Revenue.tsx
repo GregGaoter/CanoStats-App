@@ -33,9 +33,7 @@ export const Revenue = () => {
     setYearOptions({
       plugins: {
         legend: {
-          labels: {
-            color: textColor,
-          },
+          display: false,
         },
       },
       scales: {
@@ -94,9 +92,7 @@ export const Revenue = () => {
     setMonthOptions({
       plugins: {
         legend: {
-          labels: {
-            color: textColor,
-          },
+          display: false,
         },
       },
       scales: {

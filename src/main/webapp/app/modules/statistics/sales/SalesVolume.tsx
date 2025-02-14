@@ -1,13 +1,17 @@
 import { Text } from 'app/shared/component/Text';
 import { Card } from 'primereact/card';
 import { Chart } from 'primereact/chart';
+import { Dropdown } from 'primereact/dropdown';
 import { Fieldset } from 'primereact/fieldset';
 import React, { useEffect, useState } from 'react';
 
 export const SalesVolume = () => {
   const [yearData, setYearData] = useState({});
-  const [monthData, setMonthData] = useState({});
-  const [barOptions, setBarOptions] = useState({});
+  const [monthData2023, setMonthData2023] = useState({});
+  const [monthData2024, setMonthData2024] = useState({});
+  const [yearOptions, setYearOptions] = useState({});
+  const [monthOptions, setMonthOptions] = useState({});
+  const [selectedYear, setSelectedYear] = useState<number>(2023);
 
   useEffect(() => {
     const documentStyle = getComputedStyle(document.documentElement);
@@ -26,8 +30,8 @@ export const SalesVolume = () => {
         },
       ],
     });
-    setMonthData({
-      labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+    setMonthData2023({
+      labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jui', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
       datasets: [
         {
           label: `Pommes`,
@@ -49,7 +53,64 @@ export const SalesVolume = () => {
         },
       ],
     });
-    setBarOptions({
+    setMonthData2024({
+      labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jui', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
+      datasets: [
+        {
+          label: `Tomates`,
+          backgroundColor: documentStyle.getPropertyValue('--blue-400'),
+          borderColor: documentStyle.getPropertyValue('--blue-400'),
+          data: [40, 32, 85, 29, 40, 45, 9, 16, 81, 5, 9, 42],
+        },
+        {
+          label: `Lait`,
+          backgroundColor: documentStyle.getPropertyValue('--blue-600'),
+          borderColor: documentStyle.getPropertyValue('--blue-600'),
+          data: [6, 81, 16, 66, 37, 1, 36, 88, 27, 1, 72, 87],
+        },
+        {
+          label: `Pain`,
+          backgroundColor: documentStyle.getPropertyValue('--blue-800'),
+          borderColor: documentStyle.getPropertyValue('--blue-800'),
+          data: [78, 46, 27, 27, 12, 90, 40, 87, 52, 89, 26, 85],
+        },
+      ],
+    });
+    setYearOptions({
+      plugins: {
+        legend: {
+          display: false,
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: textColorSecondary,
+            font: {
+              weight: '500',
+            },
+          },
+          grid: {
+            display: false,
+          },
+          border: {
+            display: false,
+          },
+        },
+        y: {
+          ticks: {
+            color: textColorSecondary,
+          },
+          grid: {
+            color: surfaceBorder,
+          },
+          border: {
+            display: false,
+          },
+        },
+      },
+    });
+    setMonthOptions({
       plugins: {
         legend: {
           labels: {
@@ -87,6 +148,13 @@ export const SalesVolume = () => {
     });
   }, []);
 
+  const monthCardTitle = () => (
+    <div className="flex justify-content-between">
+      {'Mensuel'}
+      <Dropdown value={selectedYear} onChange={e => setSelectedYear(e.value)} options={[2023, 2024]} />
+    </div>
+  );
+
   return (
     <div className="grid">
       <div className="col-12">
@@ -96,12 +164,12 @@ export const SalesVolume = () => {
       </div>
       <div className="col-6">
         <Card title="Annuel">
-          <Chart type="bar" data={yearData} options={barOptions}></Chart>
+          <Chart type="bar" data={yearData} options={yearOptions}></Chart>
         </Card>
       </div>
       <div className="col-6">
-        <Card title="Mensuel">
-          <Chart type="bar" data={monthData} options={barOptions}></Chart>
+        <Card title={monthCardTitle}>
+          <Chart type="bar" data={selectedYear === 2023 ? monthData2023 : monthData2024} options={monthOptions}></Chart>
         </Card>
       </div>
     </div>

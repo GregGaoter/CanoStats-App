@@ -18,7 +18,7 @@ export const StatisticsMenu = () => {
       items: [
         { label: `Chiffre d'affaires`, icon: <Icon icon="sack-dollar" color={ventesColor} marginRight />, url: 'statistics/revenue' },
         { label: 'Volume', icon: <Icon icon="cube" color={ventesColor} marginRight />, url: 'statistics/sales-volume' },
-        { label: 'Tendances', icon: <Icon icon="arrow-trend-up" color={ventesColor} marginRight /> },
+        { label: 'Tendances', icon: <Icon icon="arrow-trend-up" color={ventesColor} marginRight />, url: 'statistics/sales-trends' },
       ],
     },
     { separator: true },

@@ -14,6 +14,7 @@ import Loadable from 'react-loadable';
 import { Route } from 'react-router-dom';
 import { Revenue } from './modules/statistics/sales/Revenue';
 import { SalesVolume } from './modules/statistics/sales/SalesVolume';
+import { SalesTrends } from './modules/statistics/sales/SalesTrends';
 
 interface AppRoutesProps {
   isAuthenticated: boolean;
@@ -64,6 +65,7 @@ const AppRoutes = (props: AppRoutesProps) => {
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="revenue" element={<Revenue />} />
         <Route path="sales-volume" element={<SalesVolume />} />
+        <Route path="sales-trends" element={<SalesTrends />} />
       </Route>
       <Route
         path="*"
