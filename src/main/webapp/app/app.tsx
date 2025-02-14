@@ -65,6 +65,9 @@ export const App = () => {
       headerTitle: { className: 'text-color-secondary' },
       content: { className: 'text-color-secondary p-1' },
     },
+    fieldset: {
+      legend: { className: 'text-color-secondary' },
+    },
   };
 
   return (
