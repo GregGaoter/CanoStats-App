@@ -66,7 +66,11 @@ export const App = () => {
       content: { className: 'text-color-secondary p-1' },
     },
     fieldset: {
+      root: { className: 'border-round-xl shadow-4' },
       legend: { className: 'text-color-secondary' },
+    },
+    toolbar: {
+      root: { className: 'border-round-xl shadow-4' },
     },
   };
 

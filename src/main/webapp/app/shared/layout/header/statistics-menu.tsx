@@ -4,7 +4,7 @@ import { MenuItem } from 'primereact/menuitem';
 import React from 'react';
 
 export const StatisticsMenu = () => {
-  const dashboardColor: string = 'var(--bluegray-600)';
+  const dashboardColor: string = 'var(--orange-600)';
   const ventesColor: string = 'var(--blue-600)';
   const achatsColor: string = 'var(--green-600)';
   const stocksColor: string = 'var(--yellow-600)';
