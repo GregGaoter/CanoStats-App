@@ -1,11 +1,11 @@
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
-import { MainColor } from '../model/enumeration/MainColor';
+import { StatisticsColor } from '../model/enumeration/StatisticsColor';
 
 interface StatisticsIconProps {
   icon: IconProp;
-  color: MainColor;
+  color: StatisticsColor;
 }
 
 export const StatisticsIcon = ({ icon, color }: StatisticsIconProps) => (

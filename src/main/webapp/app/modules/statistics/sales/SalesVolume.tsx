@@ -35,20 +35,20 @@ export const SalesVolume = () => {
       datasets: [
         {
           label: `Pommes`,
-          backgroundColor: documentStyle.getPropertyValue('--blue-400'),
-          borderColor: documentStyle.getPropertyValue('--blue-400'),
+          backgroundColor: documentStyle.getPropertyValue('--blue-600'),
+          borderColor: documentStyle.getPropertyValue('--blue-600'),
           data: [65, 59, 80, 81, 56, 55, 40, 45, 60, 70, 75, 90],
         },
         {
           label: `Bananes`,
-          backgroundColor: documentStyle.getPropertyValue('--blue-600'),
-          borderColor: documentStyle.getPropertyValue('--blue-600'),
+          backgroundColor: documentStyle.getPropertyValue('--yellow-600'),
+          borderColor: documentStyle.getPropertyValue('--yellow-600'),
           data: [28, 48, 40, 19, 86, 27, 90, 100, 85, 60, 50, 40],
         },
         {
           label: `Oranges`,
-          backgroundColor: documentStyle.getPropertyValue('--blue-800'),
-          borderColor: documentStyle.getPropertyValue('--blue-800'),
+          backgroundColor: documentStyle.getPropertyValue('--green-600'),
+          borderColor: documentStyle.getPropertyValue('--green-600'),
           data: [35, 40, 60, 70, 46, 33, 50, 55, 65, 75, 80, 95],
         },
       ],
@@ -58,20 +58,20 @@ export const SalesVolume = () => {
       datasets: [
         {
           label: `Tomates`,
-          backgroundColor: documentStyle.getPropertyValue('--blue-400'),
-          borderColor: documentStyle.getPropertyValue('--blue-400'),
+          backgroundColor: documentStyle.getPropertyValue('--blue-600'),
+          borderColor: documentStyle.getPropertyValue('--blue-600'),
           data: [40, 32, 85, 29, 40, 45, 9, 16, 81, 5, 9, 42],
         },
         {
           label: `Lait`,
-          backgroundColor: documentStyle.getPropertyValue('--blue-600'),
-          borderColor: documentStyle.getPropertyValue('--blue-600'),
+          backgroundColor: documentStyle.getPropertyValue('--yellow-600'),
+          borderColor: documentStyle.getPropertyValue('--yellow-600'),
           data: [6, 81, 16, 66, 37, 1, 36, 88, 27, 1, 72, 87],
         },
         {
           label: `Pain`,
-          backgroundColor: documentStyle.getPropertyValue('--blue-800'),
-          borderColor: documentStyle.getPropertyValue('--blue-800'),
+          backgroundColor: documentStyle.getPropertyValue('--green-600'),
+          borderColor: documentStyle.getPropertyValue('--green-600'),
           data: [78, 46, 27, 27, 12, 90, 40, 87, 52, 89, 26, 85],
         },
       ],

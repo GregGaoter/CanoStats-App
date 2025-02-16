@@ -1,15 +1,15 @@
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { Divider } from 'primereact/divider';
 import React, { ReactNode } from 'react';
-import { MainColor } from '../model/enumeration/MainColor';
 import { StatisticsIcon } from './StatisticsIcon';
 import { StatisticsTag } from './StatisticsTag';
 import { Text } from './Text';
+import { StatisticsColor } from '../model/enumeration/StatisticsColor';
 
 interface StatisticsCardProps {
   title: string;
   icon: IconProp;
-  color: MainColor;
+  color: StatisticsColor;
   value: number | string | JSX.Element;
   tagValue?: ReactNode;
   tagSeverity?: 'success' | 'info' | 'danger';

@@ -21,63 +21,63 @@ export const SalesTrends = () => {
     label: 2022,
     data: [70, 92, 60, 87, 78, 70, 64],
     fill: false,
-    borderColor: documentStyle.getPropertyValue('--blue-400'),
+    borderColor: documentStyle.getPropertyValue('--blue-600'),
     tension: 0.4,
   });
   const [weekData2022, setWeekData2022] = useState({
     label: 2022,
     data: [393, 682, 527, 474],
     fill: false,
-    borderColor: documentStyle.getPropertyValue('--blue-400'),
+    borderColor: documentStyle.getPropertyValue('--blue-600'),
     tension: 0.4,
   });
   const [monthData2022, setMonthData2022] = useState({
     label: 2022,
     data: [2595, 2550, 2352, 1478, 1571, 1853, 1903, 2724, 2717, 2198, 1403, 2209],
     fill: false,
-    borderColor: documentStyle.getPropertyValue('--blue-400'),
+    borderColor: documentStyle.getPropertyValue('--blue-600'),
     tension: 0.4,
   });
   const [dayData2023, setDayData2023] = useState({
     label: 2023,
     data: [71, 78, 52, 88, 94, 65, 91],
     fill: false,
-    borderColor: documentStyle.getPropertyValue('--blue-600'),
+    borderColor: documentStyle.getPropertyValue('--yellow-600'),
     tension: 0.4,
   });
   const [weekData2023, setWeekData2023] = useState({
     label: 2023,
     data: [367, 379, 587, 574],
     fill: false,
-    borderColor: documentStyle.getPropertyValue('--blue-600'),
+    borderColor: documentStyle.getPropertyValue('--yellow-600'),
     tension: 0.4,
   });
   const [monthData2023, setMonthData2023] = useState({
     label: 2023,
     data: [1843, 1426, 1769, 1990, 1443, 2799, 1537, 2024, 2341, 2476, 1763, 2299],
     fill: false,
-    borderColor: documentStyle.getPropertyValue('--blue-600'),
+    borderColor: documentStyle.getPropertyValue('--yellow-600'),
     tension: 0.4,
   });
   const [dayData2024, setDayData2024] = useState({
     label: 2024,
     data: [58, 74, 79, 57, 51, 78, 74],
     fill: false,
-    borderColor: documentStyle.getPropertyValue('--blue-800'),
+    borderColor: documentStyle.getPropertyValue('--green-600'),
     tension: 0.4,
   });
   const [weekData2024, setWeekData2024] = useState({
     label: 2024,
     data: [585, 431, 449, 582],
     fill: false,
-    borderColor: documentStyle.getPropertyValue('--blue-800'),
+    borderColor: documentStyle.getPropertyValue('--green-600'),
     tension: 0.4,
   });
   const [monthData2024, setMonthData2024] = useState({
     label: 2024,
     data: [2301, 1421, 1715, 2502, 2583, 2715, 2789, 1932, 2462, 1637, 1445, 1788],
     fill: false,
-    borderColor: documentStyle.getPropertyValue('--blue-800'),
+    borderColor: documentStyle.getPropertyValue('--green-600'),
     tension: 0.4,
   });
   const [lineOptions, setLineOptions] = useState({});
@@ -198,7 +198,7 @@ export const SalesTrends = () => {
           <Text>{`Étudie les ventes sur différentes périodes (quotidienne, hebdomadaire, mensuelle) pour identifier les tendances saisonnières.`}</Text>
         </Fieldset>
       </div>
-      <div className="col-6">
+      <div className="col-12">
         <Toolbar center={centerContent} />
       </div>
       <div className="col-6">

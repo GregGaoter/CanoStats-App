@@ -1,15 +1,17 @@
 import { Icon } from 'app/shared/component/Icon';
+import { StatisticsColor } from 'app/shared/model/enumeration/StatisticsColor';
 import { Menu } from 'primereact/menu';
 import { MenuItem } from 'primereact/menuitem';
 import React from 'react';
 
 export const StatisticsMenu = () => {
-  const dashboardColor: string = 'var(--orange-600)';
-  const ventesColor: string = 'var(--blue-600)';
-  const achatsColor: string = 'var(--green-600)';
-  const stocksColor: string = 'var(--yellow-600)';
-  const rentabiliteColor: string = 'var(--purple-600)';
-  const tendancesColor: string = 'var(--red-600)';
+  const dashboardColor: string = `var(--${StatisticsColor.DASHBOARD}-600)`;
+  const ventesColor: string = `var(--${StatisticsColor.SALES}-600)`;
+  const achatsColor: string = `var(--${StatisticsColor.PURCHASES}-600)`;
+  const stocksColor: string = `var(--${StatisticsColor.INVENTORY}-600)`;
+  const rentabiliteColor: string = `var(--${StatisticsColor.PROFITABILITY}-600)`;
+  const membersColor: string = `var(--${StatisticsColor.MEMBERS}-600)`;
+  const tendancesColor: string = `var(--${StatisticsColor.TRENDS}-600)`;
   const items: MenuItem[] = [
     { label: 'Tableau de bord', icon: <Icon icon="gauge" color={dashboardColor} marginRight />, url: 'statistics/dashboard' },
     { separator: true },
@@ -44,6 +46,15 @@ export const StatisticsMenu = () => {
       items: [
         { label: 'Marge brute', icon: <Icon icon="hand-holding-dollar" color={rentabiliteColor} marginRight /> },
         { label: 'Produits les plus rentables', icon: <Icon icon="medal" color={rentabiliteColor} marginRight /> },
+      ],
+    },
+    { separator: true },
+    {
+      label: 'Membres',
+      items: [
+        { label: 'Nombre de membres', icon: <Icon icon="users" color={membersColor} marginRight /> },
+        { label: 'Panier moyen', icon: <Icon icon="cart-shopping" color={membersColor} marginRight /> },
+        { label: 'Adhésions', icon: <Icon icon="address-card" color={membersColor} marginRight /> },
       ],
     },
     { separator: true },

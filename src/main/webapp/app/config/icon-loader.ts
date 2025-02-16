@@ -1,4 +1,5 @@
 import {
+  faAddressCard,
   faArrowDown,
   faArrowLeft,
   faArrowRight,
@@ -12,6 +13,7 @@ import {
   faBell,
   faBook,
   faBoxesStacked,
+  faCartShopping,
   faChartLine,
   faCloud,
   faCloudArrowUp,
@@ -36,6 +38,7 @@ import {
   faPallet,
   faPencilAlt,
   faPlus,
+  faPowerOff,
   faRightToBracket,
   faRoad,
   faSackDollar,
@@ -126,5 +129,8 @@ export const loadIcons = () => {
     faArrowUp,
     faArrowRight,
     faArrowDown,
+    faCartShopping,
+    faPowerOff,
+    faAddressCard,
   );
 };
