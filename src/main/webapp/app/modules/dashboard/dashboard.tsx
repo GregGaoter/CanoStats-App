@@ -64,19 +64,19 @@ export const Dashboard = () => {
       },
     });
     setPanierData({
-      labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet'],
+      labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jui', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
       datasets: [
         {
           label: '2024',
           backgroundColor: documentStyle.getPropertyValue('--blue-600'),
           borderColor: documentStyle.getPropertyValue('--blue-600'),
-          data: [65, 59, 80, 81, 56, 55, 40],
+          data: [140, 138, 118, 128, 140, 124, 123, 136, 136, 140, 133, 124],
         },
         {
           label: '2025',
           backgroundColor: documentStyle.getPropertyValue('--yellow-600'),
           borderColor: documentStyle.getPropertyValue('--yellow-600'),
-          data: [28, 48, 40, 19, 86, 27, 90],
+          data: [123, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         },
       ],
     });

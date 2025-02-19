@@ -10,6 +10,7 @@ import {
   FileUploadUploadEvent,
   ItemTemplateOptions,
 } from 'primereact/fileupload';
+import { Messages } from 'primereact/messages';
 import { ProgressBar } from 'primereact/progressbar';
 import { Tag } from 'primereact/tag';
 import { Tooltip } from 'primereact/tooltip';
@@ -18,6 +19,7 @@ import React, { useRef, useState } from 'react';
 export const FileImport = () => {
   const [totalSize, setTotalSize] = useState<number>(0);
   const fileUploadRef = useRef<FileUpload>(null);
+  const messages = useRef<Messages>(null);
 
   const onTemplateSelect = (e: FileUploadSelectEvent) => {
     let _totalSize = totalSize;
@@ -34,7 +36,15 @@ export const FileImport = () => {
       _totalSize += file.size || 0;
     });
     setTotalSize(_totalSize);
-    window.showToast('info', 'Information', 'Fichier téléchargé');
+    messages.current?.clear();
+    messages.current?.show({
+      id: '1',
+      sticky: true,
+      severity: 'info',
+      summary: 'Information',
+      detail: `Téléchargement terminé ! Response status : ${e.xhr.status} ${e.xhr.statusText}`,
+      closable: false,
+    });
   };
 
   const onTemplateRemove = (file: File, callback: any) => {
@@ -119,24 +129,27 @@ export const FileImport = () => {
       <Tooltip target=".custom-choose-btn" content="Choisir" position="bottom" />
       <Tooltip target=".custom-upload-btn" content="Télécharger" position="bottom" />
       <Tooltip target=".custom-cancel-btn" content="Effacer" position="bottom" />
-      <FileUpload
-        ref={fileUploadRef}
-        name="mouvementsStocksFile"
-        url="/api/mouvements-stocks/import"
-        multiple={false}
-        accept="application/json"
-        maxFileSize={50000000}
-        onUpload={onTemplateUpload}
-        onSelect={onTemplateSelect}
-        onError={onTemplateClear}
-        onClear={onTemplateClear}
-        headerTemplate={headerTemplate}
-        itemTemplate={itemTemplate}
-        emptyTemplate={emptyTemplate}
-        chooseOptions={chooseOptions}
-        uploadOptions={uploadOptions}
-        cancelOptions={cancelOptions}
-      />
+      <div className="flex flex-column gap-3">
+        <FileUpload
+          ref={fileUploadRef}
+          name="mouvementsStocksFile"
+          url="/api/mouvements-stocks/import"
+          multiple={false}
+          accept="application/json"
+          maxFileSize={50000000}
+          onUpload={onTemplateUpload}
+          onSelect={onTemplateSelect}
+          onError={onTemplateClear}
+          onClear={onTemplateClear}
+          headerTemplate={headerTemplate}
+          itemTemplate={itemTemplate}
+          emptyTemplate={emptyTemplate}
+          chooseOptions={chooseOptions}
+          uploadOptions={uploadOptions}
+          cancelOptions={cancelOptions}
+        />
+        <Messages ref={messages} />
+      </div>
     </Card>
   );
 };

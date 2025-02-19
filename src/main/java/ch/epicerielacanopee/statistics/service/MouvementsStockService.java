@@ -139,15 +139,17 @@ public class MouvementsStockService {
         );
         int mouvementsStocksTotal = epicerioMouvementsStocks.size();
         List<MouvementsStock> mouvementsStocks = new ArrayList<>(mouvementsStocksTotal);
-        int i = 1;
+        int i = 0;
         Instant now = Instant.now();
         for (EpicerioMouvementsStockDTO epicerioMouvementsStock : epicerioMouvementsStocks) {
             MouvementsStock mouvementsStock = create(epicerioMouvementsStock);
             mouvementsStock.setImportedDate(now);
             mouvementsStocks.add(mouvementsStock);
-            LOG.info("{} / {}", i++, mouvementsStocksTotal);
+            i++;
         }
+        LOG.info("{} / {} MouvementsStocks created", i, mouvementsStocksTotal);
         mouvementsStockRepository.saveAll(mouvementsStocks);
+        LOG.info("MouvementsStocks successfuly saved");
     }
 
     /**

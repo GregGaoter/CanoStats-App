@@ -16,7 +16,7 @@
 logging:
   level:
     ROOT: INFO
-    tech.jhipster: INFO
+    tech.jhipster: WARN
     ch.epicerielacanopee.statistics: INFO
 
 management:
