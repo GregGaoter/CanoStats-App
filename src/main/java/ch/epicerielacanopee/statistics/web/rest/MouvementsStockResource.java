@@ -6,7 +6,6 @@ import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
 import ch.epicerielacanopee.statistics.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -21,7 +20,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -29,7 +37,8 @@ import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
- * REST controller for managing {@link ch.epicerielacanopee.statistics.domain.MouvementsStock}.
+ * REST controller for managing
+ * {@link ch.epicerielacanopee.statistics.domain.MouvementsStock}.
  */
 @RestController
 @RequestMapping("/api/mouvements-stocks")
@@ -55,7 +64,9 @@ public class MouvementsStockResource {
      * {@code POST  /mouvements-stocks} : Create a new mouvementsStock.
      *
      * @param mouvementsStockDTO the mouvementsStockDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new mouvementsStockDTO, or with status {@code 400 (Bad Request)} if the mouvementsStock has already an ID.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with
+     *         body the new mouvementsStockDTO, or with status
+     *         {@code 400 (Bad Request)} if the mouvementsStock has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
@@ -74,11 +85,14 @@ public class MouvementsStockResource {
     /**
      * {@code PUT  /mouvements-stocks/:id} : Updates an existing mouvementsStock.
      *
-     * @param id the id of the mouvementsStockDTO to save.
+     * @param id                 the id of the mouvementsStockDTO to save.
      * @param mouvementsStockDTO the mouvementsStockDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated mouvementsStockDTO,
-     * or with status {@code 400 (Bad Request)} if the mouvementsStockDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the mouvementsStockDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated mouvementsStockDTO,
+     *         or with status {@code 400 (Bad Request)} if the mouvementsStockDTO is
+     *         not valid,
+     *         or with status {@code 500 (Internal Server Error)} if the
+     *         mouvementsStockDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
@@ -105,14 +119,19 @@ public class MouvementsStockResource {
     }
 
     /**
-     * {@code PATCH  /mouvements-stocks/:id} : Partial updates given fields of an existing mouvementsStock, field will ignore if it is null
+     * {@code PATCH  /mouvements-stocks/:id} : Partial updates given fields of an
+     * existing mouvementsStock, field will ignore if it is null
      *
-     * @param id the id of the mouvementsStockDTO to save.
+     * @param id                 the id of the mouvementsStockDTO to save.
      * @param mouvementsStockDTO the mouvementsStockDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated mouvementsStockDTO,
-     * or with status {@code 400 (Bad Request)} if the mouvementsStockDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the mouvementsStockDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the mouvementsStockDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated mouvementsStockDTO,
+     *         or with status {@code 400 (Bad Request)} if the mouvementsStockDTO is
+     *         not valid,
+     *         or with status {@code 404 (Not Found)} if the mouvementsStockDTO is
+     *         not found,
+     *         or with status {@code 500 (Internal Server Error)} if the
+     *         mouvementsStockDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
@@ -144,7 +163,8 @@ public class MouvementsStockResource {
      * {@code GET  /mouvements-stocks} : get all the mouvementsStocks.
      *
      * @param pageable the pagination information.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of mouvementsStocks in body.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
+     *         of mouvementsStocks in body.
      */
     @GetMapping("")
     public ResponseEntity<List<MouvementsStockDTO>> getAllMouvementsStocks(
@@ -160,7 +180,8 @@ public class MouvementsStockResource {
      * {@code GET  /mouvements-stocks/:id} : get the "id" mouvementsStock.
      *
      * @param id the id of the mouvementsStockDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the mouvementsStockDTO, or with status {@code 404 (Not Found)}.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the mouvementsStockDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
     public ResponseEntity<MouvementsStockDTO> getMouvementsStock(@PathVariable("id") UUID id) {
@@ -194,10 +215,10 @@ public class MouvementsStockResource {
     @PostMapping("/import")
     public ResponseEntity<String> importFile(@RequestParam MultipartFile mouvementsStocksFile) {
         try {
-            mouvementsStockService.importFile(mouvementsStocksFile);
-            return ResponseEntity.ok("MouvementsStocks imported successfully!");
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing file!");
+            String message = mouvementsStockService.importFile(mouvementsStocksFile);
+            return ResponseEntity.ok(message);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 }

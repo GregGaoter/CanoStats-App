@@ -8,9 +8,9 @@ import ch.epicerielacanopee.statistics.service.mapper.MouvementsStockMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,7 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * Service Implementation for managing {@link ch.epicerielacanopee.statistics.domain.MouvementsStock}.
+ * Service Implementation for managing
+ * {@link ch.epicerielacanopee.statistics.domain.MouvementsStock}.
  */
 @Service
 @Transactional
@@ -124,38 +125,41 @@ public class MouvementsStockService {
     }
 
     /**
-     * Imports a file containing a list of {@link EpicerioMouvementsStockDTO} objects.
-     * The method reads the content of the file, converts it to a list of {@link EpicerioMouvementsStockDTO},
-     * and then processes each item to create and save {@link MouvementsStock} entities.
+     * Imports a file containing a list of {@link EpicerioMouvementsStockDTO}
+     * objects, processes the data, and saves the corresponding
+     * {@link MouvementsStock} entities to the repository.
      *
      * @param file the {@link MultipartFile} to be imported
-     * @throws IOException if an I/O error occurs while reading the file
+     * @return a message indicating the number of successfully imported
+     *         {@link MouvementsStock} entities
+     * @throws Exception if an error occurs during file processing or data
+     *                   conversion
      */
-    public void importFile(MultipartFile file) throws IOException {
+    public String importFile(MultipartFile file) throws Exception {
         String content = new String(file.getBytes());
         List<EpicerioMouvementsStockDTO> epicerioMouvementsStocks = objectMapper.readValue(
             content,
             new TypeReference<List<EpicerioMouvementsStockDTO>>() {}
         );
+        epicerioMouvementsStocks.sort(Comparator.comparing(epicerioMouvementsStock -> epicerioMouvementsStock.getId()));
         int mouvementsStocksTotal = epicerioMouvementsStocks.size();
         List<MouvementsStock> mouvementsStocks = new ArrayList<>(mouvementsStocksTotal);
-        int i = 0;
         Instant now = Instant.now();
         for (EpicerioMouvementsStockDTO epicerioMouvementsStock : epicerioMouvementsStocks) {
             MouvementsStock mouvementsStock = create(epicerioMouvementsStock);
             mouvementsStock.setImportedDate(now);
             mouvementsStocks.add(mouvementsStock);
-            i++;
         }
-        LOG.info("{} / {} MouvementsStocks created", i, mouvementsStocksTotal);
         mouvementsStockRepository.saveAll(mouvementsStocks);
-        LOG.info("MouvementsStocks successfuly saved");
+        return String.format(" %d MouvementsStocks successfuly imported!", mouvementsStocksTotal);
     }
 
     /**
-     * Creates a new MouvementsStock object from the given EpicerioMouvementsStockDTO.
+     * Creates a new MouvementsStock object from the given
+     * EpicerioMouvementsStockDTO.
      *
-     * @param epicerioMouvementsStocks the DTO containing the data for the new MouvementsStock
+     * @param epicerioMouvementsStocks the DTO containing the data for the new
+     *                                 MouvementsStock
      * @return the newly created MouvementsStock object
      */
     public MouvementsStock create(EpicerioMouvementsStockDTO epicerioMouvementsStocks) {

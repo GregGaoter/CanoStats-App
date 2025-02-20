@@ -4,6 +4,7 @@ import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import {
   FileUpload,
+  FileUploadErrorEvent,
   FileUploadHeaderTemplateOptions,
   FileUploadOptions,
   FileUploadSelectEvent,
@@ -40,9 +41,9 @@ export const FileImport = () => {
     messages.current?.show({
       id: '1',
       sticky: true,
-      severity: 'info',
-      summary: 'Information',
-      detail: `Téléchargement terminé ! Response status : ${e.xhr.status} ${e.xhr.statusText}`,
+      severity: 'success',
+      summary: 'Succès',
+      detail: e.xhr.responseText,
       closable: false,
     });
   };
@@ -54,6 +55,19 @@ export const FileImport = () => {
 
   const onTemplateClear = () => {
     setTotalSize(0);
+  };
+
+  const handleError = (event: FileUploadErrorEvent) => {
+    setTotalSize(0);
+    messages.current?.clear();
+    messages.current?.show({
+      id: '1',
+      sticky: true,
+      severity: 'error',
+      summary: 'Erreur',
+      detail: event.xhr.responseText,
+      closable: false,
+    });
   };
 
   const headerTemplate = (options: FileUploadHeaderTemplateOptions) => {
@@ -139,7 +153,7 @@ export const FileImport = () => {
           maxFileSize={50000000}
           onUpload={onTemplateUpload}
           onSelect={onTemplateSelect}
-          onError={onTemplateClear}
+          onError={handleError}
           onClear={onTemplateClear}
           headerTemplate={headerTemplate}
           itemTemplate={itemTemplate}
