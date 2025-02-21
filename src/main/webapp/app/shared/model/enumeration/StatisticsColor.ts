@@ -2,8 +2,9 @@ export enum StatisticsColor {
   DASHBOARD = 'cyan',
   SALES = 'blue',
   PURCHASES = 'yellow',
-  INVENTORY = 'red',
-  PROFITABILITY = 'green',
-  MEMBERS = 'purple',
-  TRENDS = 'orange',
+  LOSSES = 'red',
+  INVENTORY = 'green',
+  PROFITABILITY = 'purple',
+  MEMBERS = 'orange',
+  TRENDS = 'teal',
 }

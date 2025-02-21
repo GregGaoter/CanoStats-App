@@ -11,6 +11,7 @@ export const StatisticsMenu = () => {
   const dashboardColor: string = `var(--${StatisticsColor.DASHBOARD}-600)`;
   const ventesColor: string = `var(--${StatisticsColor.SALES}-600)`;
   const achatsColor: string = `var(--${StatisticsColor.PURCHASES}-600)`;
+  const pertesColor: string = `var(--${StatisticsColor.LOSSES}-600)`;
   const stocksColor: string = `var(--${StatisticsColor.INVENTORY}-600)`;
   const rentabiliteColor: string = `var(--${StatisticsColor.PROFITABILITY}-600)`;
   const membersColor: string = `var(--${StatisticsColor.MEMBERS}-600)`;
@@ -59,6 +60,22 @@ export const StatisticsMenu = () => {
           label: 'Fournisseurs',
           icon: <Icon icon="truck" color={achatsColor} marginRight />,
           data: { color: StatisticsColor.PURCHASES },
+        },
+      ],
+    },
+    { separator: true },
+    {
+      label: 'Pertes',
+      items: [
+        {
+          label: 'Pertes',
+          icon: <Icon icon="trash-can" color={pertesColor} marginRight />,
+          data: { color: StatisticsColor.LOSSES },
+        },
+        {
+          label: 'Inventaire',
+          icon: <Icon icon="arrow-trend-down" color={pertesColor} marginRight />,
+          data: { color: StatisticsColor.LOSSES },
         },
       ],
     },
