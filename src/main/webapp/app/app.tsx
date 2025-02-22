@@ -72,6 +72,12 @@ export const App = () => {
     toolbar: {
       root: { className: 'border-round-xl shadow-4' },
     },
+    tabview: {
+      panelContainer: { className: 'surface-ground px-0 pb-0' },
+    },
+    tabpanel: {
+      root: { className: 'text-color-secondary' },
+    },
   };
 
   return (

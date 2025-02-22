@@ -12,7 +12,7 @@ export const StatisticsMenu = () => {
   const ventesColor: string = `var(--${StatisticsColor.SALES}-600)`;
   const achatsColor: string = `var(--${StatisticsColor.PURCHASES}-600)`;
   const pertesColor: string = `var(--${StatisticsColor.LOSSES}-600)`;
-  const stocksColor: string = `var(--${StatisticsColor.INVENTORY}-600)`;
+  const stocksColor: string = `var(--${StatisticsColor.STOCK}-600)`;
   const rentabiliteColor: string = `var(--${StatisticsColor.PROFITABILITY}-600)`;
   const membersColor: string = `var(--${StatisticsColor.MEMBERS}-600)`;
   const tendancesColor: string = `var(--${StatisticsColor.TRENDS}-600)`;
@@ -75,6 +75,7 @@ export const StatisticsMenu = () => {
         {
           label: 'Inventaire',
           icon: <Icon icon="arrow-trend-down" color={pertesColor} marginRight />,
+          url: '/statistics/inventory',
           data: { color: StatisticsColor.LOSSES },
         },
       ],
@@ -86,17 +87,17 @@ export const StatisticsMenu = () => {
         {
           label: 'Rotation',
           icon: <Icon icon="arrows-rotate" color={stocksColor} marginRight />,
-          data: { color: StatisticsColor.INVENTORY },
+          data: { color: StatisticsColor.STOCK },
         },
         {
           label: 'Stock moyen',
           icon: <Icon icon="warehouse" color={stocksColor} marginRight />,
-          data: { color: StatisticsColor.INVENTORY },
+          data: { color: StatisticsColor.STOCK },
         },
         {
           label: 'Prévisions',
           icon: <Icon icon="boxes-stacked" color={stocksColor} marginRight />,
-          data: { color: StatisticsColor.INVENTORY },
+          data: { color: StatisticsColor.STOCK },
         },
       ],
     },

@@ -3,7 +3,7 @@ export enum StatisticsColor {
   SALES = 'blue',
   PURCHASES = 'yellow',
   LOSSES = 'red',
-  INVENTORY = 'green',
+  STOCK = 'green',
   PROFITABILITY = 'purple',
   MEMBERS = 'orange',
   TRENDS = 'teal',
