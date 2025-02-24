@@ -1,18 +1,30 @@
+import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { Icon } from 'app/shared/component/Icon';
+import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
 import { InputNumber } from 'primereact/inputnumber';
 import { TabPanel, TabView } from 'primereact/tabview';
 import { Toolbar } from 'primereact/toolbar';
-import { Nullable } from 'primereact/ts-helpers';
 import React, { useState } from 'react';
+import { getEntities as getMouvementsStocks } from '../../../entities/mouvements-stock/mouvements-stock.reducer';
 
 export const Inventory = () => {
-  const [dates, setDates] = useState<Nullable<(Date | null)[]>>(null);
+  const [mouvement, setMouvement] = useState<number>(100);
+  const [dates, setDates] = useState<Date[]>([new Date(new Date().getFullYear(), 0, 1), new Date()]);
+  const dispatch = useAppDispatch();
+
+  const mouvementsStocks = useAppSelector(state => state.mouvementsStock.entities);
+  const loading = useAppSelector(state => state.mouvementsStock.loading);
+
+  const fetchMouvementsStocks = () => {
+    dispatch(getMouvementsStocks(undefined));
+  };
 
   const startContent = (
-    <div className="flex gap-3">
+    <div className="flex gap-3 align-items-end">
       <div className="flex flex-column gap-2">
         <label>Mouvement</label>
-        <InputNumber prefix="≥ " suffix="g" />
+        <InputNumber prefix="≥ " suffix="g" value={mouvement} onChange={e => setMouvement(e.value)} />
       </div>
       <div className="flex flex-column gap-2">
         <label>Période</label>
@@ -23,7 +35,12 @@ export const Inventory = () => {
           dateFormat="dd/mm/yy"
           readOnlyInput
           hideOnRangeSelection
+          showIcon
+          required
         />
+      </div>
+      <div className="flex flex-column gap-2">
+        <Button label="Appliquer" icon={<Icon icon="filter" marginRight />} onClick={() => fetchMouvementsStocks()} />
       </div>
     </div>
   );
@@ -35,6 +52,8 @@ export const Inventory = () => {
           <div className="col-12">
             <Toolbar start={startContent} />
           </div>
+          <div className="col-12">{mouvement}</div>
+          <div className="col-12">{`${dates}`}</div>
         </div>
       </TabPanel>
       <TabPanel header="A la pièce">

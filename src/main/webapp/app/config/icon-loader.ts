@@ -25,6 +25,7 @@ import {
   faEye,
   faFileImport,
   faFileInvoiceDollar,
+  faFilter,
   faFlag,
   faGauge,
   faHandHoldingDollar,
@@ -132,5 +133,6 @@ export const loadIcons = () => {
     faCartShopping,
     faPowerOff,
     faAddressCard,
+    faFilter,
   );
 };
