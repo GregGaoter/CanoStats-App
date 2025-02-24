@@ -1,23 +1,101 @@
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { Icon } from 'app/shared/component/Icon';
+import { IMouvementsStock } from 'app/shared/model/mouvements-stock.model';
+import { getInventoryByWeightQueryParams } from 'app/shared/util/QueryParamsUtil';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
+import { Card } from 'primereact/card';
+import { Chart } from 'primereact/chart';
 import { InputNumber } from 'primereact/inputnumber';
 import { TabPanel, TabView } from 'primereact/tabview';
 import { Toolbar } from 'primereact/toolbar';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getEntities as getMouvementsStocks } from '../../../entities/mouvements-stock/mouvements-stock.reducer';
 
 export const Inventory = () => {
   const [mouvement, setMouvement] = useState<number>(100);
   const [dates, setDates] = useState<Date[]>([new Date(new Date().getFullYear(), 0, 1), new Date()]);
+  const [inventoryByWeightData, setInventoryByWeightData] = useState({});
+  const [barOptions, setBarOptions] = useState({});
+
   const dispatch = useAppDispatch();
 
-  const mouvementsStocks = useAppSelector(state => state.mouvementsStock.entities);
+  const mouvementsStocks: IMouvementsStock[] = useAppSelector(state => state.mouvementsStock.entities);
   const loading = useAppSelector(state => state.mouvementsStock.loading);
 
+  const documentStyle = getComputedStyle(document.documentElement);
+  const textColor = documentStyle.getPropertyValue('--text-color');
+  const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
+  const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+
+  useEffect(() => {
+    setBarOptions({
+      plugins: {
+        legend: {
+          display: false,
+        },
+        // tooltip: {
+        //   callbacks: {
+        //     label: context => {
+        //       let label = context.dataset.label || '';
+        //       if (label) {
+        //         label += ': ';
+        //       }
+        //       if (context.parsed.y !== null) {
+        //         label += context.parsed.y;
+        //       }
+        //       return label;
+        //     },
+        //   },
+        // },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: textColorSecondary,
+            font: {
+              weight: '500',
+            },
+          },
+          grid: {
+            display: false,
+          },
+          border: {
+            display: false,
+          },
+        },
+        y: {
+          ticks: {
+            color: textColorSecondary,
+          },
+          grid: {
+            color: surfaceBorder,
+          },
+          border: {
+            display: false,
+          },
+        },
+      },
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      setInventoryByWeightData({
+        labels: mouvementsStocks.map(m => m.codeProduit),
+        datasets: [
+          {
+            backgroundColor: documentStyle.getPropertyValue('--blue-600'),
+            borderColor: documentStyle.getPropertyValue('--blue-600'),
+            data: mouvementsStocks.map(m => -m.mouvement),
+          },
+        ],
+      });
+    }
+  }, [loading]);
+
   const fetchMouvementsStocks = () => {
-    dispatch(getMouvementsStocks(undefined));
+    dispatch(getMouvementsStocks(getInventoryByWeightQueryParams(mouvement / 100, dates)));
   };
 
   const startContent = (
@@ -52,8 +130,11 @@ export const Inventory = () => {
           <div className="col-12">
             <Toolbar start={startContent} />
           </div>
-          <div className="col-12">{mouvement}</div>
-          <div className="col-12">{`${dates}`}</div>
+          <div className="col-6">
+            <Card>
+              <Chart type="bar" data={inventoryByWeightData} options={barOptions}></Chart>
+            </Card>
+          </div>
         </div>
       </TabPanel>
       <TabPanel header="A la pièce">

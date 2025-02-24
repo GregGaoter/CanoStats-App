@@ -41,7 +41,7 @@ export const MouvementsStock = () => {
       size: pagination.size,
       sort: `${pagination.sort},${pagination.order}`,
     };
-    dispatch(getMouvementsStocks(queryParams));
+    dispatch(getMouvementsStocks(undefined));
   };
 
   useEffect(() => {
