@@ -102,6 +102,7 @@
       "fieldValidateRules": ["required"]
     }
   ],
+  "jpaMetamodelFiltering": "true",
   "name": "MouvementsStock",
   "pagination": "pagination",
   "relationships": [],

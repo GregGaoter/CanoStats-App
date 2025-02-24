@@ -1,7 +1,9 @@
 package ch.epicerielacanopee.statistics.web.rest;
 
 import ch.epicerielacanopee.statistics.repository.MouvementsStockRepository;
+import ch.epicerielacanopee.statistics.service.MouvementsStockQueryService;
 import ch.epicerielacanopee.statistics.service.MouvementsStockService;
+import ch.epicerielacanopee.statistics.service.criteria.MouvementsStockCriteria;
 import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
 import ch.epicerielacanopee.statistics.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
@@ -55,9 +57,16 @@ public class MouvementsStockResource {
 
     private final MouvementsStockRepository mouvementsStockRepository;
 
-    public MouvementsStockResource(MouvementsStockService mouvementsStockService, MouvementsStockRepository mouvementsStockRepository) {
+    private final MouvementsStockQueryService mouvementsStockQueryService;
+
+    public MouvementsStockResource(
+        MouvementsStockService mouvementsStockService,
+        MouvementsStockRepository mouvementsStockRepository,
+        MouvementsStockQueryService mouvementsStockQueryService
+    ) {
         this.mouvementsStockService = mouvementsStockService;
         this.mouvementsStockRepository = mouvementsStockRepository;
+        this.mouvementsStockQueryService = mouvementsStockQueryService;
     }
 
     /**
@@ -162,18 +171,31 @@ public class MouvementsStockResource {
     /**
      * {@code GET  /mouvements-stocks} : get all the mouvementsStocks.
      *
+     * @param criteria the criteria which the requested entities should match.
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
      *         of mouvementsStocks in body.
      */
     @GetMapping("")
     public ResponseEntity<List<MouvementsStockDTO>> getAllMouvementsStocks(
+        MouvementsStockCriteria criteria,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
-        LOG.debug("REST request to get a page of MouvementsStocks");
-        Page<MouvementsStockDTO> page = mouvementsStockService.findAll(pageable);
+        Page<MouvementsStockDTO> page = mouvementsStockQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /mouvements-stocks/count} : count all the mouvementsStocks.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count
+     *         in body.
+     */
+    @GetMapping("/count")
+    public ResponseEntity<Long> countMouvementsStocks(MouvementsStockCriteria criteria) {
+        return ResponseEntity.ok().body(mouvementsStockQueryService.countByCriteria(criteria));
     }
 
     /**
