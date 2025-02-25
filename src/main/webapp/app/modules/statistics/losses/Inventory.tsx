@@ -1,5 +1,6 @@
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { Icon } from 'app/shared/component/Icon';
+import { StatisticsColor } from 'app/shared/model/enumeration/StatisticsColor';
 import { IMouvementsStock } from 'app/shared/model/mouvements-stock.model';
 import { getInventoryByWeightQueryParams } from 'app/shared/util/QueryParamsUtil';
 import { Button } from 'primereact/button';
@@ -82,11 +83,11 @@ export const Inventory = () => {
   useEffect(() => {
     if (!loading) {
       setInventoryByWeightData({
-        labels: mouvementsStocks.map(m => m.codeProduit),
+        labels: mouvementsStocks.map(m => `${m.epicerioId}-${m.codeProduit}`),
         datasets: [
           {
-            backgroundColor: documentStyle.getPropertyValue('--blue-600'),
-            borderColor: documentStyle.getPropertyValue('--blue-600'),
+            backgroundColor: documentStyle.getPropertyValue(`--${StatisticsColor.LOSSES}-600`),
+            borderColor: documentStyle.getPropertyValue(`--${StatisticsColor.LOSSES}-600`),
             data: mouvementsStocks.map(m => -m.mouvement),
           },
         ],
@@ -118,7 +119,7 @@ export const Inventory = () => {
         />
       </div>
       <div className="flex flex-column gap-2">
-        <Button label="Appliquer" icon={<Icon icon="filter" marginRight />} onClick={() => fetchMouvementsStocks()} />
+        <Button label="Appliquer" icon={<Icon icon="filter" marginRight />} loading={loading} onClick={() => fetchMouvementsStocks()} />
       </div>
     </div>
   );

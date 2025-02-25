@@ -5,11 +5,13 @@ import { IMouvementsStock, MouvementsStockField } from 'app/shared/model/mouveme
 import { IQueryParams } from 'app/shared/reducers/reducer.utils';
 import { ITEMS_PER_PAGE } from 'app/shared/util/pagination.constants';
 import { getPaginationOrderValue, getValueOfOrder, Pagination, PaginationOrder } from 'app/shared/util/PaginationUtils';
+import { getMouvementsStockQueryParams } from 'app/shared/util/QueryParamsUtil';
 import dayjs from 'dayjs';
+import { FilterMatchMode } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Column, ColumnEditorOptions } from 'primereact/column';
-import { DataTable, DataTableStateEvent } from 'primereact/datatable';
+import { DataTable, DataTableFilterMetaData, DataTableStateEvent } from 'primereact/datatable';
 import { InputNumber, InputNumberValueChangeEvent } from 'primereact/inputnumber';
 import { Paginator, PaginatorPageChangeEvent } from 'primereact/paginator';
 import React, { useEffect, useState } from 'react';
@@ -29,6 +31,9 @@ export const MouvementsStock = () => {
   const [pagination, setPagination] = useState<Pagination<MouvementsStockField>>(defaultPagination);
   const [isComponentMounting, setComponentMounting] = useState<boolean>(true);
   const [selectedMouvementsStock, setSelectedMouvementsStock] = useState<IMouvementsStock[]>([]);
+  const [filters, setFilters] = useState<{ [key: string]: DataTableFilterMetaData }>({
+    epicerioId: { value: null, matchMode: FilterMatchMode.EQUALS },
+  });
 
   const mouvementsStocks = useAppSelector(state => state.mouvementsStock.entities);
   const loading = useAppSelector(state => state.mouvementsStock.loading);
@@ -41,7 +46,7 @@ export const MouvementsStock = () => {
       size: pagination.size,
       sort: `${pagination.sort},${pagination.order}`,
     };
-    dispatch(getMouvementsStocks(undefined));
+    dispatch(getMouvementsStocks(getMouvementsStockQueryParams(filters)));
   };
 
   useEffect(() => {
@@ -62,6 +67,11 @@ export const MouvementsStock = () => {
 
   const handleSort = (event: DataTableStateEvent): void => {
     setPagination({ ...pagination, sort: event.sortField as MouvementsStockField, order: getValueOfOrder(event.sortOrder) });
+    getAllMouvementsStocks();
+  };
+
+  const handleFilter = (event: DataTableStateEvent): void => {
+    setFilters(event.filters as { [key: string]: DataTableFilterMetaData });
     getAllMouvementsStocks();
   };
 
@@ -100,6 +110,8 @@ export const MouvementsStock = () => {
         sortField={pagination.sort}
         sortOrder={getPaginationOrderValue(pagination.order)}
         onSort={handleSort}
+        filters={filters}
+        onFilter={handleFilter}
         selectionMode="checkbox"
         selection={selectedMouvementsStock}
         onSelectionChange={e => setSelectedMouvementsStock(e.value)}
@@ -108,12 +120,12 @@ export const MouvementsStock = () => {
       >
         <Column selectionMode="multiple"></Column>
         <Column field="epicerioId" header="Id" sortable filter></Column>
-        <Column field="codeProduit" header="Code" sortable filter></Column>
-        <Column field="produit" header="Produit" sortable filter></Column>
-        <Column field="type" header="Type" sortable filter></Column>
-        <Column field="mouvement" header="Mouvement" sortable filter editor={options => mouvementEditor(options)}></Column>
-        <Column field="solde" header="Solde" sortable filter></Column>
-        <Column field="date" header="Date" body={dateTemplate} sortable filter></Column>
+        <Column field="codeProduit" header="Code" sortable></Column>
+        <Column field="produit" header="Produit" sortable></Column>
+        <Column field="type" header="Type" sortable></Column>
+        <Column field="mouvement" header="Mouvement" sortable editor={options => mouvementEditor(options)}></Column>
+        <Column field="solde" header="Solde" sortable></Column>
+        <Column field="date" header="Date" body={dateTemplate} sortable></Column>
       </DataTable>
       <Paginator
         first={pagination.first}
