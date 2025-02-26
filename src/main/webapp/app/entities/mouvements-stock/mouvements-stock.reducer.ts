@@ -1,8 +1,8 @@
-import axios from 'axios';
 import { createAsyncThunk, isFulfilled, isPending } from '@reduxjs/toolkit';
-import { cleanEntity } from 'app/shared/util/entity-utils';
-import { EntityState, IQueryParams, createEntitySlice, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
 import { IMouvementsStock, defaultValue } from 'app/shared/model/mouvements-stock.model';
+import { EntityState, createEntitySlice, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
+import { cleanEntity } from 'app/shared/util/entity-utils';
+import axios from 'axios';
 
 const initialState: EntityState<IMouvementsStock> = {
   loading: false,
@@ -14,7 +14,7 @@ const initialState: EntityState<IMouvementsStock> = {
   updateSuccess: false,
 };
 
-const apiUrl = 'api/mouvements-stocks';
+export const apiUrl = 'api/mouvements-stocks';
 
 // Actions
 

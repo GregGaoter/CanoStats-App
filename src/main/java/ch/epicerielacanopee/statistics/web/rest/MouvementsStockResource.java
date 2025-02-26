@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -184,6 +185,17 @@ public class MouvementsStockResource {
         Page<MouvementsStockDTO> page = mouvementsStockQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    @GetMapping("/inventory-by-weight")
+    public ResponseEntity<Map<String, List<MouvementsStockDTO>>> findByInventoryByWeight(
+        MouvementsStockCriteria criteria,
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
+        @RequestParam float mouvementValue
+    ) {
+        List<MouvementsStockDTO> resultByCriteria = mouvementsStockQueryService.findByCriteria(criteria, pageable).getContent();
+        Map<String, List<MouvementsStockDTO>> result = mouvementsStockService.findByInventoryByWeight(resultByCriteria, mouvementValue);
+        return ResponseEntity.ok().body(result);
     }
 
     /**

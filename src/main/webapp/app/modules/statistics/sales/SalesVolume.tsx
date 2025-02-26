@@ -34,21 +34,27 @@ export const SalesVolume = () => {
       labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jui', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
       datasets: [
         {
+          type: 'bar',
           label: `Pommes`,
           backgroundColor: documentStyle.getPropertyValue('--blue-600'),
-          borderColor: documentStyle.getPropertyValue('--blue-600'),
-          data: [65, 59, 80, 81, 56, 55, 40, 45, 60, 70, 75, 90],
+          borderColor: documentStyle.getPropertyValue('--surface-card'),
+          borderWidth: 2,
+          data: [0, 59, 80, 81, 56, 55, 40, 45, 60, 70, 75, 90],
         },
         {
+          type: 'bar',
           label: `Bananes`,
           backgroundColor: documentStyle.getPropertyValue('--yellow-600'),
-          borderColor: documentStyle.getPropertyValue('--yellow-600'),
-          data: [28, 48, 40, 19, 86, 27, 90, 100, 85, 60, 50, 40],
+          borderColor: documentStyle.getPropertyValue('--surface-card'),
+          borderWidth: 2,
+          data: [0, 48, 40, 19, 86, 27, 90, 100, 85, 60, 50, 40],
         },
         {
+          type: 'bar',
           label: `Oranges`,
           backgroundColor: documentStyle.getPropertyValue('--green-600'),
-          borderColor: documentStyle.getPropertyValue('--green-600'),
+          borderColor: documentStyle.getPropertyValue('--surface-card'),
+          borderWidth: 2,
           data: [35, 40, 60, 70, 46, 33, 50, 55, 65, 75, 80, 95],
         },
       ],
@@ -57,18 +63,21 @@ export const SalesVolume = () => {
       labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jui', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
       datasets: [
         {
+          type: 'bar',
           label: `Tomates`,
           backgroundColor: documentStyle.getPropertyValue('--blue-600'),
           borderColor: documentStyle.getPropertyValue('--blue-600'),
           data: [40, 32, 85, 29, 40, 45, 9, 16, 81, 5, 9, 42],
         },
         {
+          type: 'bar',
           label: `Lait`,
           backgroundColor: documentStyle.getPropertyValue('--yellow-600'),
           borderColor: documentStyle.getPropertyValue('--yellow-600'),
           data: [6, 81, 16, 66, 37, 1, 36, 88, 27, 1, 72, 87],
         },
         {
+          type: 'bar',
           label: `Pain`,
           backgroundColor: documentStyle.getPropertyValue('--green-600'),
           borderColor: documentStyle.getPropertyValue('--green-600'),
@@ -113,13 +122,12 @@ export const SalesVolume = () => {
     setMonthOptions({
       plugins: {
         legend: {
-          labels: {
-            color: textColor,
-          },
+          display: false,
         },
       },
       scales: {
         x: {
+          stacked: true,
           ticks: {
             color: textColorSecondary,
             font: {
@@ -134,6 +142,7 @@ export const SalesVolume = () => {
           },
         },
         y: {
+          stacked: true,
           ticks: {
             color: textColorSecondary,
           },

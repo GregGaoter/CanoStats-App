@@ -1,8 +1,7 @@
-import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { Icon } from 'app/shared/component/Icon';
-import { StatisticsColor } from 'app/shared/model/enumeration/StatisticsColor';
-import { IMouvementsStock } from 'app/shared/model/mouvements-stock.model';
+import { ApiMapResponse, IMouvementsStock } from 'app/shared/model/mouvements-stock.model';
 import { getInventoryByWeightQueryParams } from 'app/shared/util/QueryParamsUtil';
+import axios from 'axios';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
 import { Card } from 'primereact/card';
@@ -11,18 +10,14 @@ import { InputNumber } from 'primereact/inputnumber';
 import { TabPanel, TabView } from 'primereact/tabview';
 import { Toolbar } from 'primereact/toolbar';
 import React, { useEffect, useState } from 'react';
-import { getEntities as getMouvementsStocks } from '../../../entities/mouvements-stock/mouvements-stock.reducer';
+import { apiUrl } from '../../../entities/mouvements-stock/mouvements-stock.reducer';
 
 export const Inventory = () => {
   const [mouvement, setMouvement] = useState<number>(100);
   const [dates, setDates] = useState<Date[]>([new Date(new Date().getFullYear(), 0, 1), new Date()]);
   const [inventoryByWeightData, setInventoryByWeightData] = useState({});
   const [barOptions, setBarOptions] = useState({});
-
-  const dispatch = useAppDispatch();
-
-  const mouvementsStocks: IMouvementsStock[] = useAppSelector(state => state.mouvementsStock.entities);
-  const loading = useAppSelector(state => state.mouvementsStock.loading);
+  const [loading, setLoading] = useState(false);
 
   const documentStyle = getComputedStyle(document.documentElement);
   const textColor = documentStyle.getPropertyValue('--text-color');
@@ -35,23 +30,10 @@ export const Inventory = () => {
         legend: {
           display: false,
         },
-        // tooltip: {
-        //   callbacks: {
-        //     label: context => {
-        //       let label = context.dataset.label || '';
-        //       if (label) {
-        //         label += ': ';
-        //       }
-        //       if (context.parsed.y !== null) {
-        //         label += context.parsed.y;
-        //       }
-        //       return label;
-        //     },
-        //   },
-        // },
       },
       scales: {
         x: {
+          stacked: true,
           ticks: {
             color: textColorSecondary,
             font: {
@@ -66,6 +48,7 @@ export const Inventory = () => {
           },
         },
         y: {
+          stacked: true,
           ticks: {
             color: textColorSecondary,
           },
@@ -80,23 +63,38 @@ export const Inventory = () => {
     });
   }, []);
 
-  useEffect(() => {
-    if (!loading) {
-      setInventoryByWeightData({
-        labels: mouvementsStocks.map(m => `${m.epicerioId}-${m.codeProduit}`),
-        datasets: [
-          {
-            backgroundColor: documentStyle.getPropertyValue(`--${StatisticsColor.LOSSES}-600`),
-            borderColor: documentStyle.getPropertyValue(`--${StatisticsColor.LOSSES}-600`),
-            data: mouvementsStocks.map(m => -m.mouvement),
-          },
-        ],
-      });
-    }
-  }, [loading]);
+  const transformApiResponseData = (data: ApiMapResponse) => {
+    const labels: string[] = Object.keys(data);
+    const ids: number[] = Array.from(
+      new Set(
+        Object.values(data)
+          .flat()
+          .map(ms => ms.epicerioId),
+      ),
+    );
+    const datasets = ids.map(id => ({
+      type: 'bar',
+      label: `${id}`,
+      data: labels.map(codeProduit => {
+        const mouvementStock: IMouvementsStock = data[codeProduit].find(ms => ms.epicerioId === id);
+        return mouvementStock ? Math.abs(mouvementStock.mouvement) : 0;
+      }),
+      backgroundColor: documentStyle.getPropertyValue('--blue-600'),
+      borderColor: documentStyle.getPropertyValue('--surface-card'),
+      borderWidth: 2,
+    }));
 
-  const fetchMouvementsStocks = () => {
-    dispatch(getMouvementsStocks(getInventoryByWeightQueryParams(mouvement / 100, dates)));
+    return { labels, datasets };
+  };
+
+  const fetchMouvementsStocks = (): void => {
+    setLoading(true);
+    axios
+      .get<ApiMapResponse>(`${apiUrl}/inventory-by-weight?${getInventoryByWeightQueryParams(mouvement / 1000, dates)}`)
+      .then(response => {
+        setInventoryByWeightData(transformApiResponseData(response.data));
+      })
+      .finally(() => setLoading(false));
   };
 
   const startContent = (
@@ -131,7 +129,7 @@ export const Inventory = () => {
           <div className="col-12">
             <Toolbar start={startContent} />
           </div>
-          <div className="col-6">
+          <div className="col-12">
             <Card>
               <Chart type="bar" data={inventoryByWeightData} options={barOptions}></Chart>
             </Card>

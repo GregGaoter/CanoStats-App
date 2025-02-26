@@ -31,3 +31,7 @@ export const defaultValue: Readonly<IMouvementsStock> = {
 };
 
 export type MouvementsStockField = keyof IMouvementsStock;
+
+export interface ApiMapResponse {
+  [key: string]: IMouvementsStock[];
+}
