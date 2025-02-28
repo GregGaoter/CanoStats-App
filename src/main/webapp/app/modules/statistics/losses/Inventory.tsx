@@ -90,7 +90,7 @@ export const Inventory = () => {
   const fetchMouvementsStocks = (): void => {
     setLoading(true);
     axios
-      .get<ApiMapResponse>(`${apiUrl}/inventory-by-weight?${getInventoryByWeightQueryParams(mouvement / 1000, dates)}`)
+      .get<ApiMapResponse>(`${apiUrl}/inventory-by-weight?${getInventoryByWeightQueryParams(mouvement / 1000, dates)}`, { timeout: 600000 })
       .then(response => {
         setInventoryByWeightData(transformApiResponseData(response.data));
       })

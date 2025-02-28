@@ -203,7 +203,21 @@ public class MouvementsStockService {
                     entry
                         .getValue()
                         .stream()
-                        .filter(m -> m.getType().equals("Inventaire") && m.getMouvement() < 0 && Math.abs(m.getMouvement()) >= mouvement)
+                        .sorted(Comparator.comparing(MouvementsStockDTO::getDate))
+                        .filter(m -> {
+                            if (m.getType().equals("Inventaire") && m.getMouvement() <= -mouvement) {
+                                List<MouvementsStockDTO> ms = entry.getValue();
+                                int index = ms.indexOf(m);
+                                if (index > 0) {
+                                    MouvementsStockDTO previousM = ms.get(index - 1);
+                                    return previousM.getSolde() - m.getSolde() >= mouvement;
+                                } else {
+                                    return true;
+                                }
+                            } else {
+                                return false;
+                            }
+                        })
                         .sorted(Comparator.comparing(MouvementsStockDTO::getMouvement))
                         .collect(Collectors.toList())
                 )
@@ -213,23 +227,4 @@ public class MouvementsStockService {
             .filter(entry -> !entry.getValue().isEmpty())
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
-    // public Map<String, List<MouvementsStockDTO>>
-    // findByInventoryByWeight(List<MouvementsStockDTO> mouvementsStocks,
-    // float mouvement) {
-    // return
-    // mouvementsStocks.stream().collect(Collectors.groupingBy(MouvementsStockDTO::getCodeProduit)).entrySet()
-    // .stream().collect(Collectors.toMap(Map.Entry::getKey, entry ->
-    // entry.getValue().stream()
-    // .sorted(Comparator.comparing(MouvementsStockDTO::getDate)).filter(m -> {
-    // int index = entry.getValue().indexOf(m);
-    // if (index > 0) {
-    // MouvementsStockDTO previous = entry.getValue().get(index - 1);
-    // return previous.getSolde() - m.getSolde() >= mouvement;
-    // }
-    // return true;
-    // }).filter(m -> m.getType().equals("Inventaire"))
-    // .sorted(Comparator.comparing(MouvementsStockDTO::getMouvement)).collect(Collectors.toList())))
-    // .entrySet().stream().filter(entry -> !entry.getValue().isEmpty())
-    // .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    // }
 }
