@@ -2,6 +2,7 @@ import { Icon } from 'app/shared/component/Icon';
 import { ApiMapResponse, IMouvementsStock } from 'app/shared/model/mouvements-stock.model';
 import { getInventoryByWeightQueryParams } from 'app/shared/util/QueryParamsUtil';
 import axios from 'axios';
+import { fromPairs, keys, map, mapValues, sortBy, sumBy } from 'lodash';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
 import { Card } from 'primereact/card';
@@ -63,11 +64,18 @@ export const Inventory = () => {
     });
   }, []);
 
+  const sortApiResponseData = (data: ApiMapResponse): ApiMapResponse => {
+    const sums = mapValues(data, mouvements => sumBy(mouvements, 'mouvement'));
+    const sortedKeys = sortBy(keys(sums), key => sums[key]);
+    return fromPairs(map(sortedKeys, key => [key, data[key]]));
+  };
+
   const transformApiResponseData = (data: ApiMapResponse) => {
-    const labels: string[] = Object.keys(data);
+    const sortedData = sortApiResponseData(data);
+    const labels: string[] = Object.keys(sortedData);
     const ids: number[] = Array.from(
       new Set(
-        Object.values(data)
+        Object.values(sortedData)
           .flat()
           .map(ms => ms.epicerioId),
       ),
@@ -76,8 +84,8 @@ export const Inventory = () => {
       type: 'bar',
       label: `${id}`,
       data: labels.map(codeProduit => {
-        const mouvementStock: IMouvementsStock = data[codeProduit].find(ms => ms.epicerioId === id);
-        return mouvementStock ? Math.abs(mouvementStock.mouvement) : 0;
+        const mouvementStock: IMouvementsStock = sortedData[codeProduit].find(ms => ms.epicerioId === id);
+        return mouvementStock ? -mouvementStock.mouvement : 0;
       }),
       backgroundColor: documentStyle.getPropertyValue('--blue-600'),
       borderColor: documentStyle.getPropertyValue('--surface-card'),

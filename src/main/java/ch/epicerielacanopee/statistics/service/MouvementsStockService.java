@@ -209,8 +209,7 @@ public class MouvementsStockService {
                                 List<MouvementsStockDTO> ms = entry.getValue();
                                 int index = ms.indexOf(m);
                                 if (index > 0) {
-                                    MouvementsStockDTO previousM = ms.get(index - 1);
-                                    return previousM.getSolde() - m.getSolde() >= mouvement;
+                                    return ms.get(index - 1).getSolde() - m.getSolde() >= mouvement;
                                 } else {
                                     return true;
                                 }
@@ -225,6 +224,11 @@ public class MouvementsStockService {
             .entrySet()
             .stream()
             .filter(entry -> !entry.getValue().isEmpty())
+            .sorted(
+                Map.Entry.comparingByValue(
+                    Comparator.comparingDouble(list -> list.stream().mapToDouble(MouvementsStockDTO::getMouvement).sum())
+                )
+            )
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }
