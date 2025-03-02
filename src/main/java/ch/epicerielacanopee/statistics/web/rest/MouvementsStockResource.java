@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -189,12 +190,13 @@ public class MouvementsStockResource {
 
     @GetMapping("/inventory-by-weight")
     public ResponseEntity<Map<String, List<MouvementsStockDTO>>> findByInventoryByWeight(
-        MouvementsStockCriteria criteria,
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        @RequestParam float mouvementValue
+        @RequestParam String vente,
+        @RequestParam Instant startDate,
+        @RequestParam Instant endDate,
+        @RequestParam float mouvement
     ) {
-        List<MouvementsStockDTO> resultByCriteria = mouvementsStockQueryService.findByCriteria(criteria, pageable).getContent();
-        Map<String, List<MouvementsStockDTO>> result = mouvementsStockService.findByInventoryByWeight(resultByCriteria, mouvementValue);
+        List<MouvementsStockDTO> resultByCriteria = mouvementsStockService.findByVenteAndDateBetween(vente, startDate, endDate);
+        Map<String, List<MouvementsStockDTO>> result = mouvementsStockService.findByInventoryByWeight(resultByCriteria, mouvement);
         return ResponseEntity.ok().body(result);
     }
 

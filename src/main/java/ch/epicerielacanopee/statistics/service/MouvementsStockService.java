@@ -192,24 +192,36 @@ public class MouvementsStockService {
         return mouvementsStock;
     }
 
+    public List<MouvementsStockDTO> findByVenteAndDateBetween(String vente, Instant startDate, Instant endDate) {
+        return mouvementsStockRepository
+            .findByVenteAndDateBetween(vente, startDate, endDate)
+            .stream()
+            .map(mouvementsStockMapper::toDto)
+            .toList();
+    }
+
     public Map<String, List<MouvementsStockDTO>> findByInventoryByWeight(List<MouvementsStockDTO> mouvementsStocks, float mouvement) {
         return mouvementsStocks
             .stream()
             .collect(Collectors.groupingBy(MouvementsStockDTO::getCodeProduit))
             .entrySet()
             .stream()
-            .collect(
-                Collectors.toMap(Map.Entry::getKey, entry ->
+            .map(entry -> {
+                entry.setValue(
+                    entry.getValue().stream().sorted(Comparator.comparing(MouvementsStockDTO::getEpicerioId)).collect(Collectors.toList())
+                );
+                return entry;
+            })
+            .map(entry -> {
+                entry.setValue(
                     entry
                         .getValue()
                         .stream()
-                        .sorted(Comparator.comparing(MouvementsStockDTO::getDate))
                         .filter(m -> {
                             if (m.getType().equals("Inventaire") && m.getMouvement() <= -mouvement) {
-                                List<MouvementsStockDTO> ms = entry.getValue();
-                                int index = ms.indexOf(m);
+                                int index = entry.getValue().indexOf(m);
                                 if (index > 0) {
-                                    return ms.get(index - 1).getSolde() - m.getSolde() >= mouvement;
+                                    return entry.getValue().get(index - 1).getSolde() - m.getSolde() >= mouvement;
                                 } else {
                                     return true;
                                 }
@@ -219,16 +231,10 @@ public class MouvementsStockService {
                         })
                         .sorted(Comparator.comparing(MouvementsStockDTO::getMouvement))
                         .collect(Collectors.toList())
-                )
-            )
-            .entrySet()
-            .stream()
+                );
+                return entry;
+            })
             .filter(entry -> !entry.getValue().isEmpty())
-            .sorted(
-                Map.Entry.comparingByValue(
-                    Comparator.comparingDouble(list -> list.stream().mapToDouble(MouvementsStockDTO::getMouvement).sum())
-                )
-            )
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }
