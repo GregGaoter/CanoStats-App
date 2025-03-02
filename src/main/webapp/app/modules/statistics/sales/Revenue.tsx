@@ -52,6 +52,10 @@ export const Revenue = () => {
           },
         },
         y: {
+          title: {
+            display: true,
+            text: `Chiffre d'affaires [CHF]`,
+          },
           ticks: {
             color: textColorSecondary,
           },

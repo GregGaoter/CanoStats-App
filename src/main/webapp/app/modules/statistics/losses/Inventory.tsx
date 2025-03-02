@@ -2,6 +2,7 @@ import { Icon } from 'app/shared/component/Icon';
 import { ApiMapResponse, IMouvementsStock } from 'app/shared/model/mouvements-stock.model';
 import { getInventoryByWeightQueryParams } from 'app/shared/util/QueryParamsUtil';
 import axios from 'axios';
+import dayjs from 'dayjs';
 import { fromPairs, keys, map, mapValues, sortBy, sumBy } from 'lodash';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
@@ -98,7 +99,9 @@ export const Inventory = () => {
   const fetchMouvementsStocks = (): void => {
     setLoading(true);
     axios
-      .get<ApiMapResponse>(`${apiUrl}/inventory-by-weight?${getInventoryByWeightQueryParams(mouvement / 1000, dates)}`, { timeout: 600000 })
+      .get<ApiMapResponse>(`${apiUrl}/inventory-by-weight?${getInventoryByWeightQueryParams(mouvement / 1000, dates)}`, {
+        timeout: 3600000,
+      })
       .then(response => {
         setInventoryByWeightData(transformApiResponseData(response.data));
       })
@@ -138,7 +141,10 @@ export const Inventory = () => {
             <Toolbar start={startContent} />
           </div>
           <div className="col-12">
-            <Card>
+            <Card
+              title={`Inventaires de plus de ${mouvement}g cummulés par produit du ${dayjs(dates[0]).format('DD.MM.YYYY')} au ${dayjs(dates[1]).format('DD.MM.YYYY')}`}
+              subTitle={`Inventaires dont la différence de solde avec l'entrée précédente est de plus de ${mouvement}g.`}
+            >
               <Chart type="bar" data={inventoryByWeightData} options={barOptions}></Chart>
             </Card>
           </div>
