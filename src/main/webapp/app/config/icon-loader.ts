@@ -23,6 +23,7 @@ import {
   faDollarSign,
   faEnvelope,
   faEye,
+  faFileExcel,
   faFileImport,
   faFileInvoiceDollar,
   faFilter,
@@ -134,5 +135,6 @@ export const loadIcons = () => {
     faPowerOff,
     faAddressCard,
     faFilter,
+    faFileExcel,
   );
 };
