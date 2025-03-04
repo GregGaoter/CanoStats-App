@@ -2,22 +2,34 @@ import { Icon } from 'app/shared/component/Icon';
 import { ApiMapResponse, IMouvementsStock } from 'app/shared/model/mouvements-stock.model';
 import { getInventoryByWeightQueryParams } from 'app/shared/util/QueryParamsUtil';
 import axios from 'axios';
-import dayjs from 'dayjs';
 import { fromPairs, keys, map, mapValues, sortBy, sumBy } from 'lodash';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
 import { Card } from 'primereact/card';
 import { Chart } from 'primereact/chart';
 import { InputNumber } from 'primereact/inputnumber';
+import { ScrollPanel } from 'primereact/scrollpanel';
 import { TabPanel, TabView } from 'primereact/tabview';
 import { Toolbar } from 'primereact/toolbar';
 import React, { useEffect, useState } from 'react';
 import { apiUrl } from '../../../entities/mouvements-stock/mouvements-stock.reducer';
 
+interface ChartData {
+  labels: string[];
+  datasets: {
+    type: string;
+    label: string;
+    data: number[];
+    backgroundColor: string;
+    borderColor: string;
+    borderWidth: number;
+  }[];
+}
+
 export const Inventory = () => {
   const [mouvement, setMouvement] = useState<number>(100);
   const [dates, setDates] = useState<Date[]>([new Date(new Date().getFullYear(), 0, 1), new Date()]);
-  const [inventoryByWeightData, setInventoryByWeightData] = useState({});
+  const [inventoryByWeightData, setInventoryByWeightData] = useState<ChartData>({ labels: [], datasets: [] });
   const [barOptions, setBarOptions] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -29,9 +41,42 @@ export const Inventory = () => {
   useEffect(() => {
     setBarOptions({
       plugins: {
+        title: {
+          display: true,
+          text: `Inventaires en 2024 de plus de 50g d'écart avec l'entrée précédente.`,
+          color: textColorSecondary,
+          font: {
+            size: 24,
+          },
+        },
+        subtitle: {
+          display: true,
+          text: `Chaque barre représente les inventaires cumulés par produit. Les inventaires de plus de 17kg ne sont pas pris en compte.`,
+          color: textColorSecondary,
+          font: {
+            size: 20,
+          },
+        },
         legend: {
           display: false,
         },
+        // datalabels: {
+        //   display: true,
+        //   formatter(value, context) {
+        //     const datasetIndex = context.datasetIndex;
+        //     const dataIndex = context.dataIndex;
+        //     const datasets = context.chart.data.datasets;
+        //     let sum = 0;
+        //     datasets.forEach((dataset, index) => {
+        //       if (index <= datasetIndex) {
+        //         sum += dataset.data[dataIndex];
+        //       }
+        //     });
+        //     return sum;
+        //   },
+        //   anchor: 'end',
+        //   align: 'end',
+        // },
       },
       scales: {
         x: {
@@ -41,6 +86,7 @@ export const Inventory = () => {
             font: {
               weight: '500',
             },
+            autoSkip: false,
           },
           grid: {
             display: false,
@@ -59,6 +105,12 @@ export const Inventory = () => {
           },
           border: {
             display: false,
+          },
+          title: {
+            display: true,
+            text: 'Poids [kg]',
+            color: textColorSecondary,
+            size: 16,
           },
         },
       },
@@ -142,10 +194,19 @@ export const Inventory = () => {
           </div>
           <div className="col-12">
             <Card
-              title={`Inventaires de plus de ${mouvement}g cummulés par produit du ${dayjs(dates[0]).format('DD.MM.YYYY')} au ${dayjs(dates[1]).format('DD.MM.YYYY')}`}
-              subTitle={`Inventaires dont la différence de solde avec l'entrée précédente est de plus de ${mouvement}g.`}
+            // title={`Inventaires de plus de ${mouvement}g cummulés par produit du ${dayjs(dates[0]).format('DD.MM.YYYY')} au ${dayjs(dates[1]).format('DD.MM.YYYY')}`}
+            // subTitle={`Inventaires dont la différence de solde avec l'entrée précédente est de plus de ${mouvement}g.`}
             >
-              <Chart type="bar" data={inventoryByWeightData} options={barOptions}></Chart>
+              <div className="flex flex-column" style={{ height: '100%' }}>
+                <ScrollPanel style={{ flexGrow: 1, height: 'auto', width: '100%' }}>
+                  <Chart
+                    type="bar"
+                    data={inventoryByWeightData}
+                    options={barOptions}
+                    width={inventoryByWeightData.labels.length <= 30 ? '1000px' : `${(inventoryByWeightData.labels.length * 1000) / 30}px`}
+                  ></Chart>
+                </ScrollPanel>
+              </div>
             </Card>
           </div>
         </div>

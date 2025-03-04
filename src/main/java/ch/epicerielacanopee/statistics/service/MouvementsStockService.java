@@ -218,7 +218,7 @@ public class MouvementsStockService {
                         .getValue()
                         .stream()
                         .filter(m -> {
-                            if (m.getType().equals("Inventaire") && m.getMouvement() <= -mouvement) {
+                            if (m.getType().equals("Inventaire") && m.getMouvement() <= -mouvement && m.getMouvement() >= -17) {
                                 int index = entry.getValue().indexOf(m);
                                 if (index > 0) {
                                     return entry.getValue().get(index - 1).getSolde() - m.getSolde() >= mouvement;
