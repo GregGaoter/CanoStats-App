@@ -1,24 +1,18 @@
-import { Icon } from 'app/shared/component/Icon';
 import { Text } from 'app/shared/component/Text';
 import { ApiMapResponse, IMouvementsStock } from 'app/shared/model/mouvements-stock.model';
 import { getInventoryByWeightQueryParams } from 'app/shared/util/QueryParamsUtil';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { fromPairs, keys, map, mapValues, sortBy, sumBy } from 'lodash';
-import { Button } from 'primereact/button';
-import { Calendar } from 'primereact/calendar';
 import { Card } from 'primereact/card';
 import { Chart } from 'primereact/chart';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
-import { InputNumber } from 'primereact/inputnumber';
 import { ScrollPanel } from 'primereact/scrollpanel';
-import { SelectButton, SelectButtonChangeEvent } from 'primereact/selectbutton';
-import { SelectItem } from 'primereact/selectitem';
 import { TabPanel, TabView } from 'primereact/tabview';
-import { Toolbar } from 'primereact/toolbar';
 import React, { useEffect, useState } from 'react';
-import { apiUrl } from '../../../entities/mouvements-stock/mouvements-stock.reducer';
+import { apiUrl } from '../../../../entities/mouvements-stock/mouvements-stock.reducer';
+import { Display, InventoryFilter } from './InventoryFilter';
 
 interface ChartData {
   labels: string[];
@@ -32,24 +26,17 @@ interface ChartData {
   }[];
 }
 
-enum Display {
-  CHART = 'CHART',
-  TABLE = 'TABLE',
-}
-
 export const Inventory = () => {
   const [mouvement, setMouvement] = useState<number>(100);
   const [dates, setDates] = useState<Date[]>([new Date(new Date().getFullYear(), 0, 1), new Date()]);
   const [apiMapResponse, setApiMapResponse] = useState<ApiMapResponse>({});
-  const [inventoryByWeightData, setInventoryByWeightData] = useState<ChartData>({ labels: [], datasets: [] });
+  const [inventoryByWeightChartData, setInventoryByWeightChartData] = useState<ChartData>({ labels: [], datasets: [] });
   const [inventoryByWeightTableData, setInventoryByWeightTableData] = useState<IMouvementsStock[]>([]);
-  const [exportData, setExportData] = useState<IMouvementsStock[]>([]);
   const [barOptions, setBarOptions] = useState({});
   const [loading, setLoading] = useState(false);
   const [selectedDisplay, setSelectedDisplay] = useState<Display>(Display.CHART);
 
   const documentStyle = getComputedStyle(document.documentElement);
-  const textColor = documentStyle.getPropertyValue('--text-color');
   const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
   const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
 
@@ -57,7 +44,7 @@ export const Inventory = () => {
     setBarOptions({
       plugins: {
         title: {
-          display: true,
+          display: false,
           text: `Inventaires en 2024 de plus de 50g d'écart avec l'entrée précédente.`,
           color: textColorSecondary,
           font: {
@@ -65,7 +52,7 @@ export const Inventory = () => {
           },
         },
         subtitle: {
-          display: true,
+          display: false,
           text: `Chaque barre représente les inventaires cumulés par produit. Les inventaires de plus de 17kg ne sont pas pris en compte.`,
           color: textColorSecondary,
           font: {
@@ -121,7 +108,7 @@ export const Inventory = () => {
     return fromPairs(map(sortedKeys, key => [key, data[key]]));
   };
 
-  const transformApiResponseData = (data: ApiMapResponse) => {
+  const getChartData = (data: ApiMapResponse) => {
     const sortedData = sortApiResponseData(data);
     const labels: string[] = Object.keys(sortedData);
     const ids: number[] = Array.from(
@@ -161,53 +148,11 @@ export const Inventory = () => {
       })
       .then(response => {
         setApiMapResponse(response.data);
-        setInventoryByWeightData(transformApiResponseData(response.data));
+        setInventoryByWeightChartData(getChartData(response.data));
         setInventoryByWeightTableData(getTableData(response.data));
-        setExportData(getExportData(response.data));
       })
       .finally(() => setLoading(false));
   };
-
-  const selectDisplayOptions: SelectItem[] = [
-    { label: 'Graphique', value: Display.CHART },
-    { label: 'Tableau', value: Display.TABLE },
-  ];
-
-  const startContent = (
-    <div className="flex gap-3 align-items-end">
-      <div className="flex flex-column gap-2">
-        <label>Mouvement</label>
-        <InputNumber prefix="≥ " suffix="g" value={mouvement} onChange={e => setMouvement(e.value)} />
-      </div>
-      <div className="flex flex-column gap-2">
-        <label>Période</label>
-        <Calendar
-          value={dates}
-          onChange={e => setDates(e.value)}
-          selectionMode="range"
-          dateFormat="dd.mm.yy"
-          readOnlyInput
-          hideOnRangeSelection
-          showIcon
-          required
-        />
-      </div>
-      <div className="flex flex-column gap-2">
-        <Button label="Appliquer" icon={<Icon icon="filter" marginRight />} loading={loading} onClick={() => fetchMouvementsStocks()} />
-      </div>
-    </div>
-  );
-
-  const endContent = (
-    <div className="flex flex-column gap-2">
-      <label>Affichage</label>
-      <SelectButton
-        value={selectedDisplay}
-        onChange={(e: SelectButtonChangeEvent) => setSelectedDisplay(e.value)}
-        options={selectDisplayOptions}
-      />
-    </div>
-  );
 
   const headerTemplate = (data: IMouvementsStock) => <Text className="font-bold">{`${data.codeProduit} - ${data.produit}`}</Text>;
 
@@ -223,58 +168,35 @@ export const Inventory = () => {
 
   const dateTemplate = (mouvementsStock: IMouvementsStock) => dayjs(mouvementsStock.date).format('DD.MM.YYYY HH:mm:ss');
 
-  const exportExcel = () => {
-    import('xlsx').then(xlsx => {
-      const worksheet = xlsx.utils.json_to_sheet(exportData);
-      const workbook = { Sheets: { data: worksheet }, SheetNames: ['Inventaires'] };
-      const excelBuffer = xlsx.write(workbook, {
-        bookType: 'xlsx',
-        type: 'array',
-      });
-      saveAsExcelFile(excelBuffer, 'inventaires-50g-2024-tableau');
-    });
-  };
-
-  const saveAsExcelFile = (buffer, fileName) => {
-    import('file-saver').then(module => {
-      if (module && module.default) {
-        const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-        const EXCEL_EXTENSION = '.xlsx';
-        const data = new Blob([buffer], {
-          type: EXCEL_TYPE,
-        });
-        module.default.saveAs(data, fileName + EXCEL_EXTENSION);
-      }
-    });
-  };
-
-  const header = (
-    <div className="flex align-items-center justify-content-end">
-      <Button type="button" icon={<Icon icon="file-excel" />} severity="success" rounded onClick={exportExcel} />
-    </div>
-  );
-
   return (
     <TabView>
       <TabPanel header="Au poids">
         <div className="grid align-items-center">
           <div className="col-12">
-            <Toolbar start={startContent} end={endContent} />
+            <InventoryFilter
+              mouvement={mouvement}
+              dates={dates}
+              loadingData={loading}
+              display={selectedDisplay}
+              onMouvementChange={m => setMouvement(m)}
+              onDatesChange={d => setDates(d)}
+              onApplyFilter={() => fetchMouvementsStocks()}
+              onDisplayChange={d => setSelectedDisplay(d)}
+            />
           </div>
           <div className="col-12">
-            <Card
-            // title={`Inventaires de plus de ${mouvement}g cummulés par produit du ${dayjs(dates[0]).format('DD.MM.YYYY')} au ${dayjs(dates[1]).format('DD.MM.YYYY')}`}
-            // subTitle={`Inventaires dont la différence de solde avec l'entrée précédente est de plus de ${mouvement}g.`}
-            >
+            <Card>
               {selectedDisplay === Display.CHART ? (
                 <div className="flex flex-column" style={{ height: '100%' }}>
                   <ScrollPanel style={{ flexGrow: 1, height: 'auto', width: '100%' }}>
                     <Chart
                       type="bar"
-                      data={inventoryByWeightData}
+                      data={inventoryByWeightChartData}
                       options={barOptions}
                       width={
-                        inventoryByWeightData.labels.length <= 30 ? '1000px' : `${(inventoryByWeightData.labels.length * 1000) / 30}px`
+                        inventoryByWeightChartData.labels.length <= 30
+                          ? '1000px'
+                          : `${(inventoryByWeightChartData.labels.length * 1000) / 30}px`
                       }
                     ></Chart>
                   </ScrollPanel>
@@ -287,7 +209,8 @@ export const Inventory = () => {
                   rowGroupHeaderTemplate={headerTemplate}
                   rowGroupFooterTemplate={footerTemplate}
                   dataKey="id"
-                  header={header}
+                  scrollable
+                  scrollHeight="600px"
                 >
                   <Column field="date" header="Date" body={dateTemplate} style={{ width: '190px' }}></Column>
                   <Column field="mouvement" header="Mouvement"></Column>

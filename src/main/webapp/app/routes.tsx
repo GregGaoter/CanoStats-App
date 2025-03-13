@@ -15,7 +15,7 @@ import { Route } from 'react-router-dom';
 import { Revenue } from './modules/statistics/sales/Revenue';
 import { SalesVolume } from './modules/statistics/sales/SalesVolume';
 import { SalesTrends } from './modules/statistics/sales/SalesTrends';
-import { Inventory } from './modules/statistics/losses/Inventory';
+import { Inventory } from './modules/statistics/losses/inventory/Inventory';
 
 interface AppRoutesProps {
   isAuthenticated: boolean;
