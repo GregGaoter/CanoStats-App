@@ -27,8 +27,8 @@ export const InventoryFilter = (props: InventoryFilterProps) => {
   const startContent = (
     <div className="flex gap-3 align-items-end">
       <div className="flex flex-column gap-2">
-        <label>Mouvement</label>
-        <InputNumber prefix="≥ " suffix="g" value={props.mouvement} onChange={e => props.onMouvementChange(e.value)} />
+        <label>{`Ecart de solde avec l'entrée précédente`}</label>
+        <InputNumber prefix="± " suffix="g" value={props.mouvement} onChange={e => props.onMouvementChange(e.value)} />
       </div>
       <div className="flex flex-column gap-2">
         <label>Période</label>

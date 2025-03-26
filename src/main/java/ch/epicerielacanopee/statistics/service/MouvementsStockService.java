@@ -218,13 +218,23 @@ public class MouvementsStockService {
                         .getValue()
                         .stream()
                         .filter(m -> {
-                            if (m.getType().equals("Inventaire") && m.getMouvement() <= -mouvement && m.getMouvement() >= -17) {
+                            if (m.getType().equals("Inventaire") && m.getMouvement() != 0) {
                                 int index = entry.getValue().indexOf(m);
+                                Optional<Float> optionalPreviousSolde = Optional.empty();
                                 if (index > 0) {
-                                    return entry.getValue().get(index - 1).getSolde() - m.getSolde() >= mouvement;
+                                    optionalPreviousSolde = Optional.of(entry.getValue().get(index - 1).getSolde());
                                 } else {
-                                    return true;
+                                    Optional<MouvementsStock> optionalPreviousM =
+                                        mouvementsStockRepository.findFirstByCodeProduitAndVenteAndEpicerioIdLessThanOrderByEpicerioIdDesc(
+                                            m.getCodeProduit(),
+                                            m.getVente(),
+                                            m.getEpicerioId()
+                                        );
+                                    optionalPreviousSolde = optionalPreviousM.map(previousM -> previousM.getSolde());
                                 }
+                                return optionalPreviousSolde.isPresent()
+                                    ? Math.abs(m.getSolde() - optionalPreviousSolde.get()) >= mouvement
+                                    : false;
                             } else {
                                 return false;
                             }
