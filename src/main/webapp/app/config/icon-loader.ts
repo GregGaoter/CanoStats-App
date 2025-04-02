@@ -15,6 +15,7 @@ import {
   faBoxesStacked,
   faCartShopping,
   faChartLine,
+  faChartSimple,
   faCloud,
   faCloudArrowUp,
   faCogs,
@@ -136,5 +137,6 @@ export const loadIcons = () => {
     faAddressCard,
     faFilter,
     faFileExcel,
+    faChartSimple,
   );
 };
