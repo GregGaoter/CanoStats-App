@@ -42,6 +42,8 @@ export const Inventory = () => {
 
   useEffect(() => {
     setBarOptions({
+      indexAxis: 'y',
+      maintainAspectRatio: false,
       plugins: {
         title: {
           display: false,
@@ -64,7 +66,7 @@ export const Inventory = () => {
         },
       },
       scales: {
-        x: {
+        y: {
           stacked: true,
           ticks: {
             color: textColorSecondary,
@@ -74,13 +76,13 @@ export const Inventory = () => {
             autoSkip: false,
           },
           grid: {
-            display: false,
+            color: surfaceBorder,
           },
           border: {
             display: false,
           },
         },
-        y: {
+        x: {
           stacked: true,
           ticks: {
             color: textColorSecondary,
@@ -123,7 +125,7 @@ export const Inventory = () => {
       label: `${id}`,
       data: labels.map(codeProduit => {
         const mouvementStock: IMouvementsStock = sortedData[codeProduit].find(ms => ms.epicerioId === id);
-        return mouvementStock ? -mouvementStock.mouvement : 0;
+        return mouvementStock ? mouvementStock.mouvement : 0;
       }),
       backgroundColor: documentStyle.getPropertyValue('--blue-600'),
       borderColor: documentStyle.getPropertyValue('--surface-card'),
@@ -193,10 +195,10 @@ export const Inventory = () => {
                       type="bar"
                       data={inventoryByWeightChartData}
                       options={barOptions}
-                      width={
-                        inventoryByWeightChartData.labels.length <= 30
-                          ? '1000px'
-                          : `${(inventoryByWeightChartData.labels.length * 1000) / 30}px`
+                      height={
+                        inventoryByWeightChartData.labels.length <= 40
+                          ? 'auto'
+                          : `${(inventoryByWeightChartData.labels.length * 1000) / 40}px`
                       }
                     ></Chart>
                   </ScrollPanel>
