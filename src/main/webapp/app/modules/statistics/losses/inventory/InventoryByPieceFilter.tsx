@@ -7,7 +7,7 @@ import { SelectItem } from 'primereact/selectitem';
 import { Toolbar } from 'primereact/toolbar';
 import React from 'react';
 
-interface InventoryFilterProps {
+interface InventoryByPieceFilterProps {
   mouvement: number;
   dates: Date[];
   loadingData: boolean;
@@ -23,12 +23,12 @@ export enum Display {
   TABLE = 'TABLE',
 }
 
-export const InventoryFilter = (props: InventoryFilterProps) => {
+export const InventoryByPieceFilter = (props: InventoryByPieceFilterProps) => {
   const startContent = (
     <div className="flex gap-3 align-items-end">
       <div className="flex flex-column gap-2">
         <label>{`Ecart de solde avec l'entrée précédente`}</label>
-        <InputNumber prefix="± " suffix="g" value={props.mouvement} onChange={e => props.onMouvementChange(e.value)} />
+        <InputNumber prefix="± " suffix=" pièces" value={props.mouvement} onChange={e => props.onMouvementChange(e.value)} />
       </div>
       <div className="flex flex-column gap-2">
         <label>Période</label>

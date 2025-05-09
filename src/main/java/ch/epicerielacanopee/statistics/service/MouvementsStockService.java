@@ -200,7 +200,7 @@ public class MouvementsStockService {
             .toList();
     }
 
-    public Map<String, List<MouvementsStockDTO>> findByInventoryByWeight(List<MouvementsStockDTO> mouvementsStocks, float mouvement) {
+    public Map<String, List<MouvementsStockDTO>> findByInventory(List<MouvementsStockDTO> mouvementsStocks, float mouvement) {
         return mouvementsStocks
             .stream()
             .collect(Collectors.groupingBy(MouvementsStockDTO::getCodeProduit))

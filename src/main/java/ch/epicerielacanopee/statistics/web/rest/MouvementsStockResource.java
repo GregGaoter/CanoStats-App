@@ -188,15 +188,15 @@ public class MouvementsStockResource {
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
-    @GetMapping("/inventory-by-weight")
-    public ResponseEntity<Map<String, List<MouvementsStockDTO>>> findByInventoryByWeight(
+    @GetMapping("/inventory")
+    public ResponseEntity<Map<String, List<MouvementsStockDTO>>> findByInventory(
         @RequestParam String vente,
         @RequestParam Instant startDate,
         @RequestParam Instant endDate,
         @RequestParam float mouvement
     ) {
         List<MouvementsStockDTO> resultByCriteria = mouvementsStockService.findByVenteAndDateBetween(vente, startDate, endDate);
-        Map<String, List<MouvementsStockDTO>> result = mouvementsStockService.findByInventoryByWeight(resultByCriteria, mouvement);
+        Map<String, List<MouvementsStockDTO>> result = mouvementsStockService.findByInventory(resultByCriteria, mouvement);
         return ResponseEntity.ok().body(result);
     }
 
