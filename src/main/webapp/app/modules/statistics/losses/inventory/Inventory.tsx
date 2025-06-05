@@ -3,35 +3,42 @@ import { ApiMapResponse, IMouvementsStock } from 'app/shared/model/mouvements-st
 import { getInventoryByPieceQueryParams, getInventoryByWeightQueryParams } from 'app/shared/util/QueryParamsUtil';
 import axios from 'axios';
 import dayjs from 'dayjs';
-import { fromPairs, keys, map, mapValues, sortBy, sumBy } from 'lodash';
+import { drop, fromPairs, keys, map, mapValues, sortBy, sumBy, take } from 'lodash';
+import { BlockUI } from 'primereact/blockui';
 import { Card } from 'primereact/card';
 import { Chart } from 'primereact/chart';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
-import { ScrollPanel } from 'primereact/scrollpanel';
+import { Paginator, PaginatorPageChangeEvent } from 'primereact/paginator';
+import { ProgressSpinner } from 'primereact/progressspinner';
 import { TabPanel, TabView } from 'primereact/tabview';
 import React, { useEffect, useState } from 'react';
 import { apiUrl } from '../../../../entities/mouvements-stock/mouvements-stock.reducer';
 import { InventoryByPieceFilter } from './InventoryByPieceFilter';
 import { Display, InventoryByWeightFilter } from './InventoryByWeightFilter';
 
+interface ChartDatasets {
+  type: string;
+  label: string;
+  data: number[];
+  backgroundColor: string;
+  borderColor: string;
+  borderWidth: number;
+}
+
 interface ChartData {
   labels: string[];
-  datasets: {
-    type: string;
-    label: string;
-    data: number[];
-    backgroundColor: string;
-    borderColor: string;
-    borderWidth: number;
-  }[];
+  datasets: ChartDatasets[];
 }
 
 export const Inventory = () => {
+  const chartDatasetsSize: number = 40;
+
   const [mouvementByWeight, setMouvementByWeight] = useState<number>(100);
   const [datesByWeight, setDatesByWeight] = useState<Date[]>([new Date(new Date().getFullYear(), 0, 1), new Date()]);
   const [apiMapResponseByWeight, setApiMapResponseByWeight] = useState<ApiMapResponse>({});
   const [inventoryByWeightChartData, setInventoryByWeightChartData] = useState<ChartData>({ labels: [], datasets: [] });
+  const [inventoryByWeightChartDataPaginate, setInventoryByWeightChartDataPaginate] = useState<ChartData>({ labels: [], datasets: [] });
   const [inventoryByWeightTableData, setInventoryByWeightTableData] = useState<IMouvementsStock[]>([]);
   const [barOptionsByWeight, setBarOptionsByWeight] = useState({});
   const [selectedDisplayByWeight, setSelectedDisplayByWeight] = useState<Display>(Display.CHART);
@@ -40,11 +47,15 @@ export const Inventory = () => {
   const [datesByPiece, setDatesByPiece] = useState<Date[]>([new Date(new Date().getFullYear(), 0, 1), new Date()]);
   const [apiMapResponseByPiece, setApiMapResponseByPiece] = useState<ApiMapResponse>({});
   const [inventoryByPieceChartData, setInventoryByPieceChartData] = useState<ChartData>({ labels: [], datasets: [] });
+  const [inventoryByPieceChartDataPaginate, setInventoryByPieceChartDataPaginate] = useState<ChartData>({ labels: [], datasets: [] });
   const [inventoryByPieceTableData, setInventoryByPieceTableData] = useState<IMouvementsStock[]>([]);
   const [barOptionsByPiece, setBarOptionsByPiece] = useState({});
   const [selectedDisplayByPiece, setSelectedDisplayByPiece] = useState<Display>(Display.CHART);
 
-  const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState<boolean>(false);
+
+  const [firstByWeightChartData, setFirstByWeightChartData] = useState<number>(0);
+  const [firstByPieceChartData, setFirstByPieceChartData] = useState<number>(0);
 
   const documentStyle = getComputedStyle(document.documentElement);
   const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
@@ -181,7 +192,7 @@ export const Inventory = () => {
     return fromPairs(map(sortedKeys, key => [key, data[key]]));
   };
 
-  const getChartData = (data: ApiMapResponse) => {
+  const getChartData = (data: ApiMapResponse): ChartData => {
     const sortedData = sortApiResponseData(data);
     const labels: string[] = Object.keys(sortedData);
     const ids: number[] = Array.from(
@@ -206,39 +217,59 @@ export const Inventory = () => {
     return { labels, datasets };
   };
 
+  const getChartDataPaginate = (chartData: ChartData, firstIndex: number): ChartData => {
+    const labelsDropped: string[] = drop(chartData.labels, firstIndex);
+    const datasetsDropped: ChartDatasets[] = chartData.datasets.map(dataset => ({ ...dataset, data: drop(dataset.data, firstIndex) }));
+    if (labelsDropped.length < chartDatasetsSize) {
+      return { labels: labelsDropped, datasets: datasetsDropped };
+    } else {
+      return {
+        labels: take(labelsDropped, chartDatasetsSize),
+        datasets: datasetsDropped.map(dataset => ({ ...dataset, data: take(dataset.data, chartDatasetsSize) })),
+      };
+    }
+  };
+
   const getTableData = (data: ApiMapResponse): IMouvementsStock[] => Object.values(sortApiResponseData(data)).flat();
 
-  const getExportData = (data: ApiMapResponse): IMouvementsStock[] =>
-    Object.values(sortApiResponseData(data))
-      .flat()
-      .map(m => ({ utilisateur: m.utilisateur, remarques: m.remarques }));
-
   const fetchMouvementsStocksByWeight = (): void => {
-    setLoading(true);
+    setLoadingData(true);
+    setApiMapResponseByWeight({});
+    setInventoryByWeightChartData({ labels: [], datasets: [] });
+    setInventoryByWeightChartDataPaginate({ labels: [], datasets: [] });
+    setInventoryByWeightTableData([]);
     axios
       .get<ApiMapResponse>(`${apiUrl}/inventory?${getInventoryByWeightQueryParams(mouvementByWeight / 1000, datesByWeight)}`, {
         timeout: 3600000,
       })
       .then(response => {
         setApiMapResponseByWeight(response.data);
-        setInventoryByWeightChartData(getChartData(response.data));
+        const chartData: ChartData = getChartData(response.data);
+        setInventoryByWeightChartData(chartData);
+        setInventoryByWeightChartDataPaginate(getChartDataPaginate(chartData, firstByWeightChartData));
         setInventoryByWeightTableData(getTableData(response.data));
       })
-      .finally(() => setLoading(false));
+      .finally(() => setLoadingData(false));
   };
 
   const fetchMouvementsStocksByPiece = (): void => {
-    setLoading(true);
+    setLoadingData(true);
+    setApiMapResponseByPiece({});
+    setInventoryByPieceChartData({ labels: [], datasets: [] });
+    setInventoryByPieceChartDataPaginate({ labels: [], datasets: [] });
+    setInventoryByPieceTableData([]);
     axios
       .get<ApiMapResponse>(`${apiUrl}/inventory?${getInventoryByPieceQueryParams(mouvementByPiece, datesByPiece)}`, {
         timeout: 3600000,
       })
       .then(response => {
         setApiMapResponseByPiece(response.data);
-        setInventoryByPieceChartData(getChartData(response.data));
+        const chartData: ChartData = getChartData(response.data);
+        setInventoryByPieceChartData(chartData);
+        setInventoryByPieceChartDataPaginate(getChartDataPaginate(chartData, firstByWeightChartData));
         setInventoryByPieceTableData(getTableData(response.data));
       })
-      .finally(() => setLoading(false));
+      .finally(() => setLoadingData(false));
   };
 
   const headerTemplate = (data: IMouvementsStock) => <Text className="font-bold">{`${data.codeProduit} - ${data.produit}`}</Text>;
@@ -263,6 +294,16 @@ export const Inventory = () => {
     );
   };
 
+  const handlePageByWeightChange = (event: PaginatorPageChangeEvent): void => {
+    setFirstByWeightChartData(event.first);
+    setInventoryByWeightChartDataPaginate(getChartDataPaginate(inventoryByWeightChartData, event.first));
+  };
+
+  const handlePageByPieceChange = (event: PaginatorPageChangeEvent): void => {
+    setFirstByPieceChartData(event.first);
+    setInventoryByPieceChartDataPaginate(getChartDataPaginate(inventoryByPieceChartData, event.first));
+  };
+
   const dateTemplate = (mouvementsStock: IMouvementsStock) => dayjs(mouvementsStock.date).format('DD.MM.YYYY HH:mm:ss');
 
   return (
@@ -270,33 +311,44 @@ export const Inventory = () => {
       <TabPanel header="Au poids">
         <div className="grid align-items-center">
           <div className="col-12">
-            <InventoryByWeightFilter
-              mouvement={mouvementByWeight}
-              dates={datesByWeight}
-              loadingData={loading}
-              display={selectedDisplayByWeight}
-              onMouvementChange={m => setMouvementByWeight(m)}
-              onDatesChange={d => setDatesByWeight(d)}
-              onApplyFilter={() => fetchMouvementsStocksByWeight()}
-              onDisplayChange={d => setSelectedDisplayByWeight(d)}
-            />
+            <BlockUI blocked={loadingData} template={<ProgressSpinner />}>
+              <InventoryByWeightFilter
+                mouvement={mouvementByWeight}
+                dates={datesByWeight}
+                loadingData={loadingData}
+                display={selectedDisplayByWeight}
+                onMouvementChange={m => setMouvementByWeight(m)}
+                onDatesChange={d => setDatesByWeight(d)}
+                onApplyFilter={() => fetchMouvementsStocksByWeight()}
+                onDisplayChange={d => setSelectedDisplayByWeight(d)}
+              />
+            </BlockUI>
           </div>
           <div className="col-12">
             <Card>
               {selectedDisplayByWeight === Display.CHART ? (
-                <div className="flex flex-column" style={{ height: '100%' }}>
-                  <ScrollPanel style={{ flexGrow: 1, height: 'auto', width: '100%' }}>
-                    <Chart
-                      type="bar"
-                      data={inventoryByWeightChartData}
-                      options={barOptionsByWeight}
-                      height={
-                        inventoryByWeightChartData.labels.length <= 40
-                          ? 'auto'
-                          : `${(inventoryByWeightChartData.labels.length * 1000) / 40}px`
-                      }
-                    ></Chart>
-                  </ScrollPanel>
+                // <div className="flex flex-column" style={{ height: '100%' }}>
+                //   <ScrollPanel style={{ flexGrow: 1, height: 'auto', width: '100%' }}>
+                //     <Chart
+                //       type="bar"
+                //       data={inventoryByWeightChartData}
+                //       options={barOptionsByWeight}
+                //       height={
+                //         inventoryByWeightChartData.labels.length <= 40
+                //           ? 'auto'
+                //           : `${(inventoryByWeightChartData.labels.length * 1000) / 40}px`
+                //       }
+                //     ></Chart>
+                //   </ScrollPanel>
+                // </div>
+                <div className="flex flex-column">
+                  <Chart type="bar" data={inventoryByWeightChartDataPaginate} options={barOptionsByWeight} height="600px"></Chart>
+                  <Paginator
+                    first={firstByWeightChartData}
+                    rows={chartDatasetsSize}
+                    totalRecords={inventoryByWeightChartData.labels.length}
+                    onPageChange={handlePageByWeightChange}
+                  />
                 </div>
               ) : (
                 <DataTable
@@ -323,33 +375,30 @@ export const Inventory = () => {
       <TabPanel header="A la pièce">
         <div className="grid align-items-center">
           <div className="col-12">
-            <InventoryByPieceFilter
-              mouvement={mouvementByPiece}
-              dates={datesByPiece}
-              loadingData={loading}
-              display={selectedDisplayByPiece}
-              onMouvementChange={m => setMouvementByPiece(m)}
-              onDatesChange={d => setDatesByPiece(d)}
-              onApplyFilter={() => fetchMouvementsStocksByPiece()}
-              onDisplayChange={d => setSelectedDisplayByPiece(d)}
-            />
+            <BlockUI blocked={loadingData} template={<ProgressSpinner />}>
+              <InventoryByPieceFilter
+                mouvement={mouvementByPiece}
+                dates={datesByPiece}
+                loadingData={loadingData}
+                display={selectedDisplayByPiece}
+                onMouvementChange={m => setMouvementByPiece(m)}
+                onDatesChange={d => setDatesByPiece(d)}
+                onApplyFilter={() => fetchMouvementsStocksByPiece()}
+                onDisplayChange={d => setSelectedDisplayByPiece(d)}
+              />
+            </BlockUI>
           </div>
           <div className="col-12">
             <Card>
               {selectedDisplayByPiece === Display.CHART ? (
-                <div className="flex flex-column" style={{ height: '100%' }}>
-                  <ScrollPanel style={{ flexGrow: 1, height: 'auto', width: '100%' }}>
-                    <Chart
-                      type="bar"
-                      data={inventoryByPieceChartData}
-                      options={barOptionsByPiece}
-                      height={
-                        inventoryByPieceChartData.labels.length <= 40
-                          ? 'auto'
-                          : `${(inventoryByPieceChartData.labels.length * 1000) / 40}px`
-                      }
-                    ></Chart>
-                  </ScrollPanel>
+                <div className="flex flex-column">
+                  <Chart type="bar" data={inventoryByPieceChartDataPaginate} options={barOptionsByPiece} height="600px"></Chart>
+                  <Paginator
+                    first={firstByPieceChartData}
+                    rows={chartDatasetsSize}
+                    totalRecords={inventoryByPieceChartData.labels.length}
+                    onPageChange={handlePageByPieceChange}
+                  />
                 </div>
               ) : (
                 <DataTable
