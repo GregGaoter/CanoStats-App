@@ -58,7 +58,7 @@ const Header = (props: IHeaderProps) => {
     {
       label: 'Tableau de bord',
       icon: <Icon icon="gauge" color={dashboardColor} marginRight />,
-      url: '/statistics/dashboard',
+      command: () => navigate('/', { replace: true }),
     },
     {
       label: 'Statistiques',
@@ -71,17 +71,17 @@ const Header = (props: IHeaderProps) => {
               {
                 label: `Chiffre d'affaires`,
                 icon: <Icon icon="sack-dollar" color={ventesColor} marginRight />,
-                url: '/statistics/revenue',
+                command: () => navigate('/statistics/revenue', { replace: true }),
               },
               {
                 label: 'Volume',
                 icon: <Icon icon="cube" color={ventesColor} marginRight />,
-                url: '/statistics/sales-volume',
+                command: () => navigate('/statistics/sales-volume', { replace: true }),
               },
               {
                 label: 'Tendances',
                 icon: <Icon icon="arrow-trend-up" color={ventesColor} marginRight />,
-                url: '/statistics/sales-trends',
+                command: () => navigate('/statistics/sales-trends', { replace: true }),
               },
             ],
           },
@@ -108,7 +108,7 @@ const Header = (props: IHeaderProps) => {
               {
                 label: 'Inventaire',
                 icon: <Icon icon="arrow-trend-down" color={pertesColor} marginRight />,
-                url: '/statistics/inventory',
+                command: () => navigate('/statistics/inventory', { replace: true }),
               },
             ],
           },
@@ -185,7 +185,7 @@ const Header = (props: IHeaderProps) => {
               {
                 label: 'Mouvements stock',
                 icon: <Icon icon="chart-line" colorSecondary marginRight />,
-                url: 'table/mouvements-stock',
+                command: () => navigate('/table/mouvements-stock', { replace: true }),
               },
             ],
           },
@@ -206,7 +206,7 @@ const Header = (props: IHeaderProps) => {
               {
                 label: 'Importation',
                 icon: <Icon icon="file-import" colorSecondary marginRight />,
-                url: 'admin/file-import',
+                command: () => navigate('/admin/file-import', { replace: true }),
               },
               {
                 label: 'Métriques',
