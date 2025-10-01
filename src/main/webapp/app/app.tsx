@@ -37,16 +37,12 @@ export const App = () => {
    * Defines the shared global pass through properties per component type.
    */
   const pt: PrimeReactPTOptions = {
-    megamenu: {
-      root: { className: 'flex justify-content-between shadow-4' },
-      submenu: { className: 'surface-card border-none' },
-      label: { className: 'text-color-secondary' },
-      panel: { className: 'surface-card border-none' },
-      submenuHeader: { className: 'surface-card' },
-    },
-    menu: {
+    menubar: {
       root: { className: 'surface-card text-color-secondary shadow-4' },
-      submenuHeader: { className: 'surface-card text-color-secondary' },
+      menu: { className: 'surface-card text-color-secondary' },
+      menuitem: { className: 'surface-card text-color-secondary' },
+      submenu: { className: 'surface-card' },
+      action: { className: 'text-color-secondary' },
       label: { className: 'text-color-secondary' },
     },
     inputtext: {
