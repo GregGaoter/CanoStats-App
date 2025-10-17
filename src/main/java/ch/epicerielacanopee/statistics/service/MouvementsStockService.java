@@ -208,6 +208,14 @@ public class MouvementsStockService {
             .toList();
     }
 
+    public List<MouvementsStockDTO> findByDateBetween(Instant startDate, Instant endDate) {
+        return mouvementsStockRepository
+            .findByDateBetween(startDate, endDate)
+            .stream()
+            .map(mouvementsStockMapper::toDto)
+            .toList();
+    }
+
     public Map<String, List<MouvementsStockDTO>> findByInventory(List<MouvementsStockDTO> mouvementsStocks, float mouvement) {
         return mouvementsStocks
             .stream()
@@ -287,7 +295,7 @@ public class MouvementsStockService {
      * @return a map where each key is a {@link YearWeek} and the value is a list of up to 5 {@link TopSellingProductResult}
      *         objects representing the top selling products for that week, sorted by descending sold percentage
      */
-    public Map<YearWeek, List<TopSellingProductResult>> top5ProductsPerWeek(List<MouvementsStockDTO> movements) {
+    public Map<YearWeek, List<TopSellingProductResult>> findTop5SellingProductsPerWeek(List<MouvementsStockDTO> movements) {
         // Index by product, sorted by date
         Map<String, List<MouvementsStockDTO>> movementsByProduct = movements
             .stream()

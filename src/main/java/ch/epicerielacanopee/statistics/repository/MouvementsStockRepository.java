@@ -17,6 +17,8 @@ import org.springframework.stereotype.Repository;
 public interface MouvementsStockRepository extends JpaRepository<MouvementsStock, UUID>, JpaSpecificationExecutor<MouvementsStock> {
     public List<MouvementsStock> findByVenteAndDateBetween(String vente, Instant startDate, Instant endDate);
 
+    public List<MouvementsStock> findByDateBetween(Instant startDate, Instant endDate);
+
     public Optional<MouvementsStock> findFirstByCodeProduitAndVenteAndEpicerioIdLessThanOrderByEpicerioIdDesc(
         String codeProduit,
         String vente,
