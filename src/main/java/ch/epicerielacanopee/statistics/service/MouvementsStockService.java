@@ -6,6 +6,7 @@ import ch.epicerielacanopee.statistics.service.dto.EpicerioMouvementsStockDTO;
 import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
 import ch.epicerielacanopee.statistics.service.dto.TopSellingProductResult;
 import ch.epicerielacanopee.statistics.service.mapper.MouvementsStockMapper;
+import ch.epicerielacanopee.statistics.service.util.ProductGroupingKey;
 import ch.epicerielacanopee.statistics.service.util.YearWeek;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -209,11 +210,7 @@ public class MouvementsStockService {
     }
 
     public List<MouvementsStockDTO> findByDateBetween(Instant startDate, Instant endDate) {
-        return mouvementsStockRepository
-            .findByDateBetween(startDate, endDate)
-            .stream()
-            .map(mouvementsStockMapper::toDto)
-            .toList();
+        return mouvementsStockRepository.findByDateBetween(startDate, endDate).stream().map(mouvementsStockMapper::toDto).toList();
     }
 
     public Map<String, List<MouvementsStockDTO>> findByInventory(List<MouvementsStockDTO> mouvementsStocks, float mouvement) {
@@ -297,12 +294,12 @@ public class MouvementsStockService {
      */
     public Map<YearWeek, List<TopSellingProductResult>> findTop5SellingProductsPerWeek(List<MouvementsStockDTO> movements) {
         // Index by product, sorted by date
-        Map<String, List<MouvementsStockDTO>> movementsByProduct = movements
+        Map<ProductGroupingKey, List<MouvementsStockDTO>> movementsByProduct = movements
             .stream()
-            .filter(m -> m.getCodeProduit() != null)
+            .filter(m -> m.getCodeProduit() != null && m.getProduit() != null)
             .collect(
                 Collectors.groupingBy(
-                    MouvementsStockDTO::getCodeProduit,
+                    m -> new ProductGroupingKey(m.getCodeProduit(), m.getProduit()),
                     Collectors.collectingAndThen(Collectors.toList(), list ->
                         list.stream().sorted(Comparator.comparing(MouvementsStockDTO::getDate)).collect(Collectors.toList())
                     )
@@ -331,8 +328,10 @@ public class MouvementsStockService {
             Instant weekStart = firstDay.atStartOfDay(zone).toInstant();
             Instant weekEnd = lastDay.plusDays(1).atStartOfDay(zone).toInstant(); // exclusive
 
-            for (Map.Entry<String, List<MouvementsStockDTO>> entry : movementsByProduct.entrySet()) {
-                String product = entry.getKey();
+            for (Map.Entry<ProductGroupingKey, List<MouvementsStockDTO>> entry : movementsByProduct.entrySet()) {
+                ProductGroupingKey key = entry.getKey();
+                String productCode = key.getCodeProduit();
+                String product = key.getProduit();
                 List<MouvementsStockDTO> productMovements = entry.getValue();
 
                 // Movement before the week (for initial stock)
@@ -377,7 +376,7 @@ public class MouvementsStockService {
 
                 float soldPercentage = (soldQuantity / availableStock) * 100f;
 
-                results.add(new TopSellingProductResult(product, soldPercentage, soldQuantity, availableStock));
+                results.add(new TopSellingProductResult(productCode, product, soldPercentage, soldQuantity, availableStock));
             }
 
             // Top 5 by descending % sold

@@ -65,6 +65,7 @@ import {
   faWarehouse,
   faWrench,
   faXmark,
+  faStar,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -138,5 +139,6 @@ export const loadIcons = () => {
     faFilter,
     faFileExcel,
     faChartSimple,
+    faStar,
   );
 };
