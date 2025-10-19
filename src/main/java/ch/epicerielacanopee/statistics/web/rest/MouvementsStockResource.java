@@ -6,7 +6,6 @@ import ch.epicerielacanopee.statistics.service.MouvementsStockService;
 import ch.epicerielacanopee.statistics.service.criteria.MouvementsStockCriteria;
 import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
 import ch.epicerielacanopee.statistics.service.dto.TopSellingProductResult;
-import ch.epicerielacanopee.statistics.service.util.YearWeek;
 import ch.epicerielacanopee.statistics.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -261,12 +260,12 @@ public class MouvementsStockResource {
     }
 
     @GetMapping("/top-5-selling-products-per-week")
-    public ResponseEntity<Map<YearWeek, List<TopSellingProductResult>>> findTop5SellingProductsPerWeek(
+    public ResponseEntity<Map<Integer, List<TopSellingProductResult>>> findTop5SellingProductsPerWeek(
         @RequestParam Instant startDate,
         @RequestParam Instant endDate
     ) {
         List<MouvementsStockDTO> resultByCriteria = mouvementsStockService.findByDateBetween(startDate, endDate);
-        Map<YearWeek, List<TopSellingProductResult>> result = mouvementsStockService.findTop5SellingProductsPerWeek(resultByCriteria);
+        Map<Integer, List<TopSellingProductResult>> result = mouvementsStockService.findTop5SellingProductsPerWeek(resultByCriteria);
         return ResponseEntity.ok().body(result);
     }
 }

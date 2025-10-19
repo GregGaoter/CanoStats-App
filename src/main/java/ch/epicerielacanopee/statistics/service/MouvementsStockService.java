@@ -17,6 +17,7 @@ import java.time.ZoneId;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -262,37 +263,58 @@ public class MouvementsStockService {
     }
 
     /**
-     * Computes the top 5 selling products per week based on stock movements.
-     * <p>
-     * For each week present in the provided list of stock movements, this method calculates,
-     * for each product, the percentage and quantity of stock sold relative to the available stock
-     * (initial stock plus deliveries) during that week. It then selects the top 5 products with the
-     * highest percentage sold for each week.
-     * </p>
+     * Compute the top-5 selling products for each ISO week number, aggregated across years.
      *
-     * <p>
-     * The calculation for each product in a week is as follows:
+     * <p>Algorithm overview:
      * <ul>
-     *   <li>Initial stock is determined as the last known balance before the week, or the first balance observed during the week if none exists before.</li>
-     *   <li>Deliveries are summed from all "Livraison" movements during the week.</li>
-     *   <li>Available stock is the sum of initial stock and deliveries.</li>
-     *   <li>Final stock is the last known balance during the week, or the initial stock if there were no movements.</li>
-     *   <li>Sold quantity is the difference between available stock and final stock (never negative).</li>
-     *   <li>Sold percentage is the sold quantity divided by available stock, expressed as a percentage.</li>
+     *   <li>Group input movements by product (combination of codeProduit and produit) and sort each group's movements by date ascending.</li>
+     *   <li>Determine the set of YearWeek values present in the input (ISO weeks, Monday-first) using the Europe/Zurich time zone.</li>
+     *   <li>For each YearWeek present:
+     *     <ul>
+     *       <li>Compute the week start (inclusive) and end (exclusive) Instants in Europe/Zurich.</li>
+     *       <li>For each product:
+     *         <ul>
+     *           <li>Find the last movement strictly before the week start to determine the initial stock (solde).</li>
+     *           <li>If no prior movement exists but at least one movement occurs during the week, use the first movement's solde during the week as a fallback initial stock.</li>
+     *           <li>Collect deliveries during the week (movements with type.equals("Livraison")) and sum their mouvement values (null treated as 0).</li>
+     *           <li>Determine the final stock as the last solde observed during the week, or reuse the initial stock if there were no movements in the week.</li>
+     *           <li>If initial or final stock is missing, or if availableStock (initialStock + deliveries) &le; 0, skip the product for that week.</li>
+     *           <li>Compute soldQuantity = max(availableStock - finalStock, 0) and soldPercentage = (soldQuantity / availableStock) * 100.</li>
+     *         </ul>
+     *       </li>
+     *       <li>Collect TopSellingProductResult instances for all products with valid metrics and select the top 5 by:
+     *         <ol>
+     *           <li>descending soldPercentage</li>
+     *           <li>then descending soldQuantity</li>
+     *         </ol>
+     *       </li>
+     *     </ul>
+     *   </li>
+     *   <li>After processing all YearWeek instances, group the per-week (YearWeek) top-5 results by ISO week number (1..53), then for each product compute the average soldPercentage across the different years in which it appeared in that week's top-5.</li>
+     *   <li>For each week number return the top 5 products ordered by descending average soldPercentage. The returned TopSellingProductResult objects contain averaged soldPercentage; soldQuantity and availableStock are set to 0 for these aggregated results.</li>
      * </ul>
-     * </p>
      *
-     * <p>
-     * Only products with sufficient data (known initial and final stock, and available stock &gt; 0)
-     * are considered. For each week, the top 5 products are selected by descending sold percentage,
-     * then by sold quantity.
-     * </p>
+     * <p>Notes, assumptions and important details:
+     * <ul>
+     *   <li>Input movements must provide:
+     *     <ul>
+     *       <li>non-null codeProduit and produit to be considered for grouping;</li>
+     *       <li>a date accessible as an Instant (the method calls m.getDate().atZone(zone));</li>
+     *       <li>solde (Float), mouvement (Float) and type (String) fields used for calculations.</li>
+     *     </ul>
+     *   </li>
+     *   <li>Week calculations use ISO week definitions (WeekFields.ISO) and the Europe/Zurich time zone.</li>
+     *   <li>If a product has no usable information for a particular YearWeek (no initial or final stock and no movements), it will be skipped for that week.</li>
+     *   <li>Negative sold quantities (resulting from stock increases due to corrections or inventories) are clamped to zero.</li>
+     *   <li>Deliveries are identified strictly by type.equals("Livraison"). Movements with null mouvement values are treated as zero quantity.</li>
+     *   <li>Final aggregation returns a Map keyed by ISO week number (Integer) mapping to a list of up to 5 TopSellingProductResult entries representing the highest average soldPercentage across all years present in the data.</li>
+     *   <li>The method does not modify the input list and does not throw checked exceptions. It is not synchronized; callers should handle concurrency if the same input collection is shared concurrently.</li>
+     * </ul>
      *
-     * @param movements the list of stock movement DTOs to analyze
-     * @return a map where each key is a {@link YearWeek} and the value is a list of up to 5 {@link TopSellingProductResult}
-     *         objects representing the top selling products for that week, sorted by descending sold percentage
+     * @param movements a list of MouvementsStockDTO instances (may be empty). Each DTO's date is interpreted in the Europe/Zurich time zone and weeks use ISO week rules.
+     * @return a map from ISO week number (1..53) to a list (up to 5 items) of TopSellingProductResult representing the products with the highest average sold percentage for that week number across all years present in the input. If no products qualify for a given week number, that week number will not be present in the map.
      */
-    public Map<YearWeek, List<TopSellingProductResult>> findTop5SellingProductsPerWeek(List<MouvementsStockDTO> movements) {
+    public Map<Integer, List<TopSellingProductResult>> findTop5SellingProductsPerWeek(List<MouvementsStockDTO> movements) {
         // Index by product, sorted by date
         Map<ProductGroupingKey, List<MouvementsStockDTO>> movementsByProduct = movements
             .stream()
@@ -396,7 +418,46 @@ public class MouvementsStockService {
             }
         }
 
-        return top5ByWeek;
+        // For each week number, identify the products that had the highest average sales rates across all available years.
+
+        // For each week, group the results by product
+        Map<Integer, Map<ProductGroupingKey, List<Float>>> soldPercentagesByWeekAndProduct = new HashMap<>();
+
+        for (Map.Entry<YearWeek, List<TopSellingProductResult>> entry : top5ByWeek.entrySet()) {
+            int weekNum = entry.getKey().getWeek();
+            for (TopSellingProductResult pr : entry.getValue()) {
+                soldPercentagesByWeekAndProduct
+                    .computeIfAbsent(weekNum, k -> new HashMap<>())
+                    .computeIfAbsent(new ProductGroupingKey(pr.getProductCode(), pr.getProduct()), k -> new ArrayList<>())
+                    .add(pr.getSoldPercentage());
+            }
+        }
+
+        // Calculate the average per product and per week
+        Map<Integer, List<TopSellingProductResult>> topProductsByWeekNumber = new HashMap<>();
+
+        for (Map.Entry<Integer, Map<ProductGroupingKey, List<Float>>> entry : soldPercentagesByWeekAndProduct.entrySet()) {
+            int weekNum = entry.getKey();
+            List<TopSellingProductResult> aggregated = new ArrayList<>();
+
+            for (Map.Entry<ProductGroupingKey, List<Float>> productEntry : entry.getValue().entrySet()) {
+                String productCode = productEntry.getKey().getCodeProduit();
+                String product = productEntry.getKey().getProduit();
+                List<Float> percentages = productEntry.getValue();
+                float avg = (float) percentages.stream().mapToDouble(Float::doubleValue).average().orElse(0);
+                aggregated.add(new TopSellingProductResult(productCode, product, avg, 0f, 0f)); // qty and stock not needed here
+            }
+
+            List<TopSellingProductResult> top5 = aggregated
+                .stream()
+                .sorted(Comparator.comparing(TopSellingProductResult::getSoldPercentage).reversed())
+                .limit(5)
+                .collect(Collectors.toList());
+
+            topProductsByWeekNumber.put(weekNum, top5);
+        }
+
+        return topProductsByWeekNumber;
     }
 
     /**

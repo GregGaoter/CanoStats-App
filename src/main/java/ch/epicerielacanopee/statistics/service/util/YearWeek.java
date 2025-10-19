@@ -15,11 +15,11 @@ public class YearWeek implements Comparable<YearWeek> {
     }
 
     public int getYear() {
-        return year;
+        return this.year;
     }
 
     public int getWeek() {
-        return week;
+        return this.week;
     }
 
     public static YearWeek from(ZonedDateTime zdt, WeekFields wf) {
@@ -45,11 +45,11 @@ public class YearWeek implements Comparable<YearWeek> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(year, week);
+        return Objects.hash(this.year, this.week);
     }
 
     @Override
     public String toString() {
-        return year + "-S" + week;
+        return this.year + "-S" + this.week;
     }
 }
