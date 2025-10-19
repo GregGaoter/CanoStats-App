@@ -210,8 +210,12 @@ public class MouvementsStockService {
             .toList();
     }
 
-    public List<MouvementsStockDTO> findByDateBetween(Instant startDate, Instant endDate) {
-        return mouvementsStockRepository.findByDateBetween(startDate, endDate).stream().map(mouvementsStockMapper::toDto).toList();
+    public List<MouvementsStockDTO> findLegByDateBetween(Instant startDate, Instant endDate) {
+        return mouvementsStockRepository
+            .findByDateBetweenAndCodeProduitStartingWith(startDate, endDate, "leg")
+            .stream()
+            .map(mouvementsStockMapper::toDto)
+            .toList();
     }
 
     public Map<String, List<MouvementsStockDTO>> findByInventory(List<MouvementsStockDTO> mouvementsStocks, float mouvement) {

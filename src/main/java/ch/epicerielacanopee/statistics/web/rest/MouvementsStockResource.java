@@ -264,7 +264,7 @@ public class MouvementsStockResource {
         @RequestParam Instant startDate,
         @RequestParam Instant endDate
     ) {
-        List<MouvementsStockDTO> resultByCriteria = mouvementsStockService.findByDateBetween(startDate, endDate);
+        List<MouvementsStockDTO> resultByCriteria = mouvementsStockService.findLegByDateBetween(startDate, endDate);
         Map<Integer, List<TopSellingProductResult>> result = mouvementsStockService.findTop5SellingProductsPerWeek(resultByCriteria);
         return ResponseEntity.ok().body(result);
     }
