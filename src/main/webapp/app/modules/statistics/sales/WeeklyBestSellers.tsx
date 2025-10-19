@@ -1,8 +1,15 @@
 import { apiUrl } from 'app/entities/mouvements-stock/mouvements-stock.reducer';
+import { Text } from 'app/shared/component/Text';
 import { TopSellingProductResult } from 'app/shared/model/TopSellingProductResult';
 import { getWeeklyBestSellersQueryParams } from 'app/shared/util/QueryParamsUtil';
 import axios from 'axios';
+import { BlockUI } from 'primereact/blockui';
+import { Card } from 'primereact/card';
+import { Column } from 'primereact/column';
+import { DataTable } from 'primereact/datatable';
+import { ProgressSpinner } from 'primereact/progressspinner';
 import React, { useState } from 'react';
+import { WeeklyBestSellersFilter } from './WeeklyBestSellersFilter';
 
 interface ApiMapResponse {
   [key: number]: TopSellingProductResult[];
@@ -36,5 +43,40 @@ export const WeeklyBestSellers = () => {
       .finally(() => setLoadingData(false));
   };
 
-  return <div>Weekly Best Sellers Component</div>;
+  const headerTemplate = (data: TableData) => <Text className="font-bold">{`Semaine ${String(data.week).padStart(2, '0')}`}</Text>;
+
+  const weekTemplate = (data: TableData) => <Text>{`S${String(data.week).padStart(2, '0')}`}</Text>;
+
+  return (
+    <div className="grid align-items-center">
+      <div className="col-12">
+        <BlockUI blocked={loadingData} template={<ProgressSpinner />}>
+          <WeeklyBestSellersFilter
+            dates={dates}
+            loadingData={loadingData}
+            onDatesChange={d => setDates(d)}
+            onApplyFilter={() => fetchWeeklyBestSellers()}
+          />
+        </BlockUI>
+      </div>
+      <div className="col-12">
+        <Card>
+          <DataTable
+            value={tableData}
+            rowGroupMode="subheader"
+            groupRowsBy="week"
+            rowGroupHeaderTemplate={headerTemplate}
+            dataKey="week"
+            scrollable
+            scrollHeight="600px"
+          >
+            <Column field="week" header="Semaine" body={weekTemplate}></Column>
+            <Column field="productCode" header="Code"></Column>
+            <Column field="product" header="Produit"></Column>
+            <Column field="soldPercentage" header="% moyen vendu"></Column>
+          </DataTable>
+        </Card>
+      </div>
+    </div>
+  );
 };
