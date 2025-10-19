@@ -47,6 +47,8 @@ export const WeeklyBestSellers = () => {
 
   const weekTemplate = (data: TableData) => <Text>{`S${String(data.week).padStart(2, '0')}`}</Text>;
 
+  const soldPercentageTemplate = (data: TableData) => <Text>{`${data.soldPercentage.toFixed(0)}`}</Text>;
+
   return (
     <div className="grid align-items-center">
       <div className="col-12">
@@ -73,7 +75,7 @@ export const WeeklyBestSellers = () => {
             <Column field="week" header="Semaine" body={weekTemplate}></Column>
             <Column field="productCode" header="Code"></Column>
             <Column field="product" header="Produit"></Column>
-            <Column field="soldPercentage" header="% moyen vendu"></Column>
+            <Column field="soldPercentage" header="% moyen vendu" body={soldPercentageTemplate}></Column>
           </DataTable>
         </Card>
       </div>
