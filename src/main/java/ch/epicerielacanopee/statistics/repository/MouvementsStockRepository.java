@@ -24,4 +24,6 @@ public interface MouvementsStockRepository extends JpaRepository<MouvementsStock
         String vente,
         Integer epicerioId
     );
+
+    Optional<MouvementsStock> findFirstByCodeProduitAndDateBeforeOrderByDateDesc(String codeProduit, Instant instant);
 }

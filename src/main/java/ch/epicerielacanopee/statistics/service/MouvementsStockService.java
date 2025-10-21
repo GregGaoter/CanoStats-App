@@ -267,56 +267,68 @@ public class MouvementsStockService {
     }
 
     /**
-     * Compute the top-5 selling products for each ISO week number, aggregated across years.
+     * Computes the top-5 selling products for each ISO week number (aggregated across years)
+     * based on weekly sales rates derived from stock movements.
      *
-     * <p>Algorithm overview:
+     * <p>Processing overview:
      * <ul>
-     *   <li>Group input movements by product (combination of codeProduit and produit) and sort each group's movements by date ascending.</li>
-     *   <li>Determine the set of YearWeek values present in the input (ISO weeks, Monday-first) using the Europe/Zurich time zone.</li>
-     *   <li>For each YearWeek present:
+     *   <li>Movements are first grouped by product (combination of product code and product name)
+     *       and sorted by movement date.</li>
+     *   <li>Weeks are determined using ISO week fields (WeekFields.ISO) and the
+     *       "Europe/Zurich" time zone. Each distinct YearWeek present in the input movements
+     *       is analyzed independently.</li>
+     *   <li>For each product and week:
      *     <ul>
-     *       <li>Compute the week start (inclusive) and end (exclusive) Instants in Europe/Zurich.</li>
-     *       <li>For each product:
+     *       <li>The method attempts to determine the initial stock at the start of the week:
      *         <ul>
-     *           <li>Find the last movement strictly before the week start to determine the initial stock (solde).</li>
-     *           <li>If no prior movement exists but at least one movement occurs during the week, use the first movement's solde during the week as a fallback initial stock.</li>
-     *           <li>Collect deliveries during the week (movements with type.equals("Livraison")) and sum their mouvement values (null treated as 0).</li>
-     *           <li>Determine the final stock as the last solde observed during the week, or reuse the initial stock if there were no movements in the week.</li>
-     *           <li>If initial or final stock is missing, or if availableStock (initialStock + deliveries) &le; 0, skip the product for that week.</li>
-     *           <li>Compute soldQuantity = max(availableStock - finalStock, 0) and soldPercentage = (soldQuantity / availableStock) * 100.</li>
+     *           <li>Prefer the last known balance strictly before the week's start by querying
+     *               the repository: {@code mouvementsStockRepository.findFirstByCodeProduitAndDateBeforeOrderByDateDesc(...)}.</li>
+     *           <li>If no prior balance exists but there are movements during the week, the
+     *               first observed balance in the week is used as a fallback initial stock.</li>
      *         </ul>
      *       </li>
-     *       <li>Collect TopSellingProductResult instances for all products with valid metrics and select the top 5 by:
-     *         <ol>
-     *           <li>descending soldPercentage</li>
-     *           <li>then descending soldQuantity</li>
-     *         </ol>
-     *       </li>
+     *       <li>All movements whose timestamp is within the week's inclusive date range are
+     *           considered "week movements".</li>
+     *       <li>Deliveries for the week are summed from movements where {@code type.equals("Livraison")}.
+     *           Null movement amounts are treated as 0.</li>
+     *       <li>The final stock for the week is taken as the last observed balance during the week,
+     *           or the initial stock if there were no movements in the week.</li>
+     *       <li>Negative balances are clamped to 0 for both initial and final stocks.</li>
+     *       <li>Available stock is computed as {@code initialStock + deliveries}. If available stock
+     *           is less than or equal to zero, the product/week pair is ignored (to avoid division by zero
+     *           and irrelevant cases).</li>
+     *       <li>Sold quantity is {@code availableStock - finalStock}, clamped to a minimum of 0
+     *           (to protect against corrections or inventory increases), and sold percentage is
+     *           {@code (soldQuantity / availableStock) * 100}.</li>
+     *       <li>Product/week pairs without sufficient information (no initial stock and no movements)
+     *           or where computed values are incomplete are skipped.</li>
      *     </ul>
      *   </li>
-     *   <li>After processing all YearWeek instances, group the per-week (YearWeek) top-5 results by ISO week number (1..53), then for each product compute the average soldPercentage across the different years in which it appeared in that week's top-5.</li>
-     *   <li>For each week number return the top 5 products ordered by descending average soldPercentage. The returned TopSellingProductResult objects contain averaged soldPercentage; soldQuantity and availableStock are set to 0 for these aggregated results.</li>
+     *   <li>After computing sold percentages per product for each YearWeek, results are aggregated
+     *       by ISO week number across years. For each product/weekNumber the average sold percentage
+     *       across all years (and YearWeeks) present in the input is computed.</li>
+     *   <li>For each week number (1–53), the products are sorted by their average sold percentage
+     *       in descending order and the top 5 products are returned.</li>
      * </ul>
      *
-     * <p>Notes, assumptions and important details:
+     * Important notes and assumptions:
      * <ul>
-     *   <li>Input movements must provide:
-     *     <ul>
-     *       <li>non-null codeProduit and produit to be considered for grouping;</li>
-     *       <li>a date accessible as an Instant (the method calls m.getDate().atZone(zone));</li>
-     *       <li>solde (Float), mouvement (Float) and type (String) fields used for calculations.</li>
-     *     </ul>
-     *   </li>
-     *   <li>Week calculations use ISO week definitions (WeekFields.ISO) and the Europe/Zurich time zone.</li>
-     *   <li>If a product has no usable information for a particular YearWeek (no initial or final stock and no movements), it will be skipped for that week.</li>
-     *   <li>Negative sold quantities (resulting from stock increases due to corrections or inventories) are clamped to zero.</li>
-     *   <li>Deliveries are identified strictly by type.equals("Livraison"). Movements with null mouvement values are treated as zero quantity.</li>
-     *   <li>Final aggregation returns a Map keyed by ISO week number (Integer) mapping to a list of up to 5 TopSellingProductResult entries representing the highest average soldPercentage across all years present in the data.</li>
-     *   <li>The method does not modify the input list and does not throw checked exceptions. It is not synchronized; callers should handle concurrency if the same input collection is shared concurrently.</li>
+     *   <li>Input {@code movements} are expected to have non-null {@code codeProduit}, {@code produit}
+     *       and a date value that can be converted to the "Europe/Zurich" zone via {@code atZone(zone)}.</li>
+     *   <li>The method depends on a repository call to obtain the last known balance before a week.
+     *       That call is executed per product/week and may be expensive for large datasets.</li>
+     *   <li>Returned percentages are in the range [0, 100]. Quantities and stocks are represented as floats.</li>
+     *   <li>The map key is the ISO week number (1–53). The associated list is ordered by decreasing
+     *       average sold percentage and contains up to 5 TopSellingProductResult entries. In the
+     *       returned TopSellingProductResult objects, quantity and stock fields are not meaningful
+     *       for the aggregated results (they are set to 0f in aggregation).</li>
      * </ul>
      *
-     * @param movements a list of MouvementsStockDTO instances (may be empty). Each DTO's date is interpreted in the Europe/Zurich time zone and weeks use ISO week rules.
-     * @return a map from ISO week number (1..53) to a list (up to 5 items) of TopSellingProductResult representing the products with the highest average sold percentage for that week number across all years present in the input. If no products qualify for a given week number, that week number will not be present in the map.
+     * @param movements list of stock movement DTOs (MouvementsStockDTO) used to compute weekly sales rates;
+     *                  only entries with non-null product code and product name are considered
+     * @return a map indexed by ISO week number (Integer). Each value is a list of up to 5
+     *         TopSellingProductResult objects representing the products with the highest average
+     *         sold percentage for that week number, sorted in descending order of sold percentage.
      */
     public Map<Integer, List<TopSellingProductResult>> findTop5SellingProductsPerWeek(List<MouvementsStockDTO> movements) {
         // Index by product, sorted by date
@@ -340,7 +352,7 @@ public class MouvementsStockService {
             .map(m -> YearWeek.from(m.getDate().atZone(zone), weekFields))
             .collect(Collectors.toCollection(TreeSet::new));
 
-        Map<YearWeek, List<TopSellingProductResult>> top5ByWeek = new TreeMap<>();
+        Map<YearWeek, List<TopSellingProductResult>> weekToSellingProductsResult = new TreeMap<>();
 
         for (YearWeek yw : weeks) {
             List<TopSellingProductResult> results = new ArrayList<>();
@@ -361,13 +373,16 @@ public class MouvementsStockService {
                 List<MouvementsStockDTO> productMovements = entry.getValue();
 
                 // Movement before the week (for initial stock)
-                Optional<MouvementsStockDTO> lastBeforeWeek = lastBefore(productMovements, weekStart);
-                Float initialStock = lastBeforeWeek.map(MouvementsStockDTO::getSolde).orElse(null);
+                Optional<MouvementsStock> lastBeforeWeek = mouvementsStockRepository.findFirstByCodeProduitAndDateBeforeOrderByDateDesc(
+                    productCode,
+                    weekStart
+                );
+                Float initialStock = lastBeforeWeek.isPresent() ? lastBeforeWeek.get().getSolde() : null;
 
                 // Movements during the week
                 List<MouvementsStockDTO> weekMovements = productMovements
                     .stream()
-                    .filter(m -> !m.getDate().isBefore(weekStart) && m.getDate().isBefore(weekEnd))
+                    .filter(m -> m.getDate().isAfter(weekStart) && m.getDate().isBefore(weekEnd))
                     .collect(Collectors.toList());
 
                 if (weekMovements.isEmpty() && initialStock == null) continue; // no usable information
@@ -394,6 +409,9 @@ public class MouvementsStockService {
 
                 if (initialStock == null || finalStock == null) continue; // do not produce incomplete results
 
+                if (initialStock < 0f) initialStock = 0f;
+                if (finalStock < 0f) finalStock = 0f;
+
                 float availableStock = initialStock + deliveries;
                 if (availableStock <= 0f) continue; // avoid division by zero or irrelevant cases
 
@@ -405,20 +423,8 @@ public class MouvementsStockService {
                 results.add(new TopSellingProductResult(productCode, product, soldPercentage, soldQuantity, availableStock));
             }
 
-            // Top 5 by descending % sold
-            List<TopSellingProductResult> top5 = results
-                .stream()
-                .sorted(
-                    Comparator.comparing(TopSellingProductResult::getSoldPercentage)
-                        .reversed()
-                        .thenComparing(TopSellingProductResult::getSoldQuantity)
-                        .reversed()
-                )
-                .limit(5)
-                .collect(Collectors.toList());
-
-            if (!top5.isEmpty()) {
-                top5ByWeek.put(yw, top5);
+            if (!results.isEmpty()) {
+                weekToSellingProductsResult.put(yw, results);
             }
         }
 
@@ -427,7 +433,7 @@ public class MouvementsStockService {
         // For each week, group the results by product
         Map<Integer, Map<ProductGroupingKey, List<Float>>> soldPercentagesByWeekAndProduct = new HashMap<>();
 
-        for (Map.Entry<YearWeek, List<TopSellingProductResult>> entry : top5ByWeek.entrySet()) {
+        for (Map.Entry<YearWeek, List<TopSellingProductResult>> entry : weekToSellingProductsResult.entrySet()) {
             int weekNum = entry.getKey().getWeek();
             for (TopSellingProductResult pr : entry.getValue()) {
                 soldPercentagesByWeekAndProduct
@@ -462,28 +468,5 @@ public class MouvementsStockService {
         }
 
         return topProductsByWeekNumber;
-    }
-
-    /**
-     * Returns the last {@link MouvementsStockDTO} from the given list whose date is before the specified instant.
-     * <p>
-     * The method iterates through the provided list of movements and keeps track of the last movement
-     * whose date is strictly before the given {@code instant}. The search stops as soon as a movement
-     * with a date not before the instant is encountered, assuming the list is sorted in ascending order by date.
-     *
-     * @param movements the list of {@link MouvementsStockDTO} to search, assumed to be sorted by date in ascending order
-     * @param instant the {@link Instant} to compare movement dates against
-     * @return an {@link Optional} containing the last movement before the specified instant, or empty if none found
-     */
-    private static Optional<MouvementsStockDTO> lastBefore(List<MouvementsStockDTO> movements, Instant instant) {
-        MouvementsStockDTO last = null;
-        for (MouvementsStockDTO m : movements) {
-            if (m.getDate().isBefore(instant)) {
-                last = m;
-            } else {
-                break;
-            }
-        }
-        return Optional.ofNullable(last);
     }
 }

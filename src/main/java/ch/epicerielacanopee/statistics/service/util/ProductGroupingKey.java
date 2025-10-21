@@ -32,4 +32,11 @@ public class ProductGroupingKey {
     public int hashCode() {
         return Objects.hash(codeProduit, produit);
     }
+
+    @Override
+    public String toString() {
+        return codeProduit.concat(" - ").concat(produit);
+    }
+
+    
 }
