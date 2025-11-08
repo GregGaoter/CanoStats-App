@@ -37,6 +37,4 @@ public class ProductGroupingKey {
     public String toString() {
         return codeProduit.concat(" - ").concat(produit);
     }
-
-    
 }

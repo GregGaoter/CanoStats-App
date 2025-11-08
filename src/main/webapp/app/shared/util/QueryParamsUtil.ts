@@ -28,9 +28,15 @@ export const getMouvementsStockQueryParams = (filters: { [key: string]: DataTabl
 };
 
 export const getWeeklyBestSellersQueryParams = (period: Date[]): string => {
+  const startDate: string = period[0].toISOString();
+
+  const year: number = period[1].getFullYear();
+  const month: number = period[1].getMonth();
+  const endDate: string = new Date(year, month + 1, 0).toISOString();
+
   const searchParams: URLSearchParams = new URLSearchParams();
-  searchParams.set('startDate', period[0].toISOString());
-  searchParams.set('endDate', period[1].toISOString());
+  searchParams.set('startDate', startDate);
+  searchParams.set('endDate', endDate);
   searchParams.set('cacheBuster', `${new Date().getTime()}`);
   return searchParams.toString();
 };

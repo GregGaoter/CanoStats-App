@@ -6,14 +6,12 @@ public class TopSellingProductResult {
     private String product;
     private float soldPercentage;
     private float soldQuantity;
-    private float availableStock;
 
-    public TopSellingProductResult(String productCode, String product, float soldPercentage, float soldQuantity, float availableStock) {
+    public TopSellingProductResult(String productCode, String product, float soldPercentage, float soldQuantity) {
         this.productCode = productCode;
         this.product = product;
         this.soldPercentage = soldPercentage;
         this.soldQuantity = soldQuantity;
-        this.availableStock = availableStock;
     }
 
     public String getProductCode() {
@@ -32,7 +30,7 @@ public class TopSellingProductResult {
         return soldQuantity;
     }
 
-    public float getAvailableStock() {
-        return availableStock;
+    public void setSoldQuantity(float soldQuantity) {
+        this.soldQuantity = soldQuantity;
     }
 }

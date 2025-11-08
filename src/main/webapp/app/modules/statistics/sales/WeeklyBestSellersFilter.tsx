@@ -19,8 +19,9 @@ export const WeeklyBestSellersFilter = (props: WeeklyBestSellersFilterProps) => 
         <Calendar
           value={props.dates}
           onChange={e => props.onDatesChange(e.value)}
+          view="month"
           selectionMode="range"
-          dateFormat="dd.mm.yy"
+          dateFormat="mm.yy"
           readOnlyInput
           hideOnRangeSelection
           showIcon

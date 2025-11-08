@@ -1,31 +1,20 @@
 package ch.epicerielacanopee.statistics.service;
 
-import ch.epicerielacanopee.statistics.domain.MouvementsStock;
-import ch.epicerielacanopee.statistics.repository.MouvementsStockRepository;
-import ch.epicerielacanopee.statistics.service.dto.EpicerioMouvementsStockDTO;
-import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
-import ch.epicerielacanopee.statistics.service.dto.TopSellingProductResult;
-import ch.epicerielacanopee.statistics.service.mapper.MouvementsStockMapper;
-import ch.epicerielacanopee.statistics.service.util.ProductGroupingKey;
-import ch.epicerielacanopee.statistics.service.util.YearWeek;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.ZoneId;
-import java.time.temporal.WeekFields;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -34,6 +23,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import ch.epicerielacanopee.statistics.domain.MouvementsStock;
+import ch.epicerielacanopee.statistics.repository.MouvementsStockRepository;
+import ch.epicerielacanopee.statistics.service.dto.EpicerioMouvementsStockDTO;
+import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
+import ch.epicerielacanopee.statistics.service.dto.TopSellingProductResult;
+import ch.epicerielacanopee.statistics.service.mapper.MouvementsStockMapper;
+import ch.epicerielacanopee.statistics.service.util.ProductGroupingKey;
+import ch.epicerielacanopee.statistics.service.util.SoldValues;
+import ch.epicerielacanopee.statistics.service.util.YearMonth;
+
 /**
  * Service Implementation for managing
  * {@link ch.epicerielacanopee.statistics.domain.MouvementsStock}.
@@ -41,6 +44,81 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @Transactional
 public class MouvementsStockService {
+
+    private static final Map<Month, List<String>> seasonalProducts = new HashMap<>();
+    static {
+        seasonalProducts.put(Month.JANUARY,
+                Arrays.asList("fru01", "leg75", "fru03", "fru22", "leg01", "leg06", "leg08", "leg09", "leg11", "leg15",
+                        "leg18", "leg21", "leg24", "leg25", "leg26", "leg27", "leg28", "leg29", "leg30", "leg31",
+                        "leg33", "leg34", "leg37", "leg39", "leg46", "leg47", "leg49", "leg50", "leg51", "leg55",
+                        "leg58", "leg60", "leg80", "fru33", "fru34", "fru35", "fru36", "fru37", "fru38", "leg87",
+                        "fru42", "leg90", "fru44", "fru45", "fru51", "leg93", "alc15", "fru23", "leg98"));
+        seasonalProducts.put(Month.FEBRUARY,
+                Arrays.asList("fru01", "leg75", "fru03", "fru22", "leg01", "leg05", "leg06", "leg08", "leg09", "leg11",
+                        "leg15", "leg18", "leg21", "leg25", "leg26", "leg27", "leg28", "leg29", "leg30", "leg31",
+                        "leg33", "leg37", "leg47", "leg49", "leg50", "leg51", "leg55", "leg58", "leg60", "leg80",
+                        "boi10", "fru33", "fru35", "fru36", "fru38", "leg87", "leg90", "fru44", "fru45", "fru51",
+                        "leg93", "fru23", "leg98", "leg104"));
+        seasonalProducts.put(Month.MARCH,
+                Arrays.asList("fru01", "leg75", "fru03", "fru22", "leg01", "leg05", "leg06", "leg08", "leg09", "leg15",
+                        "leg18", "leg21", "leg25", "leg26", "leg27", "leg28", "leg29", "leg30", "leg31", "leg32",
+                        "leg33", "leg47", "leg48", "leg49", "leg51", "leg55", "leg58", "leg60", "leg80", "fru35",
+                        "fru36", "fru38", "leg90", "fru44", "fru45", "fru51", "leg93", "fru23"));
+        seasonalProducts.put(Month.APRIL,
+                Arrays.asList("fru01", "leg75", "fru03", "fru22", "fru30", "leg69", "leg01", "leg03", "leg05", "leg06",
+                        "leg08", "leg09", "leg10", "leg16", "leg17", "leg21", "leg25", "leg28", "leg31", "leg33",
+                        "leg34", "leg47", "leg48", "leg49", "leg51", "leg55", "leg58", "leg60", "leg76", "leg80",
+                        "fru38", "leg90", "fru44", "fru45", "fru51", "leg104"));
+        seasonalProducts.put(Month.MAY,
+                Arrays.asList("leg75", "fru03", "fru22", "fru30", "leg69", "leg01", "leg03", "leg05", "leg06", "leg07",
+                        "leg08", "leg09", "leg10", "leg16", "leg17", "leg21", "leg22", "leg25", "leg28", "leg33",
+                        "leg34", "leg35", "leg40", "leg48", "leg49", "leg51", "leg59", "leg60", "leg62", "leg74",
+                        "leg76", "leg80", "fru38", "leg90", "fru44", "fru45", "fru02"));
+        seasonalProducts.put(Month.JUNE,
+                Arrays.asList("leg75", "fru03", "fru04", "fru08", "fru10", "fru14", "fru16", "fru17", "fru22", "fru30",
+                        "fru31", "leg69", "leg01", "leg03", "leg05", "leg06", "leg07", "leg08", "leg10", "leg14",
+                        "leg22", "leg24", "leg34", "leg35", "leg40", "leg43", "leg48", "leg51", "leg54", "leg59",
+                        "leg62", "leg74", "leg78", "leg76", "leg90", "fru44", "fru45", "fru02"));
+        seasonalProducts.put(Month.JULY,
+                Arrays.asList("leg75", "fru03", "fru04", "fru07", "fru08", "fru10", "fru14", "fru15", "fru16", "fru17",
+                        "fru20", "fru31", "leg69", "leg02", "leg03", "leg05", "leg06", "leg07", "leg08", "leg10",
+                        "leg13", "leg14", "leg22", "leg24", "leg34", "leg35", "leg40", "leg48", "leg54", "leg57",
+                        "leg59", "leg62", "leg74", "leg78", "leg76", "fru38", "fru43", "leg90", "fru44", "fru45",
+                        "fru02", "fru19"));
+        seasonalProducts.put(Month.AUGUST,
+                Arrays.asList("leg75", "fru03", "fru04", "fru07", "fru08", "fru14", "fru15", "fru16", "fru17", "fru20",
+                        "fru31", "leg69", "leg03", "leg05", "leg06", "leg07", "leg08", "leg10", "leg13", "leg14",
+                        "leg22", "leg24", "leg25", "leg34", "leg35", "leg40", "leg41", "leg43", "leg48", "leg54",
+                        "leg57", "leg59", "leg62", "leg74", "leg78", "leg76", "fru37", "fru38", "fru42", "fru43",
+                        "leg90", "fru44", "fru45", "fru49", "leg97", "fru19"));
+        seasonalProducts.put(Month.SEPTEMBER,
+                Arrays.asList("leg75", "fru03", "fru04", "fru11", "fru15", "fru16", "fru17", "fru20", "fru21", "fru22",
+                        "leg69", "leg01", "leg03", "leg05", "leg06", "leg07", "leg08", "leg10", "leg13", "leg14",
+                        "leg15", "leg22", "leg24", "leg25", "leg34", "leg35", "leg39", "leg40", "leg41", "leg43",
+                        "leg46", "leg49", "leg50", "leg51", "leg55", "leg56", "leg57", "leg59", "leg60", "leg62",
+                        "leg64", "leg74", "leg78", "leg76", "leg80", "fru37", "fru38", "fru43", "leg90", "fru44",
+                        "fru45", "fru49", "leg97", "fru19"));
+        seasonalProducts.put(Month.OCTOBER,
+                Arrays.asList("leg75", "fru03", "fru11", "fru21", "fru22", "leg69", "leg01", "leg03", "leg05", "leg06",
+                        "leg07", "leg08", "leg15", "leg18", "leg21", "leg22", "leg24", "leg25", "leg27", "leg28",
+                        "leg29", "leg30", "leg31", "leg32", "leg33", "leg34", "leg35", "leg39", "leg40", "leg41",
+                        "leg43", "leg46", "leg47", "leg49", "leg50", "leg51", "leg55", "leg56", "leg57", "leg59",
+                        "leg60", "leg62", "leg64", "leg74", "leg78", "leg76", "leg80", "fru35", "fru37", "fru38",
+                        "leg90", "fru44", "fru45", "fru49", "fru51"));
+        seasonalProducts.put(Month.NOVEMBER,
+                Arrays.asList("fru01", "leg75", "fru03", "fru11", "fru22", "leg01", "leg03", "leg05", "leg06", "leg08",
+                        "leg09", "leg11", "leg15", "leg18", "leg21", "leg22", "leg24", "leg25", "leg26", "leg27",
+                        "leg28", "leg29", "leg30", "leg31", "leg32", "leg33", "leg34", "leg35", "leg39", "leg43",
+                        "leg46", "leg47", "leg49", "leg50", "leg51", "leg55", "leg56", "leg57", "leg58", "leg60",
+                        "leg80", "fru33", "fru34", "fru35", "fru37", "fru38", "leg90", "fru44", "fru45", "fru51",
+                        "leg93", "fru23", "leg98"));
+        seasonalProducts.put(Month.DECEMBER,
+                Arrays.asList("fru01", "leg75", "fru03", "fru22", "leg01", "leg05", "leg06", "leg09", "leg11", "leg15",
+                        "leg18", "leg21", "leg22", "leg24", "leg25", "leg26", "leg27", "leg28", "leg29", "leg30",
+                        "leg31", "leg33", "leg34", "leg37", "leg39", "leg46", "leg47", "leg49", "leg50", "leg51",
+                        "leg55", "leg58", "leg60", "leg80", "fru33", "fru34", "fru35", "fru36", "fru37", "fru38",
+                        "leg87", "fru42", "leg90", "fru44", "fru45", "fru51", "leg93", "alc15", "fru23", "leg98"));
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(MouvementsStockService.class);
 
@@ -266,207 +344,130 @@ public class MouvementsStockService {
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    /**
-     * Computes the top-5 selling products for each ISO week number (aggregated across years)
-     * based on weekly sales rates derived from stock movements.
-     *
-     * <p>Processing overview:
-     * <ul>
-     *   <li>Movements are first grouped by product (combination of product code and product name)
-     *       and sorted by movement date.</li>
-     *   <li>Weeks are determined using ISO week fields (WeekFields.ISO) and the
-     *       "Europe/Zurich" time zone. Each distinct YearWeek present in the input movements
-     *       is analyzed independently.</li>
-     *   <li>For each product and week:
-     *     <ul>
-     *       <li>The method attempts to determine the initial stock at the start of the week:
-     *         <ul>
-     *           <li>Prefer the last known balance strictly before the week's start by querying
-     *               the repository: {@code mouvementsStockRepository.findFirstByCodeProduitAndDateBeforeOrderByDateDesc(...)}.</li>
-     *           <li>If no prior balance exists but there are movements during the week, the
-     *               first observed balance in the week is used as a fallback initial stock.</li>
-     *         </ul>
-     *       </li>
-     *       <li>All movements whose timestamp is within the week's inclusive date range are
-     *           considered "week movements".</li>
-     *       <li>Deliveries for the week are summed from movements where {@code type.equals("Livraison")}.
-     *           Null movement amounts are treated as 0.</li>
-     *       <li>The final stock for the week is taken as the last observed balance during the week,
-     *           or the initial stock if there were no movements in the week.</li>
-     *       <li>Negative balances are clamped to 0 for both initial and final stocks.</li>
-     *       <li>Available stock is computed as {@code initialStock + deliveries}. If available stock
-     *           is less than or equal to zero, the product/week pair is ignored (to avoid division by zero
-     *           and irrelevant cases).</li>
-     *       <li>Sold quantity is {@code availableStock - finalStock}, clamped to a minimum of 0
-     *           (to protect against corrections or inventory increases), and sold percentage is
-     *           {@code (soldQuantity / availableStock) * 100}.</li>
-     *       <li>Product/week pairs without sufficient information (no initial stock and no movements)
-     *           or where computed values are incomplete are skipped.</li>
-     *     </ul>
-     *   </li>
-     *   <li>After computing sold percentages per product for each YearWeek, results are aggregated
-     *       by ISO week number across years. For each product/weekNumber the average sold percentage
-     *       across all years (and YearWeeks) present in the input is computed.</li>
-     *   <li>For each week number (1–53), the products are sorted by their average sold percentage
-     *       in descending order and the top 5 products are returned.</li>
-     * </ul>
-     *
-     * Important notes and assumptions:
-     * <ul>
-     *   <li>Input {@code movements} are expected to have non-null {@code codeProduit}, {@code produit}
-     *       and a date value that can be converted to the "Europe/Zurich" zone via {@code atZone(zone)}.</li>
-     *   <li>The method depends on a repository call to obtain the last known balance before a week.
-     *       That call is executed per product/week and may be expensive for large datasets.</li>
-     *   <li>Returned percentages are in the range [0, 100]. Quantities and stocks are represented as floats.</li>
-     *   <li>The map key is the ISO week number (1–53). The associated list is ordered by decreasing
-     *       average sold percentage and contains up to 5 TopSellingProductResult entries. In the
-     *       returned TopSellingProductResult objects, quantity and stock fields are not meaningful
-     *       for the aggregated results (they are set to 0f in aggregation).</li>
-     * </ul>
-     *
-     * @param movements list of stock movement DTOs (MouvementsStockDTO) used to compute weekly sales rates;
-     *                  only entries with non-null product code and product name are considered
-     * @return a map indexed by ISO week number (Integer). Each value is a list of up to 5
-     *         TopSellingProductResult objects representing the products with the highest average
-     *         sold percentage for that week number, sorted in descending order of sold percentage.
-     */
-    public Map<Integer, List<TopSellingProductResult>> findTop5SellingProductsPerWeek(List<MouvementsStockDTO> movements) {
-        // Index by product, sorted by date
-        Map<ProductGroupingKey, List<MouvementsStockDTO>> movementsByProduct = movements
-            .stream()
-            .filter(m -> m.getCodeProduit() != null && m.getProduit() != null)
-            .collect(
-                Collectors.groupingBy(
-                    m -> new ProductGroupingKey(m.getCodeProduit(), m.getProduit()),
-                    Collectors.collectingAndThen(Collectors.toList(), list ->
-                        list.stream().sorted(Comparator.comparing(MouvementsStockDTO::getDate)).collect(Collectors.toList())
-                    )
-                )
-            );
-
-        // Build the set of present weeks
-        WeekFields weekFields = WeekFields.ISO; // ISO weeks (Monday as the first day)
+    private Map<Month, List<String>> getSeasonalProductsOverPeriod(Instant start, Instant end) {
         ZoneId zone = ZoneId.of("Europe/Zurich");
-        Set<YearWeek> weeks = movements
-            .stream()
-            .map(m -> YearWeek.from(m.getDate().atZone(zone), weekFields))
-            .collect(Collectors.toCollection(TreeSet::new));
+        LocalDate startDate = start.atZone(zone).toLocalDate().withDayOfMonth(1);
+        LocalDate endDate = end.atZone(zone).toLocalDate().withDayOfMonth(1);
 
-        Map<YearWeek, List<TopSellingProductResult>> weekToSellingProductsResult = new TreeMap<>();
+        List<Integer> months = new ArrayList<>();
+        LocalDate current = startDate;
+        while (current.isBefore(endDate) || current.isEqual(endDate)) {
+            int monthValue = current.getMonthValue();
+            if(!months.contains(monthValue)) {
+                months.add(monthValue);
+            }
+            current = current.plusMonths(1);
+        }
 
-        for (YearWeek yw : weeks) {
-            List<TopSellingProductResult> results = new ArrayList<>();
+        Map<Month, List<String>> seasonalProductsOverPeriod = seasonalProducts.entrySet().stream().filter(entry -> months.contains(entry.getKey().getValue())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        
+        return seasonalProductsOverPeriod;
+    }
 
-            // Start/end of week as Instant for filtering
-            LocalDate firstDay = LocalDate.of(yw.getYear(), 1, 4) // ISO week 1 contains Jan 4
-                .with(weekFields.weekOfWeekBasedYear(), yw.getWeek())
-                .with(weekFields.dayOfWeek(), 1);
-            LocalDate lastDay = firstDay.plusDays(6);
+    public Map<Integer, List<TopSellingProductResult>> buildMonthlySeasonalPlan(List<MouvementsStockDTO> movements, Instant startDate, Instant endDate) {
+        // 1. Regrouper par produit et par année/mois
+        Map<YearMonth, Map<ProductGroupingKey, List<MouvementsStockDTO>>> byYearMonthAndProduct = movements.stream()
+            .collect(Collectors.groupingBy(
+                m -> YearMonth.from(m.getDate(), ZoneId.of("Europe/Zurich")),
+                Collectors.groupingBy(m -> new ProductGroupingKey(m.getCodeProduit(), m.getProduit()))
+            ));
 
-            Instant weekStart = firstDay.atStartOfDay(zone).toInstant();
-            Instant weekEnd = lastDay.plusDays(1).atStartOfDay(zone).toInstant(); // exclusive
+        // 2. Calculer ventes et pourcentages par YearMonth/produit
+        Map<YearMonth, List<TopSellingProductResult>> yearMonthResults = new HashMap<>();
 
-            for (Map.Entry<ProductGroupingKey, List<MouvementsStockDTO>> entry : movementsByProduct.entrySet()) {
-                ProductGroupingKey key = entry.getKey();
+        for (Map.Entry<YearMonth, Map<ProductGroupingKey, List<MouvementsStockDTO>>> yearMonthEntry : byYearMonthAndProduct.entrySet()) {
+            YearMonth yearMonth = yearMonthEntry.getKey();
+            Map<ProductGroupingKey, List<MouvementsStockDTO>> byProduct = yearMonthEntry.getValue();
+
+            List<TopSellingProductResult> productResults = new ArrayList<>();
+
+            for (Map.Entry<ProductGroupingKey, List<MouvementsStockDTO>> productEntry : byProduct.entrySet()) {
+                ProductGroupingKey key = productEntry.getKey();
                 String productCode = key.getCodeProduit();
-                String product = key.getProduit();
-                List<MouvementsStockDTO> productMovements = entry.getValue();
+                List<MouvementsStockDTO> mvts = productEntry.getValue();
+                mvts.sort(Comparator.comparing(MouvementsStockDTO::getDate));
 
-                // Movement before the week (for initial stock)
-                Optional<MouvementsStock> lastBeforeWeek = mouvementsStockRepository.findFirstByCodeProduitAndDateBeforeOrderByDateDesc(
-                    productCode,
-                    weekStart
-                );
-                Float initialStock = lastBeforeWeek.isPresent() ? lastBeforeWeek.get().getSolde() : null;
+                if (mvts.isEmpty()) continue;
 
-                // Movements during the week
-                List<MouvementsStockDTO> weekMovements = productMovements
-                    .stream()
-                    .filter(m -> m.getDate().isAfter(weekStart) && m.getDate().isBefore(weekEnd))
-                    .collect(Collectors.toList());
+                // Movement before the month (for initial stock)
+                Optional<MouvementsStock> lastBeforeMonth = mouvementsStockRepository.findFirstByCodeProduitAndDateBeforeOrderByDateDesc(productCode, startDate);
+                float initialStock = lastBeforeMonth.isPresent() ? lastBeforeMonth.get().getSolde() : mvts.get(0).getSolde();
 
-                if (weekMovements.isEmpty() && initialStock == null) continue; // no usable information
-
-                if (initialStock == null && !weekMovements.isEmpty()) {
-                    // fallback: take the first balance observed during the week as the initial stock
-                    initialStock = weekMovements.get(0).getSolde();
-                }
-
-                // Deliveries of the week
-                float deliveries = (float) weekMovements
-                    .stream()
-                    .filter(m -> m.getType().equals("Livraison"))
-                    .map(m -> m.getMouvement() == null ? 0f : m.getMouvement())
-                    .reduce(0f, Float::sum);
-
-                // Final stock: last known balance during the week, otherwise reuse the last before if there was no movement
-                Float finalStock = null;
-                if (!weekMovements.isEmpty()) {
-                    finalStock = weekMovements.get(weekMovements.size() - 1).getSolde();
-                } else {
-                    finalStock = initialStock; // no movement → stock unchanged
-                }
-
-                if (initialStock == null || finalStock == null) continue; // do not produce incomplete results
+                // Stock final = last balance in month
+                float finalStock = mvts.get(mvts.size() - 1).getSolde();
 
                 if (initialStock < 0f) initialStock = 0f;
                 if (finalStock < 0f) finalStock = 0f;
 
-                float availableStock = initialStock + deliveries;
-                if (availableStock <= 0f) continue; // avoid division by zero or irrelevant cases
+                // Deliveries during month
+                float deliveries = (float) mvts.stream()
+                    .filter(m -> m.getType() == "Livraison")
+                    .map(m -> m.getMouvement() == null ? 0f : m.getMouvement())
+                    .reduce(0f, Float::sum);
 
-                float soldQuantity = availableStock - finalStock;
-                if (soldQuantity < 0f) soldQuantity = 0f; // protection against corrections/inventories that increase the stock
+                float available = initialStock + deliveries;
+                if (available <= 0) continue;
 
-                float soldPercentage = (soldQuantity / availableStock) * 100f;
+                float soldQuantity = available - finalStock;
+                if (soldQuantity < 0) soldQuantity = 0f;
 
-                results.add(new TopSellingProductResult(productCode, product, soldPercentage, soldQuantity, availableStock));
+                float soldPercentage = (soldQuantity / available) * 100f;
+
+                productResults.add(new TopSellingProductResult(productCode, key.getProduit(), soldPercentage, soldQuantity));
             }
 
-            if (!results.isEmpty()) {
-                weekToSellingProductsResult.put(yw, results);
-            }
+            yearMonthResults.put(yearMonth, productResults);
         }
 
-        // For each week number, identify the products that had the highest average sales rates across all available years.
+        // For each month, group the results by product
+        Map<Integer, Map<ProductGroupingKey, List<SoldValues>>> monthlyAverageByProduct = new HashMap<>();
 
-        // For each week, group the results by product
-        Map<Integer, Map<ProductGroupingKey, List<Float>>> soldPercentagesByWeekAndProduct = new HashMap<>();
-
-        for (Map.Entry<YearWeek, List<TopSellingProductResult>> entry : weekToSellingProductsResult.entrySet()) {
-            int weekNum = entry.getKey().getWeek();
+        for (Map.Entry<YearMonth, List<TopSellingProductResult>> entry : yearMonthResults.entrySet()) {
+            int monthNum = entry.getKey().getMonth();
             for (TopSellingProductResult pr : entry.getValue()) {
-                soldPercentagesByWeekAndProduct
-                    .computeIfAbsent(weekNum, k -> new HashMap<>())
+                monthlyAverageByProduct
+                    .computeIfAbsent(monthNum, k -> new HashMap<>())
                     .computeIfAbsent(new ProductGroupingKey(pr.getProductCode(), pr.getProduct()), k -> new ArrayList<>())
-                    .add(pr.getSoldPercentage());
+                    .add(new SoldValues(pr.getSoldPercentage(), pr.getSoldQuantity()));
             }
         }
 
-        // Calculate the average per product and per week
-        Map<Integer, List<TopSellingProductResult>> topProductsByWeekNumber = new HashMap<>();
+        // Calculate the average per product and per month
+        Map<Integer, List<TopSellingProductResult>> topProductsByMonthNumber = new HashMap<>();
 
-        for (Map.Entry<Integer, Map<ProductGroupingKey, List<Float>>> entry : soldPercentagesByWeekAndProduct.entrySet()) {
-            int weekNum = entry.getKey();
+        for (Map.Entry<Integer, Map<ProductGroupingKey, List<SoldValues>>> entry : monthlyAverageByProduct.entrySet()) {
+            int monthNum = entry.getKey();
             List<TopSellingProductResult> aggregated = new ArrayList<>();
 
-            for (Map.Entry<ProductGroupingKey, List<Float>> productEntry : entry.getValue().entrySet()) {
+            for (Map.Entry<ProductGroupingKey, List<SoldValues>> productEntry : entry.getValue().entrySet()) {
                 String productCode = productEntry.getKey().getCodeProduit();
                 String product = productEntry.getKey().getProduit();
-                List<Float> percentages = productEntry.getValue();
-                float avg = (float) percentages.stream().mapToDouble(Float::doubleValue).average().orElse(0);
-                aggregated.add(new TopSellingProductResult(productCode, product, avg, 0f, 0f)); // qty and stock not needed here
+                List<SoldValues> soldValues = productEntry.getValue();
+                float soldPercentageAvg = (float) soldValues.stream().mapToDouble(SoldValues::getSoldPercentage).average().orElse(0);
+                float soldQuantityAvg = (float) soldValues.stream().mapToDouble(SoldValues::getSoldQuantity).average().orElse(0);
+                aggregated.add(new TopSellingProductResult(productCode, product, soldPercentageAvg, soldQuantityAvg));
             }
+            topProductsByMonthNumber.put(monthNum, aggregated);
+        }
 
-            List<TopSellingProductResult> top5 = aggregated
-                .stream()
+        // 3. Agréger sur plusieurs années : moyenne des % et des quantités
+        Map<Integer, List<TopSellingProductResult>> seasonalPlan = new HashMap<>();
+
+        Map<Month, List<String>> seasonalProductsOverPeriod = getSeasonalProductsOverPeriod(startDate, endDate);
+
+        for (Map.Entry<Month, List<String>> entry : seasonalProductsOverPeriod.entrySet()) {
+            int monthNumber = entry.getKey().getValue();
+            List<String> seasonal = entry.getValue();
+
+            List<TopSellingProductResult> top5 = topProductsByMonthNumber.getOrDefault(monthNumber, Collections.emptyList()).stream()
+                .filter(pr -> seasonal.contains(pr.getProductCode()))
                 .sorted(Comparator.comparing(TopSellingProductResult::getSoldPercentage).reversed())
                 .limit(5)
                 .collect(Collectors.toList());
 
-            topProductsByWeekNumber.put(weekNum, top5);
+            seasonalPlan.put(monthNumber, top5);
         }
 
-        return topProductsByWeekNumber;
+        return seasonalPlan;
     }
 }

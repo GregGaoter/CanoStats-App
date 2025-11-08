@@ -3,6 +3,9 @@ import { Text } from 'app/shared/component/Text';
 import { TopSellingProductResult } from 'app/shared/model/TopSellingProductResult';
 import { getWeeklyBestSellersQueryParams } from 'app/shared/util/QueryParamsUtil';
 import axios from 'axios';
+import dayjs from 'dayjs';
+import 'dayjs/locale/fr';
+import { capitalize } from 'lodash';
 import { BlockUI } from 'primereact/blockui';
 import { Card } from 'primereact/card';
 import { Column } from 'primereact/column';
@@ -16,7 +19,7 @@ interface ApiMapResponse {
 }
 
 interface TableData extends TopSellingProductResult {
-  week: number;
+  month: string;
 }
 
 export const WeeklyBestSellers = () => {
@@ -25,15 +28,26 @@ export const WeeklyBestSellers = () => {
   const [tableData, setTableData] = useState<TableData[]>([]);
   const [loadingData, setLoadingData] = useState<boolean>(false);
 
+  dayjs.locale('fr');
+
   const getTableData = (data: ApiMapResponse): TableData[] =>
-    Object.entries(data).flatMap(([key, results]) => results.map(result => ({ ...result, week: Number(key) })));
+    Object.entries(data).flatMap(([key, results]) =>
+      results.map(result => ({
+        ...result,
+        month: capitalize(
+          dayjs()
+            .month(Number(key) - 1)
+            .format('MMMM'),
+        ),
+      })),
+    );
 
   const fetchWeeklyBestSellers = (): void => {
     setLoadingData(true);
     setApiMapResponse({});
     setTableData([]);
     axios
-      .get<ApiMapResponse>(`${apiUrl}/top-5-selling-products-per-week?${getWeeklyBestSellersQueryParams(dates)}`, {
+      .get<ApiMapResponse>(`${apiUrl}/monthly-seasonal-plan?${getWeeklyBestSellersQueryParams(dates)}`, {
         timeout: 3600000,
       })
       .then(response => {
@@ -43,9 +57,7 @@ export const WeeklyBestSellers = () => {
       .finally(() => setLoadingData(false));
   };
 
-  const headerTemplate = (data: TableData) => <Text className="font-bold">{`Semaine ${String(data.week).padStart(2, '0')}`}</Text>;
-
-  const weekTemplate = (data: TableData) => <Text>{`S${String(data.week).padStart(2, '0')}`}</Text>;
+  const headerTemplate = (data: TableData) => <Text className="font-bold">{data.month}</Text>;
 
   const soldPercentageTemplate = (data: TableData) => <Text>{`${data.soldPercentage.toFixed(0)}`}</Text>;
 
@@ -66,13 +78,12 @@ export const WeeklyBestSellers = () => {
           <DataTable
             value={tableData}
             rowGroupMode="subheader"
-            groupRowsBy="week"
+            groupRowsBy="month"
             rowGroupHeaderTemplate={headerTemplate}
-            dataKey="week"
+            dataKey="month"
             scrollable
             scrollHeight="600px"
           >
-            <Column field="week" header="Semaine" body={weekTemplate}></Column>
             <Column field="productCode" header="Code"></Column>
             <Column field="product" header="Produit"></Column>
             <Column field="soldPercentage" header="% moyen vendu" body={soldPercentageTemplate}></Column>

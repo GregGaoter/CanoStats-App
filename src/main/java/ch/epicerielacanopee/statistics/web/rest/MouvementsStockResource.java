@@ -259,13 +259,13 @@ public class MouvementsStockResource {
         }
     }
 
-    @GetMapping("/top-5-selling-products-per-week")
+    @GetMapping("/monthly-seasonal-plan")
     public ResponseEntity<Map<Integer, List<TopSellingProductResult>>> findTop5SellingProductsPerWeek(
         @RequestParam Instant startDate,
         @RequestParam Instant endDate
     ) {
         List<MouvementsStockDTO> resultByCriteria = mouvementsStockService.findLegByDateBetween(startDate, endDate);
-        Map<Integer, List<TopSellingProductResult>> result = mouvementsStockService.findTop5SellingProductsPerWeek(resultByCriteria);
-        return ResponseEntity.ok().body(result);
+        Map<Integer, List<TopSellingProductResult>> seasonalPlan = mouvementsStockService.buildMonthlySeasonalPlan(resultByCriteria, startDate, endDate);
+        return ResponseEntity.ok().body(seasonalPlan);
     }
 }
