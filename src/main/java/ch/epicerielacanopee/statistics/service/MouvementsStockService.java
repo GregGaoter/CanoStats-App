@@ -365,11 +365,13 @@ public class MouvementsStockService {
     }
 
     public Map<Integer, List<TopSellingProductResult>> buildMonthlySeasonalPlan(List<MouvementsStockDTO> movements, Instant startDate, Instant endDate) {
+        ZoneId zone = ZoneId.of("Europe/Zurich");
+
         // 1. Regrouper par produit et par année/mois
         Map<YearMonth, Map<ProductGroupingKey, List<MouvementsStockDTO>>> byYearMonthAndProduct = movements.stream()
             .collect(Collectors.groupingBy(
-                m -> YearMonth.from(m.getDate(), ZoneId.of("Europe/Zurich")),
-                Collectors.groupingBy(m -> new ProductGroupingKey(m.getCodeProduit(), m.getProduit()))
+                m -> YearMonth.from(m.getDate(), zone),
+                Collectors.groupingBy(m -> new ProductGroupingKey(m.getCodeProduit(), m.getProduit(), m.getVente()))
             ));
 
         // 2. Calculer ventes et pourcentages par YearMonth/produit
@@ -382,26 +384,25 @@ public class MouvementsStockService {
             List<TopSellingProductResult> productResults = new ArrayList<>();
 
             for (Map.Entry<ProductGroupingKey, List<MouvementsStockDTO>> productEntry : byProduct.entrySet()) {
-                ProductGroupingKey key = productEntry.getKey();
-                String productCode = key.getCodeProduit();
                 List<MouvementsStockDTO> mvts = productEntry.getValue();
+                if (mvts.isEmpty()) continue;
                 mvts.sort(Comparator.comparing(MouvementsStockDTO::getDate));
 
-                if (mvts.isEmpty()) continue;
+                ProductGroupingKey key = productEntry.getKey();
+                String productCode = key.getCodeProduit();
 
                 // Movement before the month (for initial stock)
-                Optional<MouvementsStock> lastBeforeMonth = mouvementsStockRepository.findFirstByCodeProduitAndDateBeforeOrderByDateDesc(productCode, startDate);
+                Optional<MouvementsStock> lastBeforeMonth = mouvementsStockRepository.findFirstByCodeProduitAndDateBeforeOrderByDateDesc(productCode, LocalDate.of(yearMonth.getYear(), yearMonth.getMonth(), 1).atStartOfDay(zone).toInstant());
                 float initialStock = lastBeforeMonth.isPresent() ? lastBeforeMonth.get().getSolde() : mvts.get(0).getSolde();
+                if (initialStock < 0f) continue;
 
                 // Stock final = last balance in month
                 float finalStock = mvts.get(mvts.size() - 1).getSolde();
-
-                if (initialStock < 0f) initialStock = 0f;
-                if (finalStock < 0f) finalStock = 0f;
+                if (finalStock < 0f) continue;
 
                 // Deliveries during month
                 float deliveries = (float) mvts.stream()
-                    .filter(m -> m.getType() == "Livraison")
+                    .filter(m -> m.getType().equals("Livraison"))
                     .map(m -> m.getMouvement() == null ? 0f : m.getMouvement())
                     .reduce(0f, Float::sum);
 
@@ -409,11 +410,11 @@ public class MouvementsStockService {
                 if (available <= 0) continue;
 
                 float soldQuantity = available - finalStock;
-                if (soldQuantity < 0) soldQuantity = 0f;
+                if (soldQuantity < 0) continue;
 
                 float soldPercentage = (soldQuantity / available) * 100f;
 
-                productResults.add(new TopSellingProductResult(productCode, key.getProduit(), soldPercentage, soldQuantity));
+                productResults.add(new TopSellingProductResult(productCode, key.getProduit(), soldPercentage, soldQuantity, mvts.get(0).getVente()));
             }
 
             yearMonthResults.put(yearMonth, productResults);
@@ -427,7 +428,7 @@ public class MouvementsStockService {
             for (TopSellingProductResult pr : entry.getValue()) {
                 monthlyAverageByProduct
                     .computeIfAbsent(monthNum, k -> new HashMap<>())
-                    .computeIfAbsent(new ProductGroupingKey(pr.getProductCode(), pr.getProduct()), k -> new ArrayList<>())
+                    .computeIfAbsent(new ProductGroupingKey(pr.getProductCode(), pr.getProduct(), pr.getSaleType()), k -> new ArrayList<>())
                     .add(new SoldValues(pr.getSoldPercentage(), pr.getSoldQuantity()));
             }
         }
@@ -440,12 +441,11 @@ public class MouvementsStockService {
             List<TopSellingProductResult> aggregated = new ArrayList<>();
 
             for (Map.Entry<ProductGroupingKey, List<SoldValues>> productEntry : entry.getValue().entrySet()) {
-                String productCode = productEntry.getKey().getCodeProduit();
-                String product = productEntry.getKey().getProduit();
+                ProductGroupingKey key = productEntry.getKey();
                 List<SoldValues> soldValues = productEntry.getValue();
                 float soldPercentageAvg = (float) soldValues.stream().mapToDouble(SoldValues::getSoldPercentage).average().orElse(0);
                 float soldQuantityAvg = (float) soldValues.stream().mapToDouble(SoldValues::getSoldQuantity).average().orElse(0);
-                aggregated.add(new TopSellingProductResult(productCode, product, soldPercentageAvg, soldQuantityAvg));
+                aggregated.add(new TopSellingProductResult(key.getCodeProduit(), key.getProduit(), soldPercentageAvg, soldQuantityAvg, key.getSaleType()));
             }
             topProductsByMonthNumber.put(monthNum, aggregated);
         }

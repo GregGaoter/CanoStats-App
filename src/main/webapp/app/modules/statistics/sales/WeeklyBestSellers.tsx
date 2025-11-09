@@ -59,7 +59,11 @@ export const WeeklyBestSellers = () => {
 
   const headerTemplate = (data: TableData) => <Text className="font-bold">{data.month}</Text>;
 
-  const soldPercentageTemplate = (data: TableData) => <Text>{`${data.soldPercentage.toFixed(0)}`}</Text>;
+  const soldPercentageTemplate = (data: TableData) => <Text>{`${Math.round(data.soldPercentage).toString()} %`}</Text>;
+
+  const soldQuantityTemplate = (data: TableData) => (
+    <Text>{`${Math.ceil(data.soldQuantity).toString()} ${data.saleType === 'Au poids' ? 'kg' : 'pièces'}`}</Text>
+  );
 
   return (
     <div className="grid align-items-center">
@@ -87,6 +91,7 @@ export const WeeklyBestSellers = () => {
             <Column field="productCode" header="Code"></Column>
             <Column field="product" header="Produit"></Column>
             <Column field="soldPercentage" header="% moyen vendu" body={soldPercentageTemplate}></Column>
+            <Column field="soldQuantity" header="Quantité moyenne vendu" body={soldQuantityTemplate}></Column>
           </DataTable>
         </Card>
       </div>

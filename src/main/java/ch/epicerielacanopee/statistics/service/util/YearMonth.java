@@ -20,10 +20,48 @@ public class YearMonth {
     }
 
     public int getYear() {
-        return this.year;
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
     }
 
     public int getMonth() {
-        return this.month;
+        return month;
+    }
+
+    public void setMonth(int month) {
+        this.month = month;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%04d.%02d", year, month);
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + year;
+        result = prime * result + month;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        YearMonth other = (YearMonth) obj;
+        if (year != other.year)
+            return false;
+        if (month != other.month)
+            return false;
+        return true;
     }
 }
