@@ -59,11 +59,15 @@ export const WeeklyBestSellers = () => {
 
   const headerTemplate = (data: TableData) => <Text className="font-bold">{data.month}</Text>;
 
-  const soldPercentageTemplate = (data: TableData) => <Text>{`${Math.round(data.soldPercentageAverage).toString()} % ± ${Math.round(data.soldPercentageStandardDeviation).toString()} %`}</Text>;
+  const soldPercentageTemplate = (data: TableData) => (
+    <Text>{`${Math.round(data.soldPercentageAverage).toString()} % ± ${Math.round(data.soldPercentageStandardDeviation).toString()} %`}</Text>
+  );
 
   const soldQuantityTemplate = (data: TableData) => {
     const saleType: string = data.saleType === 'Au poids' ? 'kg' : 'pièces';
-    return <Text>{`${Math.ceil(data.soldQuantityAverage).toString()} ${saleType} ± ${Math.ceil(data.soldQuantityStandardDeviation).toString()} ${saleType}`}</Text>
+    return (
+      <Text>{`${Math.ceil(data.soldQuantityAverage).toString()} ${saleType} ± ${Math.ceil(data.soldQuantityStandardDeviation).toString()} ${saleType}`}</Text>
+    );
   };
 
   return (
@@ -86,8 +90,8 @@ export const WeeklyBestSellers = () => {
             groupRowsBy="month"
             rowGroupHeaderTemplate={headerTemplate}
             dataKey="month"
-            scrollable
-            scrollHeight="600px"
+            // scrollable
+            // scrollHeight="600px"
           >
             <Column field="productCode" header="Code"></Column>
             <Column field="product" header="Produit"></Column>

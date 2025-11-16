@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.DoubleSummaryStatistics;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -412,10 +411,10 @@ public class MouvementsStockService {
                 if (available <= 0) continue;
 
                 // Sales during month
-                float soldQuantity = (float) mvts.stream()
+                float soldQuantity = Math.abs((float) mvts.stream()
                     .filter(m -> m.getType().equals("Vente"))
                     .map(m -> m.getMouvement() == null ? 0f : m.getMouvement())
-                    .reduce(0f, Float::sum);
+                    .reduce(0f, Float::sum));
 
                 float soldPercentage = (soldQuantity / available) * 100f;
 
@@ -455,7 +454,7 @@ public class MouvementsStockService {
                 DescriptiveStatistics quantityStats = new DescriptiveStatistics();
                 soldValues.forEach(v -> quantityStats.addValue(v.getSoldQuantity()));
 
-                aggregated.add(new TopSellingProductResult(key.getCodeProduit(), key.getProduit(), (float) percentageStats.getMean(), (float) percentageStats.getStandardDeviation(), (float) quantityStats.getMean(), (float) quantityStats.getStandardDeviation(), key.getSaleType()));
+                aggregated.add(new TopSellingProductResult(key.getCodeProduit(), key.getProduit(), (float) percentageStats.getMean(), (float) percentageStats.getStandardDeviation() * 100f, (float) quantityStats.getMean(), (float) quantityStats.getStandardDeviation() * 100f, key.getSaleType()));
             }
             topProductsByMonthNumber.put(monthNum, aggregated);
         }
