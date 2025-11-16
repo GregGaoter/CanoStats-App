@@ -454,7 +454,7 @@ public class MouvementsStockService {
                 DescriptiveStatistics quantityStats = new DescriptiveStatistics();
                 soldValues.forEach(v -> quantityStats.addValue(v.getSoldQuantity()));
 
-                aggregated.add(new TopSellingProductResult(key.getCodeProduit(), key.getProduit(), (float) percentageStats.getMean(), (float) percentageStats.getStandardDeviation() * 100f, (float) quantityStats.getMean(), (float) quantityStats.getStandardDeviation() * 100f, key.getSaleType()));
+                aggregated.add(new TopSellingProductResult(key.getCodeProduit(), key.getProduit(), (float) percentageStats.getMean(), (float) percentageStats.getStandardDeviation(), (float) quantityStats.getMean(), (float) quantityStats.getStandardDeviation(), key.getSaleType()));
             }
             topProductsByMonthNumber.put(monthNum, aggregated);
         }
