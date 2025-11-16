@@ -59,11 +59,12 @@ export const WeeklyBestSellers = () => {
 
   const headerTemplate = (data: TableData) => <Text className="font-bold">{data.month}</Text>;
 
-  const soldPercentageTemplate = (data: TableData) => <Text>{`${Math.round(data.soldPercentage).toString()} %`}</Text>;
+  const soldPercentageTemplate = (data: TableData) => <Text>{`${Math.round(data.soldPercentageAverage).toString()} % ± ${Math.round(data.soldPercentageStandardDeviation).toString()} %`}</Text>;
 
-  const soldQuantityTemplate = (data: TableData) => (
-    <Text>{`${Math.ceil(data.soldQuantity).toString()} ${data.saleType === 'Au poids' ? 'kg' : 'pièces'}`}</Text>
-  );
+  const soldQuantityTemplate = (data: TableData) => {
+    const saleType: string = data.saleType === 'Au poids' ? 'kg' : 'pièces';
+    return <Text>{`${Math.ceil(data.soldQuantityAverage).toString()} ${saleType} ± ${Math.ceil(data.soldQuantityStandardDeviation).toString()} ${saleType}`}</Text>
+  };
 
   return (
     <div className="grid align-items-center">
@@ -90,8 +91,8 @@ export const WeeklyBestSellers = () => {
           >
             <Column field="productCode" header="Code"></Column>
             <Column field="product" header="Produit"></Column>
-            <Column field="soldPercentage" header="% moyen vendu" body={soldPercentageTemplate}></Column>
-            <Column field="soldQuantity" header="Quantité moyenne vendu" body={soldQuantityTemplate}></Column>
+            <Column field="soldPercentageAverage" header="% moyen vendu" body={soldPercentageTemplate}></Column>
+            <Column field="soldQuantityAverage" header="Quantité moyenne vendu" body={soldQuantityTemplate}></Column>
           </DataTable>
         </Card>
       </div>

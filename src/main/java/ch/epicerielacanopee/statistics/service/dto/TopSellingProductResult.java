@@ -4,15 +4,26 @@ public class TopSellingProductResult {
 
     private String productCode;
     private String product;
-    private float soldPercentage;
-    private float soldQuantity;
+    private float soldPercentageAverage;
+    private float soldPercentageStandardDeviation;
+    private float soldQuantityAverage;
+    private float soldQuantityStandardDeviation;
     private String saleType;
 
-    public TopSellingProductResult(String productCode, String product, float soldPercentage, float soldQuantity, String saleType) {
+    public TopSellingProductResult(
+            String productCode,
+            String product,
+            float soldPercentageAverage,
+            float soldPercentageStandardDeviation,
+            float soldQuantityAverage,
+            float soldQuantityStandardDeviation,
+            String saleType) {
         this.productCode = productCode;
         this.product = product;
-        this.soldPercentage = soldPercentage;
-        this.soldQuantity = soldQuantity;
+        this.soldPercentageAverage = soldPercentageAverage;
+        this.soldPercentageStandardDeviation = soldPercentageStandardDeviation;
+        this.soldQuantityAverage = soldQuantityAverage;
+        this.soldQuantityStandardDeviation = soldQuantityStandardDeviation;
         this.saleType = saleType;
     }
 
@@ -20,20 +31,48 @@ public class TopSellingProductResult {
         return productCode;
     }
 
+    public void setProductCode(String productCode) {
+        this.productCode = productCode;
+    }
+
     public String getProduct() {
         return product;
     }
 
-    public float getSoldPercentage() {
-        return soldPercentage;
+    public void setProduct(String product) {
+        this.product = product;
     }
 
-    public float getSoldQuantity() {
-        return soldQuantity;
+    public float getSoldPercentageAverage() {
+        return soldPercentageAverage;
     }
 
-    public void setSoldQuantity(float soldQuantity) {
-        this.soldQuantity = soldQuantity;
+    public void setSoldPercentageAverage(float soldPercentageAverage) {
+        this.soldPercentageAverage = soldPercentageAverage;
+    }
+
+    public float getSoldPercentageStandardDeviation() {
+        return soldPercentageStandardDeviation;
+    }
+
+    public void setSoldPercentageStandardDeviation(float soldPercentageStandardDeviation) {
+        this.soldPercentageStandardDeviation = soldPercentageStandardDeviation;
+    }
+
+    public float getSoldQuantityAverage() {
+        return soldQuantityAverage;
+    }
+
+    public void setSoldQuantityAverage(float soldQuantityAverage) {
+        this.soldQuantityAverage = soldQuantityAverage;
+    }
+
+    public float getSoldQuantityStandardDeviation() {
+        return soldQuantityStandardDeviation;
+    }
+
+    public void setSoldQuantityStandardDeviation(float soldQuantityStandardDeviation) {
+        this.soldQuantityStandardDeviation = soldQuantityStandardDeviation;
     }
 
     public String getSaleType() {

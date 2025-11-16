@@ -1,7 +1,9 @@
 export interface TopSellingProductResult {
   productCode?: string;
   product?: string;
-  soldPercentage?: number | null;
-  soldQuantity?: number | null;
+  soldPercentageAverage?: number | null;
+  soldPercentageStandardDeviation?: number | null;
+  soldQuantityAverage?: number | null;
+  soldQuantityStandardDeviation?: number | null;
   saleType?: string;
 }

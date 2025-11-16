@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.DoubleSummaryStatistics;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -417,7 +419,7 @@ public class MouvementsStockService {
 
                 float soldPercentage = (soldQuantity / available) * 100f;
 
-                productResults.add(new TopSellingProductResult(productCode, key.getProduit(), soldPercentage, soldQuantity, mvts.get(0).getVente()));
+                productResults.add(new TopSellingProductResult(productCode, key.getProduit(), soldPercentage, 0f, soldQuantity, 0f, mvts.get(0).getVente()));
             }
 
             yearMonthResults.put(yearMonth, productResults);
@@ -432,7 +434,7 @@ public class MouvementsStockService {
                 monthlyAverageByProduct
                     .computeIfAbsent(monthNum, k -> new HashMap<>())
                     .computeIfAbsent(new ProductGroupingKey(pr.getProductCode(), pr.getProduct(), pr.getSaleType()), k -> new ArrayList<>())
-                    .add(new SoldValues(pr.getSoldPercentage(), pr.getSoldQuantity()));
+                    .add(new SoldValues(pr.getSoldPercentageAverage(), pr.getSoldQuantityAverage()));
             }
         }
 
@@ -446,9 +448,14 @@ public class MouvementsStockService {
             for (Map.Entry<ProductGroupingKey, List<SoldValues>> productEntry : entry.getValue().entrySet()) {
                 ProductGroupingKey key = productEntry.getKey();
                 List<SoldValues> soldValues = productEntry.getValue();
-                float soldPercentageAvg = (float) soldValues.stream().mapToDouble(SoldValues::getSoldPercentage).average().orElse(0);
-                float soldQuantityAvg = (float) soldValues.stream().mapToDouble(SoldValues::getSoldQuantity).average().orElse(0);
-                aggregated.add(new TopSellingProductResult(key.getCodeProduit(), key.getProduit(), soldPercentageAvg, soldQuantityAvg, key.getSaleType()));
+
+                DescriptiveStatistics percentageStats = new DescriptiveStatistics();
+                soldValues.forEach(v -> percentageStats.addValue(v.getSoldPercentage()));
+
+                DescriptiveStatistics quantityStats = new DescriptiveStatistics();
+                soldValues.forEach(v -> quantityStats.addValue(v.getSoldQuantity()));
+
+                aggregated.add(new TopSellingProductResult(key.getCodeProduit(), key.getProduit(), (float) percentageStats.getMean(), (float) percentageStats.getStandardDeviation(), (float) quantityStats.getMean(), (float) quantityStats.getStandardDeviation(), key.getSaleType()));
             }
             topProductsByMonthNumber.put(monthNum, aggregated);
         }
@@ -464,7 +471,7 @@ public class MouvementsStockService {
 
             List<TopSellingProductResult> seasonalProducts = topProductsByMonthNumber.getOrDefault(monthNumber, Collections.emptyList()).stream()
                 .filter(pr -> seasonal.contains(pr.getProductCode()))
-                .sorted(Comparator.comparing(TopSellingProductResult::getSoldPercentage).reversed())
+                .sorted(Comparator.comparing(TopSellingProductResult::getSoldPercentageAverage).reversed())
                 .collect(Collectors.toList());
 
             seasonalPlan.put(monthNumber, seasonalProducts);
