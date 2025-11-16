@@ -367,14 +367,14 @@ public class MouvementsStockService {
     public Map<Integer, List<TopSellingProductResult>> buildMonthlySeasonalPlan(List<MouvementsStockDTO> movements, Instant startDate, Instant endDate) {
         ZoneId zone = ZoneId.of("Europe/Zurich");
 
-        // 1. Regrouper par produit et par année/mois
+        // 1. Group by product and by year/month
         Map<YearMonth, Map<ProductGroupingKey, List<MouvementsStockDTO>>> byYearMonthAndProduct = movements.stream()
             .collect(Collectors.groupingBy(
                 m -> YearMonth.from(m.getDate(), zone),
                 Collectors.groupingBy(m -> new ProductGroupingKey(m.getCodeProduit(), m.getProduit(), m.getVente()))
             ));
 
-        // 2. Calculer ventes et pourcentages par YearMonth/produit
+        // 2. Calculate sales and percentages by YearMonth/product
         Map<YearMonth, List<TopSellingProductResult>> yearMonthResults = new HashMap<>();
 
         for (Map.Entry<YearMonth, Map<ProductGroupingKey, List<MouvementsStockDTO>>> yearMonthEntry : byYearMonthAndProduct.entrySet()) {
@@ -391,7 +391,7 @@ public class MouvementsStockService {
                 ProductGroupingKey key = productEntry.getKey();
                 String productCode = key.getCodeProduit();
 
-                // Movement before the month (for initial stock)
+                // Last movement before the month (for initial stock)
                 Optional<MouvementsStock> lastBeforeMonth = mouvementsStockRepository.findFirstByCodeProduitAndDateBeforeOrderByDateDesc(productCode, LocalDate.of(yearMonth.getYear(), yearMonth.getMonth(), 1).atStartOfDay(zone).toInstant());
                 float initialStock = lastBeforeMonth.isPresent() ? lastBeforeMonth.get().getSolde() : mvts.get(0).getSolde();
                 if (initialStock < 0f) continue;
@@ -409,8 +409,11 @@ public class MouvementsStockService {
                 float available = initialStock + deliveries;
                 if (available <= 0) continue;
 
-                float soldQuantity = available - finalStock;
-                if (soldQuantity < 0) continue;
+                // Sales during month
+                float soldQuantity = (float) mvts.stream()
+                    .filter(m -> m.getType().equals("Vente"))
+                    .map(m -> m.getMouvement() == null ? 0f : m.getMouvement())
+                    .reduce(0f, Float::sum);
 
                 float soldPercentage = (soldQuantity / available) * 100f;
 
@@ -450,7 +453,7 @@ public class MouvementsStockService {
             topProductsByMonthNumber.put(monthNum, aggregated);
         }
 
-        // 3. Agréger sur plusieurs années : moyenne des % et des quantités
+        // 3. Aggregate over multiple years: average of percentages and quantities
         Map<Integer, List<TopSellingProductResult>> seasonalPlan = new HashMap<>();
 
         Map<Month, List<String>> seasonalProductsOverPeriod = getSeasonalProductsOverPeriod(startDate, endDate);
@@ -459,13 +462,12 @@ public class MouvementsStockService {
             int monthNumber = entry.getKey().getValue();
             List<String> seasonal = entry.getValue();
 
-            List<TopSellingProductResult> top5 = topProductsByMonthNumber.getOrDefault(monthNumber, Collections.emptyList()).stream()
+            List<TopSellingProductResult> seasonalProducts = topProductsByMonthNumber.getOrDefault(monthNumber, Collections.emptyList()).stream()
                 .filter(pr -> seasonal.contains(pr.getProductCode()))
                 .sorted(Comparator.comparing(TopSellingProductResult::getSoldPercentage).reversed())
-                .limit(5)
                 .collect(Collectors.toList());
 
-            seasonalPlan.put(monthNumber, top5);
+            seasonalPlan.put(monthNumber, seasonalProducts);
         }
 
         return seasonalPlan;
