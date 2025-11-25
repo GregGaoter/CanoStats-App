@@ -318,7 +318,7 @@ public class MouvementsStockService {
 
     public List<MouvementsStockDTO> findLegByDateBetween(Instant startDate, Instant endDate) {
         return mouvementsStockRepository
-            .findByDateBetweenAndCodeProduitStartingWith(startDate, endDate, "leg")
+            .findByDateBetweenAndCodeProduitStartingWithIgnoreCase(startDate, endDate, "leg")
             .stream()
             .map(mouvementsStockMapper::toDto)
             .toList();
