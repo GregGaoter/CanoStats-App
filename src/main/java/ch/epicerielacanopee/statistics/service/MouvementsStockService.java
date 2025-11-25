@@ -53,72 +53,99 @@ public class MouvementsStockService {
                         "leg18", "leg21", "leg24", "leg25", "leg26", "leg27", "leg28", "leg29", "leg30", "leg31",
                         "leg33", "leg34", "leg37", "leg39", "leg46", "leg47", "leg49", "leg50", "leg51", "leg55",
                         "leg58", "leg60", "leg80", "fru33", "fru34", "fru35", "fru36", "fru37", "fru38", "leg87",
-                        "fru42", "leg90", "fru44", "fru45", "fru51", "leg93", "alc15", "fru23", "leg98","fru13","leg102","leg19","leg63","leg77","leg79","fru42","fru23","leg94","leg38","leg100","leg101","leg102"));
+                        "fru42", "leg90", "fru44", "fru45", "fru51", "leg93", "alc15", "fru23", "leg98", "fru13",
+                        "leg102", "leg19", "leg63", "leg77", "leg79", "fru42", "fru23", "leg94", "leg38", "leg100",
+                        "leg101", "leg102", "leg42", "leg45", "leg86", "leg89", "leg95", "leg103"));
         seasonalProducts.put(Month.FEBRUARY,
                 Arrays.asList("fru01", "leg75", "fru03", "fru22", "leg01", "leg05", "leg06", "leg08", "leg09", "leg11",
                         "leg15", "leg18", "leg21", "leg25", "leg26", "leg27", "leg28", "leg29", "leg30", "leg31",
                         "leg33", "leg37", "leg47", "leg49", "leg50", "leg51", "leg55", "leg58", "leg60", "leg80",
                         "boi10", "fru33", "fru35", "fru36", "fru38", "leg87", "leg90", "fru44", "fru45", "fru51",
-                        "leg93", "fru23", "leg98", "leg104","fru13","leg102","leg19","leg63","leg77","leg79","leg38","leg100","leg101","leg102"));
+                        "leg93", "fru23", "leg98", "leg104", "fru13", "leg102", "leg19", "leg63", "leg77", "leg79",
+                        "leg38", "leg100", "leg101", "leg102", "leg42", "leg45", "leg86", "leg89", "leg103"));
         seasonalProducts.put(Month.MARCH,
                 Arrays.asList("fru01", "leg75", "fru03", "fru22", "leg01", "leg05", "leg06", "leg08", "leg09", "leg15",
                         "leg18", "leg21", "leg25", "leg26", "leg27", "leg28", "leg29", "leg30", "leg31", "leg32",
                         "leg33", "leg47", "leg48", "leg49", "leg51", "leg55", "leg58", "leg60", "leg80", "fru35",
-                        "fru36", "fru38", "leg90", "fru44", "fru45", "fru51", "leg93", "fru23","fru13","leg102","leg19","leg63","leg77","leg79","leg38","leg100","leg101","leg102"));
+                        "fru36", "fru38", "leg90", "fru44", "fru45", "fru51", "leg93", "fru23", "fru13", "leg102",
+                        "leg19", "leg63", "leg77", "leg79", "leg38", "leg100", "leg101", "leg102", "leg42", "leg45",
+                        "leg86", "leg89"));
         seasonalProducts.put(Month.APRIL,
                 Arrays.asList("fru01", "leg75", "fru03", "fru22", "fru30", "leg69", "leg01", "leg03", "leg05", "leg06",
                         "leg08", "leg09", "leg10", "leg16", "leg17", "leg21", "leg25", "leg28", "leg31", "leg33",
                         "leg34", "leg47", "leg48", "leg49", "leg51", "leg55", "leg58", "leg60", "leg76", "leg80",
-                        "fru38", "leg90", "fru44", "fru45", "fru51", "leg104","fru13","leg102","leg19","leg23","leg36","leg63","leg77","leg79","leg96","leg38","leg101","leg102"));
+                        "fru38", "leg90", "fru44", "fru45", "fru51", "leg104", "fru13", "leg102", "leg19", "leg23",
+                        "leg36", "leg63", "leg77", "leg79", "leg96", "leg38", "leg101", "leg102", "leg45", "leg86",
+                        "leg89", "leg95"));
         seasonalProducts.put(Month.MAY,
                 Arrays.asList("leg75", "fru03", "fru22", "fru30", "leg69", "leg01", "leg03", "leg05", "leg06", "leg07",
                         "leg08", "leg09", "leg10", "leg16", "leg17", "leg21", "leg22", "leg25", "leg28", "leg33",
                         "leg34", "leg35", "leg40", "leg48", "leg49", "leg51", "leg59", "leg60", "leg62", "leg74",
-                        "leg76", "leg80", "fru38", "leg90", "fru44", "fru45", "fru02","fru13","leg102","leg19","leg23","leg36","leg63","leg77","leg79","leg96","leg38"));
+                        "leg76", "leg80", "fru38", "leg90", "fru44", "fru45", "fru02", "fru13", "leg102", "leg19",
+                        "leg23", "leg36", "leg63", "leg77", "leg79", "leg96", "leg38", "leg45", "leg81", "leg82",
+                        "leg85 ", "leg86", "leg89", "leg95"));
         seasonalProducts.put(Month.JUNE,
                 Arrays.asList("leg75", "fru03", "fru04", "fru08", "fru10", "fru14", "fru16", "fru17", "fru22", "fru30",
                         "fru31", "leg69", "leg01", "leg03", "leg05", "leg06", "leg07", "leg08", "leg10", "leg14",
                         "leg22", "leg24", "leg34", "leg35", "leg40", "leg43", "leg48", "leg51", "leg54", "leg59",
-                        "leg62", "leg74", "leg78", "leg76", "leg90", "fru44", "fru45", "fru02","fru13","fru29","leg23","leg36","leg77","leg79","leg83","leg84","leg44","fru05","leg96","leg38"));
+                        "leg62", "leg74", "leg78", "leg76", "leg90", "fru44", "fru45", "fru02", "fru13", "fru29",
+                        "leg23", "leg36", "leg77", "leg79", "leg83", "leg84", "leg44", "fru05", "leg96", "leg38",
+                        "leg04", "leg45", "leg52", "leg81", "leg82", "leg85 ", "leg86", "leg89", "leg95"));
         seasonalProducts.put(Month.JULY,
                 Arrays.asList("leg75", "fru03", "fru04", "fru07", "fru08", "fru10", "fru14", "fru15", "fru16", "fru17",
                         "fru20", "fru31", "leg69", "leg02", "leg03", "leg05", "leg06", "leg07", "leg08", "leg10",
                         "leg13", "leg14", "leg22", "leg24", "leg34", "leg35", "leg40", "leg48", "leg54", "leg57",
                         "leg59", "leg62", "leg74", "leg78", "leg76", "fru38", "fru43", "leg90", "fru44", "fru45",
-                        "fru02", "fru19","fru29","leg23","leg36","leg77","leg79","leg83","leg84","leg92","fru46","fru47","fru48","leg44","leg68","fru05","leg96","leg38"));
+                        "fru02", "fru19", "fru29", "leg23", "leg36", "leg77", "leg79", "leg83", "leg84", "leg92",
+                        "fru46", "fru47", "fru48", "leg44", "leg68", "fru05", "leg96", "leg38", "leg04", "leg42",
+                        "leg52", "leg66", "leg81", "leg82", "leg85 ", "leg86", "leg95"));
         seasonalProducts.put(Month.AUGUST,
                 Arrays.asList("leg75", "fru03", "fru04", "fru07", "fru08", "fru14", "fru15", "fru16", "fru17", "fru20",
                         "fru31", "leg69", "leg03", "leg05", "leg06", "leg07", "leg08", "leg10", "leg13", "leg14",
                         "leg22", "leg24", "leg25", "leg34", "leg35", "leg40", "leg41", "leg43", "leg48", "leg54",
                         "leg57", "leg59", "leg62", "leg74", "leg78", "leg76", "fru37", "fru38", "fru42", "fru43",
-                        "leg90", "fru44", "fru45", "fru49", "leg97", "fru19","fru13","fru29","leg23","leg36","leg63","leg77","leg79","leg83","leg84","leg92","fru42","fru46","fru47","fru48","fru49","leg44","leg68","fru05","leg96","leg38"));
+                        "leg90", "fru44", "fru45", "fru49", "leg97", "fru19", "fru13", "fru29", "leg23", "leg36",
+                        "leg63", "leg77", "leg79", "leg83", "leg84", "leg92", "fru42", "fru46", "fru47", "fru48",
+                        "fru49", "leg44", "leg68", "fru05", "leg96", "leg38", "leg04", "leg42", "leg52", "leg66",
+                        "leg81", "leg82", "leg85 ", "leg86", "leg95"));
         seasonalProducts.put(Month.SEPTEMBER,
                 Arrays.asList("leg75", "fru03", "fru04", "fru11", "fru15", "fru16", "fru17", "fru20", "fru21", "fru22",
                         "leg69", "leg01", "leg03", "leg05", "leg06", "leg07", "leg08", "leg10", "leg13", "leg14",
                         "leg15", "leg22", "leg24", "leg25", "leg34", "leg35", "leg39", "leg40", "leg41", "leg43",
                         "leg46", "leg49", "leg50", "leg51", "leg55", "leg56", "leg57", "leg59", "leg60", "leg62",
                         "leg64", "leg74", "leg78", "leg76", "leg80", "fru37", "fru38", "fru43", "leg90", "fru44",
-                        "fru45", "fru49", "leg97", "fru19","fru13","leg23","leg36","leg63","leg77","leg79","fru32","leg83","leg84","leg92","fru46","fru47","fru48","fru49","leg44","leg68","fru05","leg96","leg94","leg38","leg91","leg101"));
+                        "fru45", "fru49", "leg97", "fru19", "fru13", "leg23", "leg36", "leg63", "leg77", "leg79",
+                        "fru32", "leg83", "leg84", "leg92", "fru46", "fru47", "fru48", "fru49", "leg44", "leg68",
+                        "fru05", "leg96", "leg94", "leg38", "leg91", "leg101", "leg04", "leg42", "leg45", "leg52",
+                        "leg66", "leg81", "leg82", "leg85 ", "leg86", "leg89", "leg95", "leg103"));
         seasonalProducts.put(Month.OCTOBER,
                 Arrays.asList("leg75", "fru03", "fru11", "fru21", "fru22", "leg69", "leg01", "leg03", "leg05", "leg06",
                         "leg07", "leg08", "leg15", "leg18", "leg21", "leg22", "leg24", "leg25", "leg27", "leg28",
                         "leg29", "leg30", "leg31", "leg32", "leg33", "leg34", "leg35", "leg39", "leg40", "leg41",
                         "leg43", "leg46", "leg47", "leg49", "leg50", "leg51", "leg55", "leg56", "leg57", "leg59",
                         "leg60", "leg62", "leg64", "leg74", "leg78", "leg76", "leg80", "fru35", "fru37", "fru38",
-                        "leg90", "fru44", "fru45", "fru49", "fru51","fru13","leg102","leg36","leg63","leg77","leg79","fru32","leg83","fru48","fru49","leg44","leg68","leg96","fru23","leg94","leg38","leg91","leg100","leg101","leg102"));
+                        "leg90", "fru44", "fru45", "fru49", "fru51", "fru13", "leg102", "leg36", "leg63", "leg77",
+                        "leg79", "fru32", "leg83", "fru48", "fru49", "leg44", "leg68", "leg96", "fru23", "leg94",
+                        "leg38", "leg91", "leg100", "leg101", "leg102", "leg04", "leg42", "leg45", "leg52", "leg66",
+                        "leg81", "leg82", "leg85 ", "leg86", "leg89", "leg95", "leg103"));
         seasonalProducts.put(Month.NOVEMBER,
                 Arrays.asList("fru01", "leg75", "fru03", "fru11", "fru22", "leg01", "leg03", "leg05", "leg06", "leg08",
                         "leg09", "leg11", "leg15", "leg18", "leg21", "leg22", "leg24", "leg25", "leg26", "leg27",
                         "leg28", "leg29", "leg30", "leg31", "leg32", "leg33", "leg34", "leg35", "leg39", "leg43",
                         "leg46", "leg47", "leg49", "leg50", "leg51", "leg55", "leg56", "leg57", "leg58", "leg60",
                         "leg80", "fru33", "fru34", "fru35", "fru37", "fru38", "leg90", "fru44", "fru45", "fru51",
-                        "leg93", "fru23", "leg98","fru13","leg102","leg19","leg36","leg63","leg77","leg79","leg68","fru23","leg94","leg38","leg91","leg100","leg101","leg102"));
+                        "leg93", "fru23", "leg98", "fru13", "leg102", "leg19", "leg36", "leg63", "leg77", "leg79",
+                        "leg68", "fru23", "leg94", "leg38", "leg91", "leg100", "leg101", "leg102", "leg04", "leg42",
+                        "leg45", "leg82", "leg86", "leg89", "leg95", "leg103"));
         seasonalProducts.put(Month.DECEMBER,
                 Arrays.asList("fru01", "leg75", "fru03", "fru22", "leg01", "leg05", "leg06", "leg09", "leg11", "leg15",
                         "leg18", "leg21", "leg22", "leg24", "leg25", "leg26", "leg27", "leg28", "leg29", "leg30",
                         "leg31", "leg33", "leg34", "leg37", "leg39", "leg46", "leg47", "leg49", "leg50", "leg51",
                         "leg55", "leg58", "leg60", "leg80", "fru33", "fru34", "fru35", "fru36", "fru37", "fru38",
-                        "leg87", "fru42", "leg90", "fru44", "fru45", "fru51", "leg93", "alc15", "fru23", "leg98","fru13","leg102","leg19","leg63","leg77","fru42","fru23","leg94","leg38","leg91","leg100","leg101","leg102"));
+                        "leg87", "fru42", "leg90", "fru44", "fru45", "fru51", "leg93", "alc15", "fru23", "leg98",
+                        "fru13", "leg102", "leg19", "leg63", "leg77", "fru42", "fru23", "leg94", "leg38", "leg91",
+                        "leg100", "leg101", "leg102", "leg04", "leg42", "leg45", "leg82", "leg86", "leg89", "leg95",
+                        "leg103"));
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(MouvementsStockService.class);
