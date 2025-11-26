@@ -437,4 +437,9 @@ public class MouvementsStock implements Serializable {
             ", active='" + getActive() + "'" +
             "}";
     }
+
+    @PrePersist
+    public void prePersist() {
+        this.codeProduit = this.codeProduit.toLowerCase();
+    }
 }

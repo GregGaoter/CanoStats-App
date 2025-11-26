@@ -16,4 +16,5 @@
     <include file="config/liquibase/changelog/20250219200000_add_mouvements_stock_epicerio_id_unique_constraint.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251126003000_add_mouvements_stock_columns_index.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251126170000_add_mouvements_stock_composites_index.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251126173000_patch_mouvements_stock_lowercase_code_produit.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>
