@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="20251126170000-1" author="ggautier">
+        <createIndex indexName="idx_mouvements_vente_date" tableName="mouvements_stock">
+            <column name="vente"/>
+            <column name="date"/>
+        </createIndex>
+        <createIndex indexName="idx_mouvements_code_date" tableName="mouvements_stock">
+            <column name="code_produit"/>
+            <column name="date"/>
+        </createIndex>
+        <createIndex indexName="idx_mouvements_code_vente_epicerio" tableName="mouvements_stock">
+            <column name="code_produit"/>
+            <column name="vente"/>
+            <column name="epicerio_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
