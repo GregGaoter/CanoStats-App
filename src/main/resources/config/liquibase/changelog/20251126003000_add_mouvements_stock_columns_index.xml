@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="20251126003000-1" author="ggautier">
+        <createIndex indexName="idx_mouvements_stock_epicerio_id"
+                     tableName="mouvements_stock">
+            <column name="epicerio_id"/>
+        </createIndex>
+        <createIndex indexName="idx_mouvements_stock_date"
+                     tableName="mouvements_stock">
+            <column name="date"/>
+        </createIndex>
+        <createIndex indexName="idx_mouvements_stock_type"
+                     tableName="mouvements_stock">
+            <column name="type"/>
+        </createIndex>
+        <createIndex indexName="idx_mouvements_stock_vente"
+                     tableName="mouvements_stock">
+            <column name="vente"/>
+        </createIndex>
+        <createIndex indexName="idx_mouvements_stock_code_produit"
+                     tableName="mouvements_stock">
+            <column name="code_produit"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
