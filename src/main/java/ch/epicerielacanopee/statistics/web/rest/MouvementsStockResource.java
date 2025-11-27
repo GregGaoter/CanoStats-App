@@ -1,6 +1,7 @@
 package ch.epicerielacanopee.statistics.web.rest;
 
 import ch.epicerielacanopee.statistics.repository.MouvementsStockRepository;
+import ch.epicerielacanopee.statistics.repository.projection.MouvementsStockProjection;
 import ch.epicerielacanopee.statistics.service.MouvementsStockQueryService;
 import ch.epicerielacanopee.statistics.service.MouvementsStockService;
 import ch.epicerielacanopee.statistics.service.criteria.MouvementsStockCriteria;
@@ -260,11 +261,11 @@ public class MouvementsStockResource {
     }
 
     @GetMapping("/monthly-seasonal-plan")
-    public ResponseEntity<Map<Integer, List<SellingProductResult>>> findTop5SellingProductsPerWeek(
+    public ResponseEntity<Map<Integer, List<SellingProductResult>>> buildMonthlySeasonalPlan(
         @RequestParam Instant startDate,
         @RequestParam Instant endDate
     ) {
-        List<MouvementsStockDTO> resultByCriteria = mouvementsStockService.findLegByDateBetween(startDate, endDate);
+        List<MouvementsStockProjection> resultByCriteria = mouvementsStockService.findLegByDateBetween(startDate, endDate);
         Map<Integer, List<SellingProductResult>> seasonalPlan = mouvementsStockService.buildMonthlySeasonalPlan(resultByCriteria, startDate, endDate);
         return ResponseEntity.ok().body(seasonalPlan);
     }

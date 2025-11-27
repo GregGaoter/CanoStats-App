@@ -1,6 +1,8 @@
 package ch.epicerielacanopee.statistics.repository;
 
 import ch.epicerielacanopee.statistics.domain.MouvementsStock;
+import ch.epicerielacanopee.statistics.repository.projection.MouvementsStockProjection;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +19,7 @@ import org.springframework.stereotype.Repository;
 public interface MouvementsStockRepository extends JpaRepository<MouvementsStock, UUID>, JpaSpecificationExecutor<MouvementsStock> {
     public List<MouvementsStock> findByVenteAndDateBetween(String vente, Instant startDate, Instant endDate);
 
-    public List<MouvementsStock> findByCodeProduitStartingWithAndDateBetween(String codeProduitPrefix, Instant startDate, Instant endDate);
+    public List<MouvementsStockProjection> findByCodeProduitStartingWithAndDateBetween(String codeProduitPrefix, Instant startDate, Instant endDate);
 
     public Optional<MouvementsStock> findFirstByCodeProduitAndVenteAndEpicerioIdLessThanOrderByEpicerioIdDesc(
         String codeProduit,

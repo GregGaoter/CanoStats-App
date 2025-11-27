@@ -30,6 +30,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import ch.epicerielacanopee.statistics.domain.MouvementsStock;
 import ch.epicerielacanopee.statistics.repository.MouvementsStockRepository;
+import ch.epicerielacanopee.statistics.repository.projection.MouvementsStockProjection;
 import ch.epicerielacanopee.statistics.service.dto.EpicerioMouvementsStockDTO;
 import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
 import ch.epicerielacanopee.statistics.service.dto.SellingProductResult;
@@ -316,11 +317,10 @@ public class MouvementsStockService {
             .toList();
     }
 
-    public List<MouvementsStockDTO> findLegByDateBetween(Instant startDate, Instant endDate) {
+    public List<MouvementsStockProjection> findLegByDateBetween(Instant startDate, Instant endDate) {
         return mouvementsStockRepository
             .findByCodeProduitStartingWithAndDateBetween("leg", startDate, endDate)
             .stream()
-            .map(mouvementsStockMapper::toDto)
             .toList();
     }
 
@@ -392,11 +392,11 @@ public class MouvementsStockService {
         return seasonalProductsOverPeriod;
     }
 
-    public Map<Integer, List<SellingProductResult>> buildMonthlySeasonalPlan(List<MouvementsStockDTO> movements, Instant startDate, Instant endDate) {
+    public Map<Integer, List<SellingProductResult>> buildMonthlySeasonalPlan(List<MouvementsStockProjection> movements, Instant startDate, Instant endDate) {
         ZoneId zone = ZoneId.of("Europe/Zurich");
 
         // 1. Group by product and by year/month
-        Map<YearMonth, Map<ProductGroupingKey, List<MouvementsStockDTO>>> byYearMonthAndProduct = movements.stream()
+        Map<YearMonth, Map<ProductGroupingKey, List<MouvementsStockProjection>>> byYearMonthAndProduct = movements.stream()
             .collect(Collectors.groupingBy(
                 m -> YearMonth.from(m.getDate(), zone),
                 Collectors.groupingBy(m -> new ProductGroupingKey(m.getCodeProduit(), m.getProduit(), m.getVente()))
@@ -405,16 +405,16 @@ public class MouvementsStockService {
         // 2. Calculate sales and percentages by YearMonth/product
         Map<YearMonth, List<SellingProductResult>> yearMonthResults = new HashMap<>();
 
-        for (Map.Entry<YearMonth, Map<ProductGroupingKey, List<MouvementsStockDTO>>> yearMonthEntry : byYearMonthAndProduct.entrySet()) {
+        for (Map.Entry<YearMonth, Map<ProductGroupingKey, List<MouvementsStockProjection>>> yearMonthEntry : byYearMonthAndProduct.entrySet()) {
             YearMonth yearMonth = yearMonthEntry.getKey();
-            Map<ProductGroupingKey, List<MouvementsStockDTO>> byProduct = yearMonthEntry.getValue();
+            Map<ProductGroupingKey, List<MouvementsStockProjection>> byProduct = yearMonthEntry.getValue();
 
             List<SellingProductResult> productResults = new ArrayList<>();
 
-            for (Map.Entry<ProductGroupingKey, List<MouvementsStockDTO>> productEntry : byProduct.entrySet()) {
-                List<MouvementsStockDTO> mvts = productEntry.getValue();
+            for (Map.Entry<ProductGroupingKey, List<MouvementsStockProjection>> productEntry : byProduct.entrySet()) {
+                List<MouvementsStockProjection> mvts = productEntry.getValue();
                 if (mvts.isEmpty()) continue;
-                mvts.sort(Comparator.comparing(MouvementsStockDTO::getDate));
+                mvts.sort(Comparator.comparing(MouvementsStockProjection::getDate));
 
                 ProductGroupingKey key = productEntry.getKey();
                 String productCode = key.getCodeProduit();
