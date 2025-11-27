@@ -1,6 +1,6 @@
 import { apiUrl } from 'app/entities/mouvements-stock/mouvements-stock.reducer';
 import { Text } from 'app/shared/component/Text';
-import { TopSellingProductResult } from 'app/shared/model/TopSellingProductResult';
+import { SellingProductResult } from 'app/shared/model/SellingProductResult';
 import { getWeeklyBestSellersQueryParams } from 'app/shared/util/QueryParamsUtil';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -15,10 +15,10 @@ import React, { useState } from 'react';
 import { WeeklyBestSellersFilter } from './WeeklyBestSellersFilter';
 
 interface ApiMapResponse {
-  [key: number]: TopSellingProductResult[];
+  [key: number]: SellingProductResult[];
 }
 
-interface TableData extends TopSellingProductResult {
+interface TableData extends SellingProductResult {
   month: string;
 }
 

@@ -1,6 +1,6 @@
 package ch.epicerielacanopee.statistics.service.dto;
 
-public class TopSellingProductResult {
+public class SellingProductResult {
 
     private String productCode;
     private String product;
@@ -10,7 +10,7 @@ public class TopSellingProductResult {
     private float soldQuantityStandardDeviation;
     private String saleType;
 
-    public TopSellingProductResult(
+    public SellingProductResult(
             String productCode,
             String product,
             float soldPercentageAverage,

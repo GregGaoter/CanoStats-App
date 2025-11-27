@@ -32,7 +32,7 @@ import ch.epicerielacanopee.statistics.domain.MouvementsStock;
 import ch.epicerielacanopee.statistics.repository.MouvementsStockRepository;
 import ch.epicerielacanopee.statistics.service.dto.EpicerioMouvementsStockDTO;
 import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
-import ch.epicerielacanopee.statistics.service.dto.TopSellingProductResult;
+import ch.epicerielacanopee.statistics.service.dto.SellingProductResult;
 import ch.epicerielacanopee.statistics.service.mapper.MouvementsStockMapper;
 import ch.epicerielacanopee.statistics.service.util.ProductGroupingKey;
 import ch.epicerielacanopee.statistics.service.util.SoldValues;
@@ -392,7 +392,7 @@ public class MouvementsStockService {
         return seasonalProductsOverPeriod;
     }
 
-    public Map<Integer, List<TopSellingProductResult>> buildMonthlySeasonalPlan(List<MouvementsStockDTO> movements, Instant startDate, Instant endDate) {
+    public Map<Integer, List<SellingProductResult>> buildMonthlySeasonalPlan(List<MouvementsStockDTO> movements, Instant startDate, Instant endDate) {
         ZoneId zone = ZoneId.of("Europe/Zurich");
 
         // 1. Group by product and by year/month
@@ -403,13 +403,13 @@ public class MouvementsStockService {
             ));
 
         // 2. Calculate sales and percentages by YearMonth/product
-        Map<YearMonth, List<TopSellingProductResult>> yearMonthResults = new HashMap<>();
+        Map<YearMonth, List<SellingProductResult>> yearMonthResults = new HashMap<>();
 
         for (Map.Entry<YearMonth, Map<ProductGroupingKey, List<MouvementsStockDTO>>> yearMonthEntry : byYearMonthAndProduct.entrySet()) {
             YearMonth yearMonth = yearMonthEntry.getKey();
             Map<ProductGroupingKey, List<MouvementsStockDTO>> byProduct = yearMonthEntry.getValue();
 
-            List<TopSellingProductResult> productResults = new ArrayList<>();
+            List<SellingProductResult> productResults = new ArrayList<>();
 
             for (Map.Entry<ProductGroupingKey, List<MouvementsStockDTO>> productEntry : byProduct.entrySet()) {
                 List<MouvementsStockDTO> mvts = productEntry.getValue();
@@ -445,7 +445,7 @@ public class MouvementsStockService {
 
                 float soldPercentage = (soldQuantity / available) * 100f;
 
-                productResults.add(new TopSellingProductResult(productCode, key.getProduit(), soldPercentage, 0f, soldQuantity, 0f, mvts.get(0).getVente()));
+                productResults.add(new SellingProductResult(productCode, key.getProduit(), soldPercentage, 0f, soldQuantity, 0f, mvts.get(0).getVente()));
             }
 
             yearMonthResults.put(yearMonth, productResults);
@@ -454,9 +454,9 @@ public class MouvementsStockService {
         // For each month, group the results by product
         Map<Integer, Map<ProductGroupingKey, List<SoldValues>>> monthlyAverageByProduct = new HashMap<>();
 
-        for (Map.Entry<YearMonth, List<TopSellingProductResult>> entry : yearMonthResults.entrySet()) {
+        for (Map.Entry<YearMonth, List<SellingProductResult>> entry : yearMonthResults.entrySet()) {
             int monthNum = entry.getKey().getMonth();
-            for (TopSellingProductResult pr : entry.getValue()) {
+            for (SellingProductResult pr : entry.getValue()) {
                 monthlyAverageByProduct
                     .computeIfAbsent(monthNum, k -> new HashMap<>())
                     .computeIfAbsent(new ProductGroupingKey(pr.getProductCode(), pr.getProduct(), pr.getSaleType()), k -> new ArrayList<>())
@@ -465,11 +465,11 @@ public class MouvementsStockService {
         }
 
         // Calculate the average per product and per month
-        Map<Integer, List<TopSellingProductResult>> topProductsByMonthNumber = new HashMap<>();
+        Map<Integer, List<SellingProductResult>> productsByMonthNumber = new HashMap<>();
 
         for (Map.Entry<Integer, Map<ProductGroupingKey, List<SoldValues>>> entry : monthlyAverageByProduct.entrySet()) {
             int monthNum = entry.getKey();
-            List<TopSellingProductResult> aggregated = new ArrayList<>();
+            List<SellingProductResult> aggregated = new ArrayList<>();
 
             for (Map.Entry<ProductGroupingKey, List<SoldValues>> productEntry : entry.getValue().entrySet()) {
                 ProductGroupingKey key = productEntry.getKey();
@@ -481,13 +481,13 @@ public class MouvementsStockService {
                 DescriptiveStatistics quantityStats = new DescriptiveStatistics();
                 soldValues.forEach(v -> quantityStats.addValue(v.getSoldQuantity()));
 
-                aggregated.add(new TopSellingProductResult(key.getCodeProduit(), key.getProduit(), (float) percentageStats.getMean(), (float) percentageStats.getStandardDeviation(), (float) quantityStats.getMean(), (float) quantityStats.getStandardDeviation(), key.getSaleType()));
+                aggregated.add(new SellingProductResult(key.getCodeProduit(), key.getProduit(), (float) percentageStats.getMean(), (float) percentageStats.getStandardDeviation(), (float) quantityStats.getMean(), (float) quantityStats.getStandardDeviation(), key.getSaleType()));
             }
-            topProductsByMonthNumber.put(monthNum, aggregated);
+            productsByMonthNumber.put(monthNum, aggregated);
         }
 
         // 3. Aggregate over multiple years: average of percentages and quantities
-        Map<Integer, List<TopSellingProductResult>> seasonalPlan = new HashMap<>();
+        Map<Integer, List<SellingProductResult>> seasonalPlan = new HashMap<>();
 
         Map<Month, List<String>> seasonalProductsOverPeriod = getSeasonalProductsOverPeriod(startDate, endDate);
 
@@ -495,9 +495,9 @@ public class MouvementsStockService {
             int monthNumber = entry.getKey().getValue();
             List<String> seasonal = entry.getValue();
 
-            List<TopSellingProductResult> seasonalProducts = topProductsByMonthNumber.getOrDefault(monthNumber, Collections.emptyList()).stream()
+            List<SellingProductResult> seasonalProducts = productsByMonthNumber.getOrDefault(monthNumber, Collections.emptyList()).stream()
                 .filter(pr -> seasonal.contains(pr.getProductCode()))
-                .sorted(Comparator.comparing(TopSellingProductResult::getSoldPercentageAverage).reversed())
+                .sorted(Comparator.comparing(SellingProductResult::getSoldPercentageAverage).reversed())
                 .collect(Collectors.toList());
 
             seasonalPlan.put(monthNumber, seasonalProducts);

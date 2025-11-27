@@ -5,7 +5,7 @@ import ch.epicerielacanopee.statistics.service.MouvementsStockQueryService;
 import ch.epicerielacanopee.statistics.service.MouvementsStockService;
 import ch.epicerielacanopee.statistics.service.criteria.MouvementsStockCriteria;
 import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
-import ch.epicerielacanopee.statistics.service.dto.TopSellingProductResult;
+import ch.epicerielacanopee.statistics.service.dto.SellingProductResult;
 import ch.epicerielacanopee.statistics.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -260,12 +260,12 @@ public class MouvementsStockResource {
     }
 
     @GetMapping("/monthly-seasonal-plan")
-    public ResponseEntity<Map<Integer, List<TopSellingProductResult>>> findTop5SellingProductsPerWeek(
+    public ResponseEntity<Map<Integer, List<SellingProductResult>>> findTop5SellingProductsPerWeek(
         @RequestParam Instant startDate,
         @RequestParam Instant endDate
     ) {
         List<MouvementsStockDTO> resultByCriteria = mouvementsStockService.findLegByDateBetween(startDate, endDate);
-        Map<Integer, List<TopSellingProductResult>> seasonalPlan = mouvementsStockService.buildMonthlySeasonalPlan(resultByCriteria, startDate, endDate);
+        Map<Integer, List<SellingProductResult>> seasonalPlan = mouvementsStockService.buildMonthlySeasonalPlan(resultByCriteria, startDate, endDate);
         return ResponseEntity.ok().body(seasonalPlan);
     }
 }

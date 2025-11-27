@@ -1,4 +1,4 @@
-export interface TopSellingProductResult {
+export interface SellingProductResult {
   productCode?: string;
   product?: string;
   soldPercentageAverage?: number | null;
