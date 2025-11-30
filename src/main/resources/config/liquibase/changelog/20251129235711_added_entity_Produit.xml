@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity Produit.
+    -->
+    <changeSet id="20251129235711-1" author="jhipster">
+        <createTable tableName="produit">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="epicerio_id" type="integer">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_date" type="${datetimeType}">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_updated_date" type="${datetimeType}">
+                <constraints nullable="false" />
+            </column>
+            <column name="imported_date" type="${datetimeType}">
+                <constraints nullable="false" />
+            </column>
+            <column name="nom" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="code" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="disponible" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="prix_fournisseur" type="${floatType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="ht_ttc" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="taux_tva" type="${floatType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="marge_profit" type="${floatType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="prix_vente" type="${floatType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="vendu" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="quantite_par_piece" type="${floatType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="unite" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="prix_par_unite" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="description" type="${clobType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="remarques_internes" type="${clobType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="fournisseur" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="ref_fournisseur" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="stock" type="${floatType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="commandes_clients" type="${floatType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="derniere_verification_date" type="date">
+                <constraints nullable="true" />
+            </column>
+            <column name="derniere_livraison_date" type="date">
+                <constraints nullable="true" />
+            </column>
+            <column name="achat_fournisseur" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="dernier_achat_date" type="date">
+                <constraints nullable="true" />
+            </column>
+            <column name="dernier_achat_quantite" type="${floatType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="stats_livraison" type="${floatType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="stats_perte" type="${floatType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="stats_vente" type="${floatType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="stats_vente_speciale" type="${floatType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="tags" type="${clobType}">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="produit" columnName="created_date" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="produit" columnName="last_updated_date" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="produit" columnName="imported_date" columnDataType="${datetimeType}"/>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
+    <!--
+        Load sample data generated with Faker.js
+        - This data can be easily edited using a CSV editor (or even MS Excel) and
+          is located in the 'src/main/resources/config/liquibase/fake-data' directory
+        - By default this data is applied when running with the JHipster 'dev' profile.
+          This can be customized by adding or removing 'faker' in the 'spring.liquibase.contexts'
+          Spring Boot configuration key.
+    -->
+    <changeSet id="20251129235711-1-data" author="jhipster" context="faker">
+        <loadData
+                  file="config/liquibase/fake-data/produit.csv"
+                  separator=";"
+                  tableName="produit"
+                  usePreparedStatements="true">
+            <column name="id" type="${uuidType}"/>
+            <column name="epicerio_id" type="numeric"/>
+            <column name="created_date" type="date"/>
+            <column name="last_updated_date" type="date"/>
+            <column name="imported_date" type="date"/>
+            <column name="nom" type="string"/>
+            <column name="code" type="string"/>
+            <column name="disponible" type="string"/>
+            <column name="prix_fournisseur" type="numeric"/>
+            <column name="ht_ttc" type="string"/>
+            <column name="taux_tva" type="numeric"/>
+            <column name="marge_profit" type="numeric"/>
+            <column name="prix_vente" type="numeric"/>
+            <column name="vendu" type="string"/>
+            <column name="quantite_par_piece" type="numeric"/>
+            <column name="unite" type="string"/>
+            <column name="prix_par_unite" type="string"/>
+            <column name="description" type="clob"/>
+            <column name="remarques_internes" type="clob"/>
+            <column name="fournisseur" type="string"/>
+            <column name="ref_fournisseur" type="string"/>
+            <column name="stock" type="numeric"/>
+            <column name="commandes_clients" type="numeric"/>
+            <column name="derniere_verification_date" type="date"/>
+            <column name="derniere_livraison_date" type="date"/>
+            <column name="achat_fournisseur" type="string"/>
+            <column name="dernier_achat_date" type="date"/>
+            <column name="dernier_achat_quantite" type="numeric"/>
+            <column name="stats_livraison" type="numeric"/>
+            <column name="stats_perte" type="numeric"/>
+            <column name="stats_vente" type="numeric"/>
+            <column name="stats_vente_speciale" type="numeric"/>
+            <column name="tags" type="clob"/>
+            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
+        </loadData>
+    </changeSet>
+</databaseChangeLog>

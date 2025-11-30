@@ -24,4 +24,40 @@ entity MouvementsStock {
   active Boolean required
 }
 
+entity Produit {
+  id UUID
+  epicerioId Integer
+  createdDate Instant required
+  lastUpdatedDate Instant required
+  importedDate Instant required
+  nom String
+  code String
+  disponible String
+  prixFournisseur Float
+  htTtc String
+  tauxTva Float
+  margeProfit Float
+  prixVente Float
+  vendu String
+  quantiteParPiece Float
+  unite String
+  prixParUnite String
+  description TextBlob
+  remarquesInternes TextBlob
+  fournisseur String
+  refFournisseur String
+  stock Float
+  commandesClients Float
+  derniereVerificationDate LocalDate
+  derniereLivraisonDate LocalDate
+  achatFournisseur String
+  dernierAchatDate LocalDate
+  dernierAchatQuantite Float
+  statsLivraison Float
+  statsPerte Float
+  statsVente Float
+  statsVenteSpeciale Float
+  tags TextBlob
+}
+
 use mapstruct, pagination, filter for *

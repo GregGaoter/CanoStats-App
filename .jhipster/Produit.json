@@ -1,0 +1,149 @@
+{
+  "annotations": {
+    "changelogDate": "20251129235711"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "UUID"
+    },
+    {
+      "fieldName": "epicerioId",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "createdDate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "lastUpdatedDate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "importedDate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "nom",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "code",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "disponible",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "prixFournisseur",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "htTtc",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "tauxTva",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "margeProfit",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "prixVente",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "vendu",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "quantiteParPiece",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "unite",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "prixParUnite",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "remarquesInternes",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "fournisseur",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "refFournisseur",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "stock",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "commandesClients",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "derniereVerificationDate",
+      "fieldType": "LocalDate"
+    },
+    {
+      "fieldName": "derniereLivraisonDate",
+      "fieldType": "LocalDate"
+    },
+    {
+      "fieldName": "achatFournisseur",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "dernierAchatDate",
+      "fieldType": "LocalDate"
+    },
+    {
+      "fieldName": "dernierAchatQuantite",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "statsLivraison",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "statsPerte",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "statsVente",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "statsVenteSpeciale",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "tags",
+      "fieldType": "TextBlob"
+    }
+  ],
+  "name": "Produit",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

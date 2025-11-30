@@ -17,4 +17,8 @@
     <include file="config/liquibase/changelog/20251126003000_add_mouvements_stock_columns_index.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251126170000_add_mouvements_stock_composites_index.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251126173000_patch_mouvements_stock_lowercase_code_produit.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251129235711_added_entity_Produit.xml" relativeToChangelogFile="false"/>
+    <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
+    <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
+    <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>
