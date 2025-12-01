@@ -613,4 +613,9 @@ public class Produit implements Serializable {
             ", tags='" + getTags() + "'" +
             "}";
     }
+
+    @PrePersist
+    public void prePersist() {
+        this.code = this.code.toLowerCase();
+    }
 }
