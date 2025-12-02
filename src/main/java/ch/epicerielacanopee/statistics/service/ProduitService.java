@@ -33,15 +33,16 @@ public class ProduitService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProduitService.class);
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     private final ProduitRepository produitRepository;
 
     private final ProduitMapper produitMapper;
 
-    public ProduitService(ProduitRepository produitRepository, ProduitMapper produitMapper) {
+    public ProduitService(ProduitRepository produitRepository, ProduitMapper produitMapper, ObjectMapper objectMapper) {
         this.produitRepository = produitRepository;
         this.produitMapper = produitMapper;
+        this.objectMapper = objectMapper;
     }
 
     /**

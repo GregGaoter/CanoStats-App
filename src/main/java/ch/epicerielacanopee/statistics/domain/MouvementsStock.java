@@ -440,6 +440,6 @@ public class MouvementsStock implements Serializable {
 
     @PrePersist
     public void prePersist() {
-        this.codeProduit = this.codeProduit.toLowerCase();
+        if(this.codeProduit != null) this.codeProduit = this.codeProduit.toLowerCase();
     }
 }

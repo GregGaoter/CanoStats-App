@@ -616,6 +616,6 @@ public class Produit implements Serializable {
 
     @PrePersist
     public void prePersist() {
-        this.code = this.code.toLowerCase();
+        if(this.code != null) this.code = this.code.toLowerCase();
     }
 }

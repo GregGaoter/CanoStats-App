@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Icon } from 'app/shared/component/Icon';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
+import { Dropdown } from 'primereact/dropdown';
 import {
   FileUpload,
   FileUploadErrorEvent,
@@ -12,13 +13,23 @@ import {
   ItemTemplateOptions,
 } from 'primereact/fileupload';
 import { Messages } from 'primereact/messages';
-import { ProgressBar } from 'primereact/progressbar';
 import { Tag } from 'primereact/tag';
 import { Tooltip } from 'primereact/tooltip';
 import React, { useRef, useState } from 'react';
 
+interface ImportEntity {
+  entity: string;
+  remoteUrl: string;
+}
+
 export const FileImport = () => {
+  const importEntities: ImportEntity[] = [
+    { entity: 'Mouvements de stock', remoteUrl: '/api/mouvements-stocks/import' },
+    { entity: 'Produits', remoteUrl: '/api/produits/import' },
+  ];
+
   const [totalSize, setTotalSize] = useState<number>(0);
+  const [importEntity, setImportEntity] = useState<ImportEntity>(importEntities[0]);
   const fileUploadRef = useRef<FileUpload>(null);
   const messages = useRef<Messages>(null);
 
@@ -70,20 +81,20 @@ export const FileImport = () => {
     });
   };
 
+  const cardTitleTemplate = () => (
+    <div className="flex gap-3 align-items-center">
+      <div className="text-2xl">Importer des données</div>
+      <Dropdown value={importEntity} onChange={e => setImportEntity(e.value)} options={importEntities} optionLabel="entity" />
+    </div>
+  );
+
   const headerTemplate = (options: FileUploadHeaderTemplateOptions) => {
     const { className, chooseButton, uploadButton, cancelButton } = options;
-    const value: number = fileUploadRef && fileUploadRef.current ? parseFloat(`${fileUploadRef.current.formatSize(totalSize)}`) : 0;
-    const formatedValue: string = value === 0 ? '0 B' : value.toFixed(1).concat(' MB');
-
     return (
       <div className={className} style={{ backgroundColor: 'transparent', display: 'flex', alignItems: 'center' }}>
         {chooseButton}
         {uploadButton}
         {cancelButton}
-        <div className="flex align-items-center gap-3 ml-auto text-color-secondary">
-          <span>{formatedValue} / 50 MB</span>
-          <ProgressBar value={2 * value} showValue={false} style={{ width: '10rem', height: '12px' }}></ProgressBar>
-        </div>
       </div>
     );
   };
@@ -139,15 +150,15 @@ export const FileImport = () => {
   };
 
   return (
-    <Card title="Importer des données de mouvements de stock">
+    <Card title={cardTitleTemplate()}>
       <Tooltip target=".custom-choose-btn" content="Choisir" position="bottom" />
       <Tooltip target=".custom-upload-btn" content="Télécharger" position="bottom" />
       <Tooltip target=".custom-cancel-btn" content="Effacer" position="bottom" />
       <div className="flex flex-column gap-3">
         <FileUpload
           ref={fileUploadRef}
-          name="mouvementsStocksFile"
-          url="/api/mouvements-stocks/import"
+          name="importFile"
+          url={importEntity.remoteUrl}
           multiple={false}
           accept="application/json"
           maxFileSize={50000000}

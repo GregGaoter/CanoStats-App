@@ -26,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import ch.epicerielacanopee.statistics.domain.MouvementsStock;
 import ch.epicerielacanopee.statistics.repository.MouvementsStockRepository;
@@ -151,16 +150,16 @@ public class MouvementsStockService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MouvementsStockService.class);
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     private final MouvementsStockRepository mouvementsStockRepository;
 
     private final MouvementsStockMapper mouvementsStockMapper;
 
-    public MouvementsStockService(MouvementsStockRepository mouvementsStockRepository, MouvementsStockMapper mouvementsStockMapper) {
+    public MouvementsStockService(MouvementsStockRepository mouvementsStockRepository, MouvementsStockMapper mouvementsStockMapper, ObjectMapper objectMapper) {
         this.mouvementsStockRepository = mouvementsStockRepository;
         this.mouvementsStockMapper = mouvementsStockMapper;
-        objectMapper.registerModule(new JavaTimeModule());
+        this.objectMapper = objectMapper;
     }
 
     /**

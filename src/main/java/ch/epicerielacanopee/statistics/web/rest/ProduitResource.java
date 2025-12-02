@@ -183,14 +183,14 @@ public class ProduitResource {
     /**
      * Handles the import of a file containing products.
      *
-     * @param productsFile the file to be imported
+     * @param importFile the file to be imported
      * @return a ResponseEntity with a success message if the import is successful,
      *         or an error message if there is an issue processing the file.
      */
     @PostMapping("/import")
-    public ResponseEntity<String> importFile(@RequestParam MultipartFile productsFile) {
+    public ResponseEntity<String> importFile(@RequestParam MultipartFile importFile) {
         try {
-            String message = produitService.importFile(productsFile);
+            String message = produitService.importFile(importFile);
             return ResponseEntity.ok(message);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
