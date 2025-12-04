@@ -37,3 +37,5 @@ export interface IProduit {
 }
 
 export const defaultValue: Readonly<IProduit> = {};
+
+export type ProduitField = keyof IProduit;

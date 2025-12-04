@@ -3,10 +3,10 @@ import { Route } from 'react-router-dom';
 
 import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
 
-import Produit from './produit';
+import { Produit } from './produit';
+import ProduitDeleteDialog from './produit-delete-dialog';
 import ProduitDetail from './produit-detail';
 import ProduitUpdate from './produit-update';
-import ProduitDeleteDialog from './produit-delete-dialog';
 
 const ProduitRoutes = () => (
   <ErrorBoundaryRoutes>

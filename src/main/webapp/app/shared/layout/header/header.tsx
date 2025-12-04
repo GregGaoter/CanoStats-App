@@ -182,6 +182,11 @@ const Header = (props: IHeaderProps) => {
           icon: <Icon icon="chart-line" colorSecondary marginRight />,
           command: () => navigate('/table/mouvements-stock', { replace: true }),
         },
+        {
+          label: 'Produits',
+          icon: <Icon icon="carrot" colorSecondary marginRight />,
+          command: () => navigate('/table/produit', { replace: true }),
+        },
       ],
     },
     {

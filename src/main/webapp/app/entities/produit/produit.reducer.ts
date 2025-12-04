@@ -20,8 +20,8 @@ const apiUrl = 'api/produits';
 
 export const getEntities = createAsyncThunk(
   'produit/fetch_entity_list',
-  async ({ page, size, sort }: IQueryParams) => {
-    const requestUrl = `${apiUrl}?${sort ? `page=${page}&size=${size}&sort=${sort}&` : ''}cacheBuster=${new Date().getTime()}`;
+  async (queryParams: string) => {
+    const requestUrl = `${apiUrl}?${queryParams ? queryParams : ''}`;
     return axios.get<IProduit[]>(requestUrl);
   },
   { serializeError: serializeAxiosError },
@@ -40,7 +40,7 @@ export const createEntity = createAsyncThunk(
   'produit/create_entity',
   async (entity: IProduit, thunkAPI) => {
     const result = await axios.post<IProduit>(apiUrl, cleanEntity(entity));
-    thunkAPI.dispatch(getEntities({}));
+    thunkAPI.dispatch(getEntities(undefined));
     return result;
   },
   { serializeError: serializeAxiosError },
@@ -50,7 +50,7 @@ export const updateEntity = createAsyncThunk(
   'produit/update_entity',
   async (entity: IProduit, thunkAPI) => {
     const result = await axios.put<IProduit>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
-    thunkAPI.dispatch(getEntities({}));
+    thunkAPI.dispatch(getEntities(undefined));
     return result;
   },
   { serializeError: serializeAxiosError },
@@ -60,7 +60,7 @@ export const partialUpdateEntity = createAsyncThunk(
   'produit/partial_update_entity',
   async (entity: IProduit, thunkAPI) => {
     const result = await axios.patch<IProduit>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
-    thunkAPI.dispatch(getEntities({}));
+    thunkAPI.dispatch(getEntities(undefined));
     return result;
   },
   { serializeError: serializeAxiosError },
@@ -71,7 +71,7 @@ export const deleteEntity = createAsyncThunk(
   async (id: string | number, thunkAPI) => {
     const requestUrl = `${apiUrl}/${id}`;
     const result = await axios.delete<IProduit>(requestUrl);
-    thunkAPI.dispatch(getEntities({}));
+    thunkAPI.dispatch(getEntities(undefined));
     return result;
   },
   { serializeError: serializeAxiosError },

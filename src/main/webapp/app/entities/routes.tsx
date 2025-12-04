@@ -5,6 +5,7 @@ import MouvementsStock from './mouvements-stock/mouvements-stock';
 import MouvementsStockDeleteDialog from './mouvements-stock/mouvements-stock-delete-dialog';
 import MouvementsStockDetail from './mouvements-stock/mouvements-stock-detail';
 import MouvementsStockUpdate from './mouvements-stock/mouvements-stock-update';
+import { Produit } from './produit/produit';
 /* jhipster-needle-add-route-import - JHipster will add routes here */
 
 export default () => {
@@ -20,6 +21,9 @@ export default () => {
               <Route path="edit" element={<MouvementsStockUpdate />} />
               <Route path="delete" element={<MouvementsStockDeleteDialog />} />
             </Route>
+          </Route>
+          <Route path="produit">
+            <Route index element={<Produit />} />
           </Route>
           {/* jhipster-needle-add-route-path - JHipster will add routes here */}
         </Route>
