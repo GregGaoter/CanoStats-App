@@ -1,9 +1,9 @@
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { Text } from 'app/shared/component/Text';
-import { ProduitField } from 'app/shared/model/produit.model';
+import { IProduit, ProduitField } from 'app/shared/model/produit.model';
 import { ITEMS_PER_PAGE } from 'app/shared/util/pagination.constants';
 import { getPaginationOrderValue, getValueOfOrder, Pagination, PaginationOrder } from 'app/shared/util/PaginationUtils';
-import { getProduitQueryParams } from 'app/shared/util/QueryParamsUtil';
+import { getProduitsQueryParams } from 'app/shared/util/QueryParamsUtil';
 import dayjs from 'dayjs';
 import { Card } from 'primereact/card';
 import { Column } from 'primereact/column';
@@ -31,7 +31,7 @@ export const Produit = () => {
   const totalItems = useAppSelector(state => state.produit.totalItems);
 
   const getAllProduits = () => {
-    dispatch(getProduits(getProduitQueryParams(pagination)));
+    dispatch(getProduits(getProduitsQueryParams(pagination)));
   };
 
   useEffect(() => {
@@ -57,7 +57,9 @@ export const Produit = () => {
 
   const cardTitle = <Text>Produits</Text>;
 
-  const dateTemplate = (date: dayjs.Dayjs) => dayjs(date).format('DD-MM-YYYY');
+  const dateTemplate = (date: dayjs.Dayjs): string => (date ? dayjs(date).format('DD-MM-YYYY') : '');
+
+  const derniereLivraisonDateTemplate = (produit: IProduit): string => dateTemplate(produit.derniereLivraisonDate);
 
   return (
     <Card title={<Text>Produits</Text>}>
@@ -75,7 +77,7 @@ export const Produit = () => {
         <Column field="code" header="Code" sortable></Column>
         <Column field="prixFournisseur" header="Prix fournisseur"></Column>
         <Column field="prixVente" header="Prix de vente"></Column>
-        <Column field="derniereLivraisonDate" header="Dernière livraison" body={dateTemplate} sortable></Column>
+        <Column field="derniereLivraisonDate" header="Dernière livraison" body={derniereLivraisonDateTemplate} sortable></Column>
         <Column field="tags" header="Tags"></Column>
       </DataTable>
       <Paginator

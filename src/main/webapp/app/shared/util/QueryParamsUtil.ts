@@ -4,6 +4,7 @@ import { Pagination } from './PaginationUtils';
 
 export const getPaginationSearchParams = <T>(pagination: Pagination<T>): URLSearchParams => {
   const searchParams: URLSearchParams = new URLSearchParams();
+  if (!pagination) return searchParams;
   searchParams.set('page', `${pagination.page}`);
   searchParams.set('size', `${pagination.size}`);
   searchParams.set('sort', `${pagination.sort as string},${pagination.order as string}`);
@@ -37,7 +38,7 @@ export const getMouvementsStockQueryParams = (filters: { [key: string]: DataTabl
   return searchParams.toString();
 };
 
-export const getProduitQueryParams = (pagination: Pagination<ProduitField>): string => {
+export const getProduitsQueryParams = (pagination: Pagination<ProduitField>): string => {
   const searchParams: URLSearchParams = new URLSearchParams(getPaginationSearchParams(pagination));
   searchParams.set('cacheBuster', `${new Date().getTime()}`);
   return searchParams.toString();
