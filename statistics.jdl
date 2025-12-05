@@ -60,4 +60,6 @@ entity Produit {
   tags TextBlob
 }
 
-use mapstruct, pagination, filter for *
+use mapstruct, pagination for *
+filter MouvementsStock
+filter Produit

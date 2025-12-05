@@ -141,6 +141,7 @@
       "fieldType": "TextBlob"
     }
   ],
+  "jpaMetamodelFiltering": true,
   "name": "Produit",
   "pagination": "pagination",
   "relationships": [],

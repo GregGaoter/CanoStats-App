@@ -19,7 +19,7 @@
     "feignClient": null,
     "jhipsterVersion": "8.7.3",
     "jwtSecretKey": "ZTQxYjk5YzVlOTY0MWJlYzc3MWY4NzY3NjgxOTBhMzBlNmNmODY1OTYzMTA4Nzg0YWQ0OGY2ZGNmYjEyNTc0Y2U0ZGUzYjEzODNmMjI3NDE1NzMxODA0YzE2ZjIyZjc0NjA2NTVmNmJkYjM0OTZlOGUxYjNlN2FlMWRjZDk3MDM=",
-    "lastLiquibaseTimestamp": 1764460631000,
+    "lastLiquibaseTimestamp": 1764862392000,
     "messageBroker": false,
     "microfrontend": null,
     "microfrontends": [],

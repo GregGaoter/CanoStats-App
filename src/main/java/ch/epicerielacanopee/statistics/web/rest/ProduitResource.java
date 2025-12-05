@@ -1,7 +1,9 @@
 package ch.epicerielacanopee.statistics.web.rest;
 
 import ch.epicerielacanopee.statistics.repository.ProduitRepository;
+import ch.epicerielacanopee.statistics.service.ProduitQueryService;
 import ch.epicerielacanopee.statistics.service.ProduitService;
+import ch.epicerielacanopee.statistics.service.criteria.ProduitCriteria;
 import ch.epicerielacanopee.statistics.service.dto.ProduitDTO;
 import ch.epicerielacanopee.statistics.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
@@ -45,9 +47,12 @@ public class ProduitResource {
 
     private final ProduitRepository produitRepository;
 
-    public ProduitResource(ProduitService produitService, ProduitRepository produitRepository) {
+    private final ProduitQueryService produitQueryService;
+
+    public ProduitResource(ProduitService produitService, ProduitRepository produitRepository, ProduitQueryService produitQueryService) {
         this.produitService = produitService;
         this.produitRepository = produitRepository;
+        this.produitQueryService = produitQueryService;
     }
 
     /**
@@ -142,14 +147,31 @@ public class ProduitResource {
      * {@code GET  /produits} : get all the produits.
      *
      * @param pageable the pagination information.
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of produits in body.
      */
     @GetMapping("")
-    public ResponseEntity<List<ProduitDTO>> getAllProduits(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
-        LOG.debug("REST request to get a page of Produits");
-        Page<ProduitDTO> page = produitService.findAll(pageable);
+    public ResponseEntity<List<ProduitDTO>> getAllProduits(
+        ProduitCriteria criteria,
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable
+    ) {
+        LOG.debug("REST request to get Produits by criteria: {}", criteria);
+
+        Page<ProduitDTO> page = produitQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /produits/count} : count all the produits.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/count")
+    public ResponseEntity<Long> countProduits(ProduitCriteria criteria) {
+        LOG.debug("REST request to count Produits by criteria: {}", criteria);
+        return ResponseEntity.ok().body(produitQueryService.countByCriteria(criteria));
     }
 
     /**
