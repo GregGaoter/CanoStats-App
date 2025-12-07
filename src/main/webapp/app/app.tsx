@@ -14,6 +14,7 @@ import { hasAnyAuthority } from './shared/auth/private-route';
 import { ToastProvider } from './shared/component/ToastContext';
 import ErrorBoundary from './shared/error/error-boundary';
 import Footer from './shared/layout/footer/footer';
+import { getProductTypesByCode } from './entities/produit/produit.reducer';
 
 const baseHref = document.querySelector('base').getAttribute('href').replace(/\/$/, '');
 
@@ -23,6 +24,7 @@ export const App = () => {
   useEffect(() => {
     dispatch(getSession());
     dispatch(getProfile());
+    dispatch(getProductTypesByCode());
   }, []);
 
   const isAuthenticated = useAppSelector(state => state.authentication.isAuthenticated);

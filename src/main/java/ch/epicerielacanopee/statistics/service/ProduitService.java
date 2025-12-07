@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ch.epicerielacanopee.statistics.domain.Produit;
 import ch.epicerielacanopee.statistics.repository.ProduitRepository;
+import ch.epicerielacanopee.statistics.repository.projection.ProduitCodeProjection;
 import ch.epicerielacanopee.statistics.service.dto.EpicerioProduitDTO;
 import ch.epicerielacanopee.statistics.service.dto.ProduitDTO;
 import ch.epicerielacanopee.statistics.service.mapper.ProduitMapper;
@@ -183,8 +184,8 @@ public class ProduitService {
     }
 
     public List<String> getProductTypesByCode() {
-        List<String> distinctCodes = produitRepository.findDistinctCodeByCodeIsNotNull();
-        return distinctCodes.stream().map(String::trim).map(s -> s.replaceAll("\\d+", ""))
-                .filter(s -> s.matches("[A-Za-z]+")).distinct().sorted().toList();
+        List<ProduitCodeProjection> produits = produitRepository.findDistinctCodeByCodeIsNotNull();
+        return produits.stream().map(ProduitCodeProjection::getCode).map(String::trim)
+                .map(s -> s.replaceAll("\\d+", "")).filter(s -> s.matches("[A-Za-z]+")).distinct().sorted().toList();
     }
 }

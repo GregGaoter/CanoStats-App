@@ -1,6 +1,7 @@
 package ch.epicerielacanopee.statistics.repository;
 
 import ch.epicerielacanopee.statistics.domain.Produit;
+import ch.epicerielacanopee.statistics.repository.projection.ProduitCodeProjection;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,5 +15,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProduitRepository extends JpaRepository<Produit, UUID>, JpaSpecificationExecutor<Produit> {
 
-  List<String> findDistinctCodeByCodeIsNotNull();
+  List<ProduitCodeProjection> findDistinctCodeByCodeIsNotNull();
 }

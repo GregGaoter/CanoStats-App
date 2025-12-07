@@ -4,7 +4,11 @@ import { cleanEntity } from 'app/shared/util/entity-utils';
 import { EntityState, IQueryParams, createEntitySlice, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
 import { IProduit, defaultValue } from 'app/shared/model/produit.model';
 
-const initialState: EntityState<IProduit> = {
+interface ProduitState extends EntityState<IProduit> {
+  productTypesByCode: string[];
+}
+
+const initialState: ProduitState = {
   loading: false,
   errorMessage: null,
   entities: [],
@@ -12,6 +16,7 @@ const initialState: EntityState<IProduit> = {
   updating: false,
   totalItems: 0,
   updateSuccess: false,
+  productTypesByCode: [],
 };
 
 const apiUrl = 'api/produits';
@@ -77,6 +82,15 @@ export const deleteEntity = createAsyncThunk(
   { serializeError: serializeAxiosError },
 );
 
+export const getProductTypesByCode = createAsyncThunk(
+  'produit/fetch_product_types_by_code',
+  async () => {
+    const requestUrl = `${apiUrl}/product-types-by-code`;
+    return axios.get<string[]>(requestUrl);
+  },
+  { serializeError: serializeAxiosError },
+);
+
 // slice
 
 export const ProduitSlice = createEntitySlice({
@@ -101,6 +115,13 @@ export const ProduitSlice = createEntitySlice({
           loading: false,
           entities: data,
           totalItems: parseInt(headers['x-total-count'], 10),
+        };
+      })
+      .addMatcher(isFulfilled(getProductTypesByCode), (state, action) => {
+        return {
+          ...state,
+          loading: false,
+          productTypesByCode: action.payload.data,
         };
       })
       .addMatcher(isFulfilled(createEntity, updateEntity, partialUpdateEntity), (state, action) => {

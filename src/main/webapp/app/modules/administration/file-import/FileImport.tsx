@@ -1,4 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useAppSelector } from 'app/config/store';
 import { Icon } from 'app/shared/component/Icon';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
@@ -27,6 +28,8 @@ export const FileImport = () => {
     { entity: 'Mouvements de stock', remoteUrl: '/api/mouvements-stocks/import' },
     { entity: 'Produits', remoteUrl: '/api/produits/import' },
   ];
+
+  const productTypesByCode = useAppSelector(state => state.produit.productTypesByCode);
 
   const [totalSize, setTotalSize] = useState<number>(0);
   const [importEntity, setImportEntity] = useState<ImportEntity>(importEntities[0]);
