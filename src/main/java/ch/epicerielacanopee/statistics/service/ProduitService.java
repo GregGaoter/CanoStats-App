@@ -25,7 +25,8 @@ import ch.epicerielacanopee.statistics.service.dto.ProduitDTO;
 import ch.epicerielacanopee.statistics.service.mapper.ProduitMapper;
 
 /**
- * Service Implementation for managing {@link ch.epicerielacanopee.statistics.domain.Produit}.
+ * Service Implementation for managing
+ * {@link ch.epicerielacanopee.statistics.domain.Produit}.
  */
 @Service
 @Transactional
@@ -81,14 +82,14 @@ public class ProduitService {
         LOG.debug("Request to partially update Produit : {}", produitDTO);
 
         return produitRepository
-            .findById(produitDTO.getId())
-            .map(existingProduit -> {
-                produitMapper.partialUpdate(existingProduit, produitDTO);
+                .findById(produitDTO.getId())
+                .map(existingProduit -> {
+                    produitMapper.partialUpdate(existingProduit, produitDTO);
 
-                return existingProduit;
-            })
-            .map(produitRepository::save)
-            .map(produitMapper::toDto);
+                    return existingProduit;
+                })
+                .map(produitRepository::save)
+                .map(produitMapper::toDto);
     }
 
     /**
@@ -166,9 +167,9 @@ public class ProduitService {
     public String importFile(MultipartFile file) throws Exception {
         String content = new String(file.getBytes());
         List<EpicerioProduitDTO> epicerioProduitDTOs = objectMapper.readValue(
-            content,
-            new TypeReference<List<EpicerioProduitDTO>>() {}
-        );
+                content,
+                new TypeReference<List<EpicerioProduitDTO>>() {
+                });
         epicerioProduitDTOs.sort(Comparator.comparing(epicerioProduit -> epicerioProduit.getId()));
         int produitsTotal = epicerioProduitDTOs.size();
         List<Produit> produits = new ArrayList<>(produitsTotal);
@@ -179,5 +180,11 @@ public class ProduitService {
         produitRepository.deleteAllInBatch();
         produitRepository.saveAll(produits);
         return String.format(" %d Produits successfuly imported!", produitsTotal);
+    }
+
+    public List<String> getProductTypesByCode() {
+        List<String> distinctCodes = produitRepository.findDistinctCodeByCodeIsNotNull();
+        return distinctCodes.stream().map(String::trim).map(s -> s.replaceAll("\\d+", ""))
+                .filter(s -> s.matches("[A-Za-z]+")).distinct().sorted().toList();
     }
 }

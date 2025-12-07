@@ -218,4 +218,10 @@ public class ProduitResource {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
+    @GetMapping("/product-types-by-code")
+    public ResponseEntity<List<String>> getProductTypesByCode() {
+        List<String> productTypes = produitService.getProductTypesByCode();
+        return ResponseEntity.ok().body(productTypes);
+    }
 }
