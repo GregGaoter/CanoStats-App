@@ -30,6 +30,7 @@ export const FileImport = () => {
   ];
 
   const productTypesByCode = useAppSelector(state => state.produit.productTypesByCode);
+  const mouvementsStockDateRange = useAppSelector(state => state.mouvementsStock.dateRange);
 
   const [totalSize, setTotalSize] = useState<number>(0);
   const [importEntity, setImportEntity] = useState<ImportEntity>(importEntities[0]);

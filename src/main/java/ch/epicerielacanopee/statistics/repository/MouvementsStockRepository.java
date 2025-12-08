@@ -31,6 +31,6 @@ public interface MouvementsStockRepository extends JpaRepository<MouvementsStock
 
     Optional<MouvementsStock> findFirstByCodeProduitAndDateBeforeOrderByDateDesc(String codeProduit, Instant instant);
 
-    @Query("SELECT MIN(date) AS minDate, MAX(date) AS maxDate FROM mouvements_stock")
+    @Query("SELECT MIN(date) AS minDate, MAX(date) AS maxDate FROM MouvementsStock")
     MouvementsStockDateRangeProjection findDateRange();
 }

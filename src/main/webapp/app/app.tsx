@@ -15,6 +15,7 @@ import { ToastProvider } from './shared/component/ToastContext';
 import ErrorBoundary from './shared/error/error-boundary';
 import Footer from './shared/layout/footer/footer';
 import { getProductTypesByCode } from './entities/produit/produit.reducer';
+import { getDateRange as getMouvementsStockDateRange } from './entities/mouvements-stock/mouvements-stock.reducer';
 
 const baseHref = document.querySelector('base').getAttribute('href').replace(/\/$/, '');
 
@@ -25,6 +26,7 @@ export const App = () => {
     dispatch(getSession());
     dispatch(getProfile());
     dispatch(getProductTypesByCode());
+    dispatch(getMouvementsStockDateRange());
   }, []);
 
   const isAuthenticated = useAppSelector(state => state.authentication.isAuthenticated);

@@ -1,10 +1,15 @@
 import { createAsyncThunk, isFulfilled, isPending } from '@reduxjs/toolkit';
 import { IMouvementsStock, defaultValue } from 'app/shared/model/mouvements-stock.model';
+import { MouvementsStockDateRange } from 'app/shared/model/MouvementsStockDateRange';
 import { EntityState, createEntitySlice, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
 import { cleanEntity } from 'app/shared/util/entity-utils';
 import axios from 'axios';
 
-const initialState: EntityState<IMouvementsStock> = {
+interface MouvementsStockState extends EntityState<IMouvementsStock> {
+  dateRange: MouvementsStockDateRange;
+}
+
+const initialState: MouvementsStockState = {
   loading: false,
   errorMessage: null,
   entities: [],
@@ -12,6 +17,7 @@ const initialState: EntityState<IMouvementsStock> = {
   updating: false,
   totalItems: 0,
   updateSuccess: false,
+  dateRange: { startDate: null, endDate: null },
 };
 
 export const apiUrl = 'api/mouvements-stocks';
@@ -77,6 +83,15 @@ export const deleteEntity = createAsyncThunk(
   { serializeError: serializeAxiosError },
 );
 
+export const getDateRange = createAsyncThunk(
+  'mouvementsStock/fetch_date_range',
+  async () => {
+    const requestUrl = `${apiUrl}/date-range`;
+    return axios.get<MouvementsStockDateRange>(requestUrl);
+  },
+  { serializeError: serializeAxiosError },
+);
+
 // slice
 
 export const MouvementsStockSlice = createEntitySlice({
@@ -101,6 +116,12 @@ export const MouvementsStockSlice = createEntitySlice({
           loading: false,
           entities: data,
           totalItems: parseInt(headers['x-total-count'], 10),
+        };
+      })
+      .addMatcher(isFulfilled(getDateRange), (state, action) => {
+        return {
+          ...state,
+          dateRange: action.payload.data,
         };
       })
       .addMatcher(isFulfilled(createEntity, updateEntity, partialUpdateEntity), (state, action) => {
