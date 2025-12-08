@@ -1,6 +1,7 @@
 package ch.epicerielacanopee.statistics.repository;
 
 import ch.epicerielacanopee.statistics.domain.MouvementsStock;
+import ch.epicerielacanopee.statistics.repository.projection.MouvementsStockDateRangeProjection;
 import ch.epicerielacanopee.statistics.repository.projection.MouvementsStockProjection;
 
 import java.time.Instant;
@@ -9,6 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -28,4 +30,7 @@ public interface MouvementsStockRepository extends JpaRepository<MouvementsStock
     );
 
     Optional<MouvementsStock> findFirstByCodeProduitAndDateBeforeOrderByDateDesc(String codeProduit, Instant instant);
+
+    @Query("SELECT MIN(date) AS minDate, MAX(date) AS maxDate FROM mouvements_stock")
+    MouvementsStockDateRangeProjection findDateRange();
 }

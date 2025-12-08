@@ -29,11 +29,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ch.epicerielacanopee.statistics.domain.MouvementsStock;
 import ch.epicerielacanopee.statistics.repository.MouvementsStockRepository;
+import ch.epicerielacanopee.statistics.repository.projection.MouvementsStockDateRangeProjection;
 import ch.epicerielacanopee.statistics.repository.projection.MouvementsStockProjection;
 import ch.epicerielacanopee.statistics.service.dto.EpicerioMouvementsStockDTO;
 import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
 import ch.epicerielacanopee.statistics.service.dto.SellingProductResult;
 import ch.epicerielacanopee.statistics.service.mapper.MouvementsStockMapper;
+import ch.epicerielacanopee.statistics.service.util.MouvementsStockDateRange;
 import ch.epicerielacanopee.statistics.service.util.ProductGroupingKey;
 import ch.epicerielacanopee.statistics.service.util.SoldValues;
 import ch.epicerielacanopee.statistics.service.util.YearMonth;
@@ -503,5 +505,10 @@ public class MouvementsStockService {
         }
 
         return seasonalPlan;
+    }
+
+    public MouvementsStockDateRange getDateRange() {
+      MouvementsStockDateRangeProjection dateRangeProjection = mouvementsStockRepository.findDateRange();
+        return new MouvementsStockDateRange(dateRangeProjection.getMinDate(), dateRangeProjection.getMaxDate());
     }
 }

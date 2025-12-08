@@ -7,6 +7,7 @@ import ch.epicerielacanopee.statistics.service.MouvementsStockService;
 import ch.epicerielacanopee.statistics.service.criteria.MouvementsStockCriteria;
 import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
 import ch.epicerielacanopee.statistics.service.dto.SellingProductResult;
+import ch.epicerielacanopee.statistics.service.util.MouvementsStockDateRange;
 import ch.epicerielacanopee.statistics.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -268,5 +269,11 @@ public class MouvementsStockResource {
         List<MouvementsStockProjection> resultByCriteria = mouvementsStockService.findLegByDateBetween(startDate, endDate);
         Map<Integer, List<SellingProductResult>> seasonalPlan = mouvementsStockService.buildMonthlySeasonalPlan(resultByCriteria, startDate, endDate);
         return ResponseEntity.ok().body(seasonalPlan);
+    }
+
+    @GetMapping("/date-range")
+    public ResponseEntity<MouvementsStockDateRange> getDateRange() {
+        MouvementsStockDateRange dateRange = mouvementsStockService.getDateRange();
+        return ResponseEntity.ok().body(dateRange);
     }
 }
