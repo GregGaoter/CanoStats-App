@@ -261,7 +261,7 @@ public class MouvementsStockResource {
         }
     }
 
-    @GetMapping("/monthly-seasonal-plan")
+    @GetMapping("/monthly-analysis")
     public ResponseEntity<Map<Integer, List<SellingProductResult>>> buildMonthlySeasonalPlan(
         @RequestParam Instant startDate,
         @RequestParam Instant endDate

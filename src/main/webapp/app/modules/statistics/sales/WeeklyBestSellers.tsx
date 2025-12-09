@@ -47,7 +47,7 @@ export const WeeklyBestSellers = () => {
     setApiMapResponse({});
     setTableData([]);
     axios
-      .get<ApiMapResponse>(`${apiUrl}/monthly-seasonal-plan?${getWeeklyBestSellersQueryParams(dates)}`, {
+      .get<ApiMapResponse>(`${apiUrl}/monthly-analysis?${getWeeklyBestSellersQueryParams(dates)}`, {
         timeout: 3600000,
       })
       .then(response => {
