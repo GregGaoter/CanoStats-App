@@ -33,4 +33,7 @@ public interface MouvementsStockRepository extends JpaRepository<MouvementsStock
 
     @Query("SELECT MIN(date) AS minDate, MAX(date) AS maxDate FROM MouvementsStock")
     MouvementsStockDateRangeProjection findDateRange();
+
+    @Query("SELECT MAX(date) FROM MouvementsStock")
+    Instant findMaxDate();
 }

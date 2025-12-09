@@ -511,4 +511,8 @@ public class MouvementsStockService {
       MouvementsStockDateRangeProjection dateRangeProjection = mouvementsStockRepository.findDateRange();
         return new MouvementsStockDateRange(dateRangeProjection.getMinDate(), dateRangeProjection.getMaxDate());
     }
+
+    public Instant getMaxDate() {
+      return mouvementsStockRepository.findMaxDate();
+    }
 }

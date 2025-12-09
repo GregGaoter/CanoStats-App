@@ -276,4 +276,10 @@ public class MouvementsStockResource {
         MouvementsStockDateRange dateRange = mouvementsStockService.getDateRange();
         return ResponseEntity.ok().body(dateRange);
     }
+
+    @GetMapping("/max-date")
+    public ResponseEntity<Instant> getMaxDate() {
+        Instant maxDate = mouvementsStockService.getMaxDate();
+        return ResponseEntity.ok().body(maxDate);
+    }
 }
