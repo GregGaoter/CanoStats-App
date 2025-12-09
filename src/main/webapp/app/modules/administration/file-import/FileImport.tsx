@@ -1,7 +1,10 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppSelector } from 'app/config/store';
+import { apiUrl as mouvementsStockApiUrl } from 'app/entities/mouvements-stock/mouvements-stock.reducer';
 import { Icon } from 'app/shared/component/Icon';
 import { LabelledControl } from 'app/shared/component/LabelledControl';
+import axios, { AxiosResponse } from 'axios';
+import dayjs, { Dayjs } from 'dayjs';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Dropdown } from 'primereact/dropdown';
@@ -14,10 +17,11 @@ import {
   FileUploadUploadEvent,
   ItemTemplateOptions,
 } from 'primereact/fileupload';
+import { InputText } from 'primereact/inputtext';
 import { Messages } from 'primereact/messages';
 import { Tag } from 'primereact/tag';
 import { Tooltip } from 'primereact/tooltip';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 enum EntityType {
   MOUVEMENTS_STOCK = 'Mouvements de stock',
@@ -40,8 +44,18 @@ export const FileImport = () => {
 
   const [totalSize, setTotalSize] = useState<number>(0);
   const [importEntity, setImportEntity] = useState<ImportEntity>(importEntities[0]);
+  const [mouvementsStockMaxDate, setMouvementsStockMaxDate] = useState<Dayjs>(undefined);
   const fileUploadRef = useRef<FileUpload>(null);
   const messages = useRef<Messages>(null);
+
+  const fetchMouvementsStockMaxDate = async () => {
+    const maxDate: AxiosResponse<Dayjs, any> = await axios.get<Dayjs>(`${mouvementsStockApiUrl}/max-date`);
+    setMouvementsStockMaxDate(maxDate.data);
+  };
+
+  useEffect(() => {
+    fetchMouvementsStockMaxDate();
+  }, []);
 
   const onTemplateSelect = (e: FileUploadSelectEvent) => {
     let _totalSize = totalSize;
@@ -158,10 +172,20 @@ export const FileImport = () => {
       <Tooltip target=".custom-upload-btn" content="Télécharger" position="bottom" />
       <Tooltip target=".custom-cancel-btn" content="Effacer" position="bottom" />
       <div className="flex flex-column gap-3">
-        <LabelledControl
-          label="Type de données"
-          control={<Dropdown value={importEntity} onChange={e => setImportEntity(e.value)} options={importEntities} optionLabel="entity" />}
-        />
+        <div className="flex gap-3">
+          <LabelledControl
+            label="Type de données"
+            control={
+              <Dropdown value={importEntity} onChange={e => setImportEntity(e.value)} options={importEntities} optionLabel="entity" />
+            }
+          />
+          {importEntity.entity === EntityType.MOUVEMENTS_STOCK && (
+            <LabelledControl
+              label="Dernier import"
+              control={<InputText value={`${dayjs(mouvementsStockMaxDate).format('DD.MM.YYYY')}`} disabled />}
+            />
+          )}
+        </div>
         <FileUpload
           ref={fileUploadRef}
           name="importFile"
