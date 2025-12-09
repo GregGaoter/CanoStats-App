@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppSelector } from 'app/config/store';
 import { Icon } from 'app/shared/component/Icon';
+import { LabelledControl } from 'app/shared/component/LabelledControl';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Dropdown } from 'primereact/dropdown';
@@ -18,15 +19,20 @@ import { Tag } from 'primereact/tag';
 import { Tooltip } from 'primereact/tooltip';
 import React, { useRef, useState } from 'react';
 
+enum EntityType {
+  MOUVEMENTS_STOCK = 'Mouvements de stock',
+  PRODUITS = 'Produits',
+}
+
 interface ImportEntity {
-  entity: string;
+  entity: EntityType;
   remoteUrl: string;
 }
 
 export const FileImport = () => {
   const importEntities: ImportEntity[] = [
-    { entity: 'Mouvements de stock', remoteUrl: '/api/mouvements-stocks/import' },
-    { entity: 'Produits', remoteUrl: '/api/produits/import' },
+    { entity: EntityType.MOUVEMENTS_STOCK, remoteUrl: '/api/mouvements-stocks/import' },
+    { entity: EntityType.PRODUITS, remoteUrl: '/api/produits/import' },
   ];
 
   const productTypesByCode = useAppSelector(state => state.produit.productTypesByCode);
@@ -84,13 +90,6 @@ export const FileImport = () => {
       closable: false,
     });
   };
-
-  const cardTitleTemplate = () => (
-    <div className="flex gap-3 align-items-center">
-      <div className="text-2xl">Importer des données</div>
-      <Dropdown value={importEntity} onChange={e => setImportEntity(e.value)} options={importEntities} optionLabel="entity" />
-    </div>
-  );
 
   const headerTemplate = (options: FileUploadHeaderTemplateOptions) => {
     const { className, chooseButton, uploadButton, cancelButton } = options;
@@ -154,11 +153,15 @@ export const FileImport = () => {
   };
 
   return (
-    <Card title={cardTitleTemplate()}>
+    <Card title="Importer des données">
       <Tooltip target=".custom-choose-btn" content="Choisir" position="bottom" />
       <Tooltip target=".custom-upload-btn" content="Télécharger" position="bottom" />
       <Tooltip target=".custom-cancel-btn" content="Effacer" position="bottom" />
       <div className="flex flex-column gap-3">
+        <LabelledControl
+          label="Type de données"
+          control={<Dropdown value={importEntity} onChange={e => setImportEntity(e.value)} options={importEntities} optionLabel="entity" />}
+        />
         <FileUpload
           ref={fileUploadRef}
           name="importFile"
