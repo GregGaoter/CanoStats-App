@@ -16,7 +16,7 @@ import { Revenue } from './modules/statistics/sales/Revenue';
 import { SalesVolume } from './modules/statistics/sales/SalesVolume';
 import { SalesTrends } from './modules/statistics/sales/SalesTrends';
 import { Inventory } from './modules/statistics/losses/inventory/Inventory';
-import { WeeklyBestSellers } from './modules/statistics/sales/WeeklyBestSellers';
+import { MonthlyAnalysis } from './modules/statistics/sales/MonthlyAnalysis';
 
 interface AppRoutesProps {
   isAuthenticated: boolean;
@@ -69,7 +69,7 @@ const AppRoutes = (props: AppRoutesProps) => {
         <Route path="sales-volume" element={<SalesVolume />} />
         <Route path="sales-trends" element={<SalesTrends />} />
         <Route path="inventory" element={<Inventory />} />
-        <Route path="weekly-best-sellers" element={<WeeklyBestSellers />} />
+        <Route path="monthly-analysis" element={<MonthlyAnalysis />} />
       </Route>
       <Route
         path="*"

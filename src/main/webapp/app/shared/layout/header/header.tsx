@@ -82,9 +82,9 @@ const Header = (props: IHeaderProps) => {
               command: () => navigate('/statistics/sales-trends', { replace: true }),
             },
             {
-              label: 'Meilleures ventes par semaine',
+              label: 'Analyse mensuelle',
               icon: <Icon icon="star" color={ventesColor} marginRight />,
-              command: () => navigate('/statistics/weekly-best-sellers', { replace: true }),
+              command: () => navigate('/statistics/monthly-analysis', { replace: true }),
             },
           ],
         },

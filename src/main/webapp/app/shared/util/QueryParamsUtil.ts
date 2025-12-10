@@ -44,7 +44,7 @@ export const getProduitsQueryParams = (pagination: Pagination<ProduitField>): st
   return searchParams.toString();
 };
 
-export const getWeeklyBestSellersQueryParams = (period: Date[]): string => {
+export const getMonthlyAnalysisQueryParams = (period: Date[]): string => {
   const startDate: string = period[0].toISOString();
 
   const year: number = period[1].getFullYear();

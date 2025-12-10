@@ -1,7 +1,7 @@
 import { apiUrl } from 'app/entities/mouvements-stock/mouvements-stock.reducer';
 import { Text } from 'app/shared/component/Text';
-import { SellingProductResult } from 'app/shared/model/SellingProductResult';
-import { getWeeklyBestSellersQueryParams } from 'app/shared/util/QueryParamsUtil';
+import { MonthlyAnalysisResult } from 'app/shared/model/MonthlyAnalysisResult';
+import { getMonthlyAnalysisQueryParams } from 'app/shared/util/QueryParamsUtil';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
@@ -12,17 +12,17 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import React, { useState } from 'react';
-import { WeeklyBestSellersFilter } from './WeeklyBestSellersFilter';
+import { MonthlyAnalysisFilter } from './MonthlyAnalysisFilter';
 
 interface ApiMapResponse {
-  [key: number]: SellingProductResult[];
+  [key: number]: MonthlyAnalysisResult[];
 }
 
-interface TableData extends SellingProductResult {
+interface TableData extends MonthlyAnalysisResult {
   month: string;
 }
 
-export const WeeklyBestSellers = () => {
+export const MonthlyAnalysis = () => {
   const [dates, setDates] = useState<Date[]>([new Date(new Date().getFullYear(), 0, 1), new Date()]);
   const [apiMapResponse, setApiMapResponse] = useState<ApiMapResponse>({});
   const [tableData, setTableData] = useState<TableData[]>([]);
@@ -47,7 +47,7 @@ export const WeeklyBestSellers = () => {
     setApiMapResponse({});
     setTableData([]);
     axios
-      .get<ApiMapResponse>(`${apiUrl}/monthly-analysis?${getWeeklyBestSellersQueryParams(dates)}`, {
+      .get<ApiMapResponse>(`${apiUrl}/monthly-analysis?${getMonthlyAnalysisQueryParams(dates)}`, {
         timeout: 3600000,
       })
       .then(response => {
@@ -60,13 +60,13 @@ export const WeeklyBestSellers = () => {
   const headerTemplate = (data: TableData) => <Text className="font-bold">{data.month}</Text>;
 
   const soldPercentageTemplate = (data: TableData) => (
-    <Text>{`${Math.round(data.soldPercentageAverage).toString()} % ± ${Math.round(data.soldPercentageStandardDeviation).toString()} %`}</Text>
+    <Text>{`${Math.round(data.percentageAverage).toString()} % ± ${Math.round(data.percentageStandardDeviation).toString()} %`}</Text>
   );
 
   const soldQuantityTemplate = (data: TableData) => {
-    const saleType: string = data.saleType === 'Au poids' ? 'kg' : 'pièces';
+    const unit: string = data.unit === 'Au poids' ? 'kg' : 'pièces';
     return (
-      <Text>{`${Math.ceil(data.soldQuantityAverage).toString()} ${saleType} ± ${Math.ceil(data.soldQuantityStandardDeviation).toString()} ${saleType}`}</Text>
+      <Text>{`${Math.ceil(data.quantityAverage).toString()} ${unit} ± ${Math.ceil(data.quantityStandardDeviation).toString()} ${unit}`}</Text>
     );
   };
 
@@ -74,7 +74,7 @@ export const WeeklyBestSellers = () => {
     <div className="grid align-items-center">
       <div className="col-12">
         <BlockUI blocked={loadingData} template={<ProgressSpinner />}>
-          <WeeklyBestSellersFilter
+          <MonthlyAnalysisFilter
             dates={dates}
             loadingData={loadingData}
             onDatesChange={d => setDates(d)}

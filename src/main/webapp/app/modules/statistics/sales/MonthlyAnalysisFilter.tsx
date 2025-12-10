@@ -5,14 +5,14 @@ import { Calendar } from 'primereact/calendar';
 import { Toolbar } from 'primereact/toolbar';
 import React from 'react';
 
-interface WeeklyBestSellersFilterProps {
+interface MonthlyAnalysisFilterProps {
   dates: Date[];
   loadingData: boolean;
   onDatesChange: (dates: Date[]) => void;
   onApplyFilter: () => void;
 }
 
-export const WeeklyBestSellersFilter = (props: WeeklyBestSellersFilterProps) => {
+export const MonthlyAnalysisFilter = (props: MonthlyAnalysisFilterProps) => {
   const startContent = (
     <div className="flex gap-3 align-items-end">
       <LabelledControl
