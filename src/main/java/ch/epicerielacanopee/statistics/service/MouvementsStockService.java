@@ -33,12 +33,12 @@ import ch.epicerielacanopee.statistics.repository.MouvementsStockRepository;
 import ch.epicerielacanopee.statistics.repository.projection.MouvementsStockDateRangeProjection;
 import ch.epicerielacanopee.statistics.repository.projection.MouvementsStockProjection;
 import ch.epicerielacanopee.statistics.service.dto.EpicerioMouvementsStockDTO;
-import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
 import ch.epicerielacanopee.statistics.service.dto.MonthlyAnalysisResult;
+import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
 import ch.epicerielacanopee.statistics.service.mapper.MouvementsStockMapper;
+import ch.epicerielacanopee.statistics.service.util.AnalysisValues;
 import ch.epicerielacanopee.statistics.service.util.MouvementsStockDateRange;
 import ch.epicerielacanopee.statistics.service.util.ProductGroupingKey;
-import ch.epicerielacanopee.statistics.service.util.AnalysisValues;
 import ch.epicerielacanopee.statistics.service.util.YearMonth;
 
 /**
@@ -159,7 +159,8 @@ public class MouvementsStockService {
 
     private final MouvementsStockMapper mouvementsStockMapper;
 
-    public MouvementsStockService(MouvementsStockRepository mouvementsStockRepository, MouvementsStockMapper mouvementsStockMapper, ObjectMapper objectMapper) {
+    public MouvementsStockService(MouvementsStockRepository mouvementsStockRepository,
+            MouvementsStockMapper mouvementsStockMapper, ObjectMapper objectMapper) {
         this.mouvementsStockRepository = mouvementsStockRepository;
         this.mouvementsStockMapper = mouvementsStockMapper;
         this.objectMapper = objectMapper;
@@ -201,14 +202,14 @@ public class MouvementsStockService {
         LOG.debug("Request to partially update MouvementsStock : {}", mouvementsStockDTO);
 
         return mouvementsStockRepository
-            .findById(mouvementsStockDTO.getId())
-            .map(existingMouvementsStock -> {
-                mouvementsStockMapper.partialUpdate(existingMouvementsStock, mouvementsStockDTO);
+                .findById(mouvementsStockDTO.getId())
+                .map(existingMouvementsStock -> {
+                    mouvementsStockMapper.partialUpdate(existingMouvementsStock, mouvementsStockDTO);
 
-                return existingMouvementsStock;
-            })
-            .map(mouvementsStockRepository::save)
-            .map(mouvementsStockMapper::toDto);
+                    return existingMouvementsStock;
+                })
+                .map(mouvementsStockRepository::save)
+                .map(mouvementsStockMapper::toDto);
     }
 
     /**
@@ -259,9 +260,9 @@ public class MouvementsStockService {
     public String importFile(MultipartFile file) throws Exception {
         String content = new String(file.getBytes());
         List<EpicerioMouvementsStockDTO> epicerioMouvementsStocks = objectMapper.readValue(
-            content,
-            new TypeReference<List<EpicerioMouvementsStockDTO>>() {}
-        );
+                content,
+                new TypeReference<List<EpicerioMouvementsStockDTO>>() {
+                });
         epicerioMouvementsStocks.sort(Comparator.comparing(epicerioMouvementsStock -> epicerioMouvementsStock.getId()));
         int mouvementsStocksTotal = epicerioMouvementsStocks.size();
         List<MouvementsStock> mouvementsStocks = new ArrayList<>(mouvementsStocksTotal);
@@ -313,65 +314,66 @@ public class MouvementsStockService {
 
     public List<MouvementsStockDTO> findByVenteAndDateBetween(String vente, Instant startDate, Instant endDate) {
         return mouvementsStockRepository
-            .findByVenteAndDateBetween(vente, startDate, endDate)
-            .stream()
-            .map(mouvementsStockMapper::toDto)
-            .toList();
+                .findByVenteAndDateBetween(vente, startDate, endDate)
+                .stream()
+                .map(mouvementsStockMapper::toDto)
+                .toList();
     }
 
     public List<MouvementsStockProjection> findLegByDateBetween(Instant startDate, Instant endDate) {
         return mouvementsStockRepository
-            .findByCodeProduitStartingWithAndDateBetween("leg", startDate, endDate)
-            .stream()
-            .toList();
+                .findByCodeProduitStartingWithAndDateBetween("leg", startDate, endDate)
+                .stream()
+                .toList();
     }
 
-    public Map<String, List<MouvementsStockDTO>> findByInventory(List<MouvementsStockDTO> mouvementsStocks, float mouvement) {
+    public Map<String, List<MouvementsStockDTO>> findByInventory(List<MouvementsStockDTO> mouvementsStocks,
+            float mouvement) {
         return mouvementsStocks
-            .stream()
-            .collect(Collectors.groupingBy(MouvementsStockDTO::getCodeProduit))
-            .entrySet()
-            .stream()
-            .map(entry -> {
-                entry.setValue(
-                    entry.getValue().stream().sorted(Comparator.comparing(MouvementsStockDTO::getEpicerioId)).collect(Collectors.toList())
-                );
-                return entry;
-            })
-            .map(entry -> {
-                entry.setValue(
-                    entry
-                        .getValue()
-                        .stream()
-                        .filter(m -> {
-                            if (m.getType().equals("Inventaire") && m.getMouvement() != 0) {
-                                int index = entry.getValue().indexOf(m);
-                                Optional<Float> optionalPreviousSolde = Optional.empty();
-                                if (index > 0) {
-                                    optionalPreviousSolde = Optional.of(entry.getValue().get(index - 1).getSolde());
-                                } else {
-                                    Optional<MouvementsStock> optionalPreviousM =
-                                        mouvementsStockRepository.findFirstByCodeProduitAndVenteAndEpicerioIdLessThanOrderByEpicerioIdDesc(
-                                            m.getCodeProduit(),
-                                            m.getVente(),
-                                            m.getEpicerioId()
-                                        );
-                                    optionalPreviousSolde = optionalPreviousM.map(previousM -> previousM.getSolde());
-                                }
-                                return optionalPreviousSolde.isPresent()
-                                    ? Math.abs(m.getSolde() - optionalPreviousSolde.get()) >= mouvement
-                                    : false;
-                            } else {
-                                return false;
-                            }
-                        })
-                        .sorted(Comparator.comparing(MouvementsStockDTO::getMouvement))
-                        .collect(Collectors.toList())
-                );
-                return entry;
-            })
-            .filter(entry -> !entry.getValue().isEmpty())
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .stream()
+                .collect(Collectors.groupingBy(MouvementsStockDTO::getCodeProduit))
+                .entrySet()
+                .stream()
+                .map(entry -> {
+                    entry.setValue(
+                            entry.getValue().stream().sorted(Comparator.comparing(MouvementsStockDTO::getEpicerioId))
+                                    .collect(Collectors.toList()));
+                    return entry;
+                })
+                .map(entry -> {
+                    entry.setValue(
+                            entry
+                                    .getValue()
+                                    .stream()
+                                    .filter(m -> {
+                                        if (m.getType().equals("Inventaire") && m.getMouvement() != 0) {
+                                            int index = entry.getValue().indexOf(m);
+                                            Optional<Float> optionalPreviousSolde = Optional.empty();
+                                            if (index > 0) {
+                                                optionalPreviousSolde = Optional
+                                                        .of(entry.getValue().get(index - 1).getSolde());
+                                            } else {
+                                                Optional<MouvementsStock> optionalPreviousM = mouvementsStockRepository
+                                                        .findFirstByCodeProduitAndVenteAndEpicerioIdLessThanOrderByEpicerioIdDesc(
+                                                                m.getCodeProduit(),
+                                                                m.getVente(),
+                                                                m.getEpicerioId());
+                                                optionalPreviousSolde = optionalPreviousM
+                                                        .map(previousM -> previousM.getSolde());
+                                            }
+                                            return optionalPreviousSolde.isPresent()
+                                                    ? Math.abs(m.getSolde() - optionalPreviousSolde.get()) >= mouvement
+                                                    : false;
+                                        } else {
+                                            return false;
+                                        }
+                                    })
+                                    .sorted(Comparator.comparing(MouvementsStockDTO::getMouvement))
+                                    .collect(Collectors.toList()));
+                    return entry;
+                })
+                .filter(entry -> !entry.getValue().isEmpty())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private Map<Month, List<String>> getSeasonalProductsOverPeriod(Instant start, Instant end) {
@@ -383,85 +385,153 @@ public class MouvementsStockService {
         LocalDate current = startDate;
         while (current.isBefore(endDate) || current.isEqual(endDate)) {
             int monthValue = current.getMonthValue();
-            if(!months.contains(monthValue)) {
+            if (!months.contains(monthValue)) {
                 months.add(monthValue);
             }
             current = current.plusMonths(1);
         }
 
-        Map<Month, List<String>> seasonalProductsOverPeriod = seasonalProducts.entrySet().stream().filter(entry -> months.contains(entry.getKey().getValue())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        
-        return seasonalProductsOverPeriod;
+        return seasonalProducts
+                .entrySet()
+                .stream()
+                .filter(entry -> months.contains(entry.getKey().getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    public Map<Integer, List<MonthlyAnalysisResult>> getMonthlyAnalysis(List<MouvementsStockProjection> movements, Instant startDate, Instant endDate) {
+    public Map<Integer, List<MonthlyAnalysisResult>> getMonthlyAnalysis(
+            List<MouvementsStockProjection> movements,
+            Instant startDate,
+            Instant endDate) {
         ZoneId zone = ZoneId.of(Constants.TIME_ZONE);
 
-        Map<YearMonth, Map<ProductGroupingKey, List<MouvementsStockProjection>>> byYearMonthAndProduct = movements.stream()
-            .collect(Collectors.groupingBy(
-                m -> YearMonth.from(m.getDate(), zone),
-                Collectors.groupingBy(m -> new ProductGroupingKey(m.getCodeProduit(), m.getProduit(), m.getVente()))
-            ));
+        Map<YearMonth, Map<ProductGroupingKey, List<MouvementsStockProjection>>> byYearMonthAndProduct = groupByYearMonthAndProduct(
+                movements, zone);
 
+        Map<YearMonth, List<MonthlyAnalysisResult>> yearMonthResults = buildMonthlyAnalysisResults(
+                byYearMonthAndProduct, zone);
+
+        Map<Integer, Map<ProductGroupingKey, List<AnalysisValues>>> monthlyAverageByProduct = buildMonthlyAverageByProduct(
+                yearMonthResults);
+
+        Map<Integer, List<MonthlyAnalysisResult>> productsByMonthNumber = aggregateStatisticsByMonth(
+                monthlyAverageByProduct);
+
+        return filterSeasonalProducts(startDate, endDate, productsByMonthNumber);
+    }
+
+    private Map<YearMonth, Map<ProductGroupingKey, List<MouvementsStockProjection>>> groupByYearMonthAndProduct(
+            List<MouvementsStockProjection> movements,
+            ZoneId zone) {
+        return movements
+                .stream()
+                .collect(
+                        Collectors.groupingBy(
+                                m -> YearMonth.from(m.getDate(), zone),
+                                Collectors.groupingBy(m -> new ProductGroupingKey(m.getCodeProduit(), m.getProduit(),
+                                        m.getVente()))));
+    }
+
+    private Map<YearMonth, List<MonthlyAnalysisResult>> buildMonthlyAnalysisResults(
+            Map<YearMonth, Map<ProductGroupingKey, List<MouvementsStockProjection>>> byYearMonthAndProduct,
+            ZoneId zone) {
         Map<YearMonth, List<MonthlyAnalysisResult>> yearMonthResults = new HashMap<>();
 
-        for (Map.Entry<YearMonth, Map<ProductGroupingKey, List<MouvementsStockProjection>>> yearMonthEntry : byYearMonthAndProduct.entrySet()) {
+        for (Map.Entry<YearMonth, Map<ProductGroupingKey, List<MouvementsStockProjection>>> yearMonthEntry : byYearMonthAndProduct
+                .entrySet()) {
             YearMonth yearMonth = yearMonthEntry.getKey();
             Map<ProductGroupingKey, List<MouvementsStockProjection>> byProduct = yearMonthEntry.getValue();
 
             List<MonthlyAnalysisResult> monthlyAnalysisResults = new ArrayList<>();
 
             for (Map.Entry<ProductGroupingKey, List<MouvementsStockProjection>> productEntry : byProduct.entrySet()) {
-                List<MouvementsStockProjection> mvts = productEntry.getValue();
-                if (mvts.isEmpty()) continue;
-                mvts.sort(Comparator.comparing(MouvementsStockProjection::getDate));
-
-                ProductGroupingKey key = productEntry.getKey();
-                String productCode = key.getCodeProduit();
-
-                Optional<MouvementsStock> lastBeforeMonth = mouvementsStockRepository.findFirstByCodeProduitAndDateBeforeOrderByDateDesc(productCode, LocalDate.of(yearMonth.getYear(), yearMonth.getMonth(), 1).atStartOfDay(zone).toInstant());
-                float initialStock = lastBeforeMonth.isPresent() ? lastBeforeMonth.get().getSolde() : mvts.get(0).getSolde();
-                if (initialStock < 0f) continue;
-
-                float finalStock = mvts.get(mvts.size() - 1).getSolde();
-                if (finalStock < 0f) continue;
-
-                float deliveries = (float) mvts.stream()
-                    .filter(m -> m.getType().equals("Livraison"))
-                    .map(m -> m.getMouvement() == null ? 0f : m.getMouvement())
-                    .reduce(0f, Float::sum);
-
-                float available = initialStock + deliveries;
-                if (available <= 0) continue;
-
-                float soldQuantity = Math.abs((float) mvts.stream()
-                    .filter(m -> m.getType().equals("Vente"))
-                    .map(m -> m.getMouvement() == null ? 0f : m.getMouvement())
-                    .reduce(0f, Float::sum));
-
-                float soldPercentage = (soldQuantity / available) * 100f;
-
-                monthlyAnalysisResults.add(new MonthlyAnalysisResult(productCode, key.getProduit(), soldPercentage, 0f, soldQuantity, 0f, mvts.get(0).getVente()));
+                analyzeProductMonth(yearMonth, productEntry.getKey(), productEntry.getValue(), zone)
+                        .ifPresent(monthlyAnalysisResults::add);
             }
 
             yearMonthResults.put(yearMonth, monthlyAnalysisResults);
         }
 
+        return yearMonthResults;
+    }
+
+    private Optional<MonthlyAnalysisResult> analyzeProductMonth(
+            YearMonth yearMonth,
+            ProductGroupingKey key,
+            List<MouvementsStockProjection> mvts,
+            ZoneId zone) {
+        if (mvts.isEmpty()) {
+            return Optional.empty();
+        }
+        mvts.sort(Comparator.comparing(MouvementsStockProjection::getDate));
+
+        String productCode = key.getCodeProduit();
+        Optional<MouvementsStock> lastBeforeMonth = mouvementsStockRepository
+                .findFirstByCodeProduitAndDateBeforeOrderByDateDesc(
+                        productCode,
+                        LocalDate.of(yearMonth.getYear(), yearMonth.getMonth(), 1).atStartOfDay(zone).toInstant());
+
+        float initialStock = lastBeforeMonth.map(MouvementsStock::getSolde).orElse(mvts.get(0).getSolde());
+        if (initialStock < 0f) {
+            return Optional.empty();
+        }
+
+        float closingStock = mvts.get(mvts.size() - 1).getSolde();
+        if (closingStock < 0f) {
+            return Optional.empty();
+        }
+
+        float deliveries = sumMovementsOfType(mvts, "Livraison");
+        float available = initialStock + deliveries;
+        if (available <= 0f) {
+            return Optional.empty();
+        }
+
+        float soldQuantity = Math.abs(sumMovementsOfType(mvts, "Vente"));
+        float soldPercentage = (soldQuantity / available) * 100f;
+
+        return Optional.of(
+                new MonthlyAnalysisResult(
+                        productCode,
+                        key.getProduit(),
+                        soldPercentage,
+                        0f,
+                        soldQuantity,
+                        0f,
+                        mvts.get(0).getVente()));
+    }
+
+    private float sumMovementsOfType(List<MouvementsStockProjection> mvts, String type) {
+        return (float) mvts
+                .stream()
+                .filter(m -> m.getType().equals(type))
+                .map(m -> m.getMouvement() == null ? 0f : m.getMouvement())
+                .reduce(0f, Float::sum);
+    }
+
+    private Map<Integer, Map<ProductGroupingKey, List<AnalysisValues>>> buildMonthlyAverageByProduct(
+            Map<YearMonth, List<MonthlyAnalysisResult>> yearMonthResults) {
         Map<Integer, Map<ProductGroupingKey, List<AnalysisValues>>> monthlyAverageByProduct = new HashMap<>();
 
         for (Map.Entry<YearMonth, List<MonthlyAnalysisResult>> entry : yearMonthResults.entrySet()) {
             int monthNum = entry.getKey().getMonth();
             for (MonthlyAnalysisResult pr : entry.getValue()) {
                 monthlyAverageByProduct
-                    .computeIfAbsent(monthNum, k -> new HashMap<>())
-                    .computeIfAbsent(new ProductGroupingKey(pr.getProductCode(), pr.getProduct(), pr.getUnit()), k -> new ArrayList<>())
-                    .add(new AnalysisValues(pr.getPercentageAverage(), pr.getQuantityAverage()));
+                        .computeIfAbsent(monthNum, k -> new HashMap<>())
+                        .computeIfAbsent(new ProductGroupingKey(pr.getProductCode(), pr.getProduct(), pr.getUnit()),
+                                k -> new ArrayList<>())
+                        .add(new AnalysisValues(pr.getPercentageAverage(), pr.getQuantityAverage()));
             }
         }
 
+        return monthlyAverageByProduct;
+    }
+
+    private Map<Integer, List<MonthlyAnalysisResult>> aggregateStatisticsByMonth(
+            Map<Integer, Map<ProductGroupingKey, List<AnalysisValues>>> monthlyAverageByProduct) {
         Map<Integer, List<MonthlyAnalysisResult>> productsByMonthNumber = new HashMap<>();
 
-        for (Map.Entry<Integer, Map<ProductGroupingKey, List<AnalysisValues>>> entry : monthlyAverageByProduct.entrySet()) {
+        for (Map.Entry<Integer, Map<ProductGroupingKey, List<AnalysisValues>>> entry : monthlyAverageByProduct
+                .entrySet()) {
             int monthNum = entry.getKey();
             List<MonthlyAnalysisResult> aggregated = new ArrayList<>();
 
@@ -475,23 +545,39 @@ public class MouvementsStockService {
                 DescriptiveStatistics quantityStats = new DescriptiveStatistics();
                 analysisValues.forEach(v -> quantityStats.addValue(v.getQuantity()));
 
-                aggregated.add(new MonthlyAnalysisResult(key.getCodeProduit(), key.getProduit(), (float) percentageStats.getMean(), (float) percentageStats.getStandardDeviation(), (float) quantityStats.getMean(), (float) quantityStats.getStandardDeviation(), key.getSaleType()));
+                aggregated.add(
+                        new MonthlyAnalysisResult(
+                                key.getCodeProduit(),
+                                key.getProduit(),
+                                (float) percentageStats.getMean(),
+                                (float) percentageStats.getStandardDeviation(),
+                                (float) quantityStats.getMean(),
+                                (float) quantityStats.getStandardDeviation(),
+                                key.getSaleType()));
             }
             productsByMonthNumber.put(monthNum, aggregated);
         }
 
-        Map<Integer, List<MonthlyAnalysisResult>> monthlyAnalysis = new HashMap<>();
+        return productsByMonthNumber;
+    }
 
+    private Map<Integer, List<MonthlyAnalysisResult>> filterSeasonalProducts(
+            Instant startDate,
+            Instant endDate,
+            Map<Integer, List<MonthlyAnalysisResult>> productsByMonthNumber) {
+        Map<Integer, List<MonthlyAnalysisResult>> monthlyAnalysis = new HashMap<>();
         Map<Month, List<String>> seasonalProductsOverPeriod = getSeasonalProductsOverPeriod(startDate, endDate);
 
         for (Map.Entry<Month, List<String>> entry : seasonalProductsOverPeriod.entrySet()) {
             int monthNumber = entry.getKey().getValue();
             List<String> seasonal = entry.getValue();
 
-            List<MonthlyAnalysisResult> seasonalProducts = productsByMonthNumber.getOrDefault(monthNumber, Collections.emptyList()).stream()
-                .filter(pr -> seasonal.contains(pr.getProductCode()))
-                .sorted(Comparator.comparing(MonthlyAnalysisResult::getPercentageAverage).reversed())
-                .collect(Collectors.toList());
+            List<MonthlyAnalysisResult> seasonalProducts = productsByMonthNumber
+                    .getOrDefault(monthNumber, Collections.emptyList())
+                    .stream()
+                    .filter(pr -> seasonal.contains(pr.getProductCode()))
+                    .sorted(Comparator.comparing(MonthlyAnalysisResult::getPercentageAverage).reversed())
+                    .collect(Collectors.toList());
 
             monthlyAnalysis.put(monthNumber, seasonalProducts);
         }
@@ -500,11 +586,11 @@ public class MouvementsStockService {
     }
 
     public MouvementsStockDateRange getDateRange() {
-      MouvementsStockDateRangeProjection dateRangeProjection = mouvementsStockRepository.findDateRange();
+        MouvementsStockDateRangeProjection dateRangeProjection = mouvementsStockRepository.findDateRange();
         return new MouvementsStockDateRange(dateRangeProjection.getMinDate(), dateRangeProjection.getMaxDate());
     }
 
     public Instant getMaxDate() {
-      return mouvementsStockRepository.findMaxDate();
+        return mouvementsStockRepository.findMaxDate();
     }
 }
