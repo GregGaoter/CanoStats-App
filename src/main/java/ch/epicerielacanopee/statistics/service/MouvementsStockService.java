@@ -401,6 +401,7 @@ public class MouvementsStockService {
 
     public Map<Integer, List<MonthlyAnalysisResult>> getMonthlyAnalysis(
             List<MouvementsStockProjection> movements,
+            String movementsType,
             Instant startDate,
             Instant endDate) {
         ZoneId zone = ZoneId.of(Constants.TIME_ZONE);
@@ -409,7 +410,7 @@ public class MouvementsStockService {
                 movements, zone);
 
         Map<YearMonth, List<MonthlyAnalysisResult>> yearMonthResults = buildMonthlyAnalysisResults(
-                byYearMonthAndProduct, zone);
+                byYearMonthAndProduct, movementsType, zone);
 
         Map<Integer, Map<ProductGroupingKey, List<AnalysisValues>>> monthlyAverageByProduct = buildMonthlyAverageByProduct(
                 yearMonthResults);
@@ -434,6 +435,7 @@ public class MouvementsStockService {
 
     private Map<YearMonth, List<MonthlyAnalysisResult>> buildMonthlyAnalysisResults(
             Map<YearMonth, Map<ProductGroupingKey, List<MouvementsStockProjection>>> byYearMonthAndProduct,
+            String movementsType,
             ZoneId zone) {
         Map<YearMonth, List<MonthlyAnalysisResult>> yearMonthResults = new HashMap<>();
 
@@ -445,7 +447,7 @@ public class MouvementsStockService {
             List<MonthlyAnalysisResult> monthlyAnalysisResults = new ArrayList<>();
 
             for (Map.Entry<ProductGroupingKey, List<MouvementsStockProjection>> productEntry : byProduct.entrySet()) {
-                analyzeProductMonth(yearMonth, productEntry.getKey(), productEntry.getValue(), zone)
+                analyzeProductMonth(yearMonth, productEntry.getKey(), productEntry.getValue(), movementsType, zone)
                         .ifPresent(monthlyAnalysisResults::add);
             }
 
@@ -459,6 +461,7 @@ public class MouvementsStockService {
             YearMonth yearMonth,
             ProductGroupingKey key,
             List<MouvementsStockProjection> mvts,
+            String movementsType,
             ZoneId zone) {
         if (mvts.isEmpty()) {
             return Optional.empty();
@@ -487,7 +490,7 @@ public class MouvementsStockService {
             return Optional.empty();
         }
 
-        float soldQuantity = Math.abs(sumMovementsOfType(mvts, "Vente"));
+        float soldQuantity = Math.abs(sumMovementsOfType(mvts, movementsType));
         float soldPercentage = (soldQuantity / available) * 100f;
 
         return Optional.of(
