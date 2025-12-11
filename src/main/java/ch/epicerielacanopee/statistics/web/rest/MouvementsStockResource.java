@@ -1,16 +1,5 @@
 package ch.epicerielacanopee.statistics.web.rest;
 
-import ch.epicerielacanopee.statistics.repository.MouvementsStockRepository;
-import ch.epicerielacanopee.statistics.repository.projection.MouvementsStockProjection;
-import ch.epicerielacanopee.statistics.service.MouvementsStockQueryService;
-import ch.epicerielacanopee.statistics.service.MouvementsStockService;
-import ch.epicerielacanopee.statistics.service.criteria.MouvementsStockCriteria;
-import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
-import ch.epicerielacanopee.statistics.service.dto.MonthlyAnalysisResult;
-import ch.epicerielacanopee.statistics.service.util.MouvementsStockDateRange;
-import ch.epicerielacanopee.statistics.web.rest.errors.BadRequestAlertException;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
@@ -19,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,6 +29,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import ch.epicerielacanopee.statistics.repository.MouvementsStockRepository;
+import ch.epicerielacanopee.statistics.repository.projection.MouvementsStockProjection;
+import ch.epicerielacanopee.statistics.service.MouvementsStockQueryService;
+import ch.epicerielacanopee.statistics.service.MouvementsStockService;
+import ch.epicerielacanopee.statistics.service.criteria.MouvementsStockCriteria;
+import ch.epicerielacanopee.statistics.service.dto.MonthlyAnalysisResult;
+import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
+import ch.epicerielacanopee.statistics.service.util.MouvementsStockDateRange;
+import ch.epicerielacanopee.statistics.web.rest.errors.BadRequestAlertException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -65,10 +67,9 @@ public class MouvementsStockResource {
     private final MouvementsStockQueryService mouvementsStockQueryService;
 
     public MouvementsStockResource(
-        MouvementsStockService mouvementsStockService,
-        MouvementsStockRepository mouvementsStockRepository,
-        MouvementsStockQueryService mouvementsStockQueryService
-    ) {
+            MouvementsStockService mouvementsStockService,
+            MouvementsStockRepository mouvementsStockRepository,
+            MouvementsStockQueryService mouvementsStockQueryService) {
         this.mouvementsStockService = mouvementsStockService;
         this.mouvementsStockRepository = mouvementsStockRepository;
         this.mouvementsStockQueryService = mouvementsStockQueryService;
@@ -84,16 +85,19 @@ public class MouvementsStockResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<MouvementsStockDTO> createMouvementsStock(@Valid @RequestBody MouvementsStockDTO mouvementsStockDTO)
-        throws URISyntaxException {
+    public ResponseEntity<MouvementsStockDTO> createMouvementsStock(
+            @Valid @RequestBody MouvementsStockDTO mouvementsStockDTO)
+            throws URISyntaxException {
         LOG.debug("REST request to save MouvementsStock : {}", mouvementsStockDTO);
         if (mouvementsStockDTO.getId() != null) {
-            throw new BadRequestAlertException("A new mouvementsStock cannot already have an ID", ENTITY_NAME, "idexists");
+            throw new BadRequestAlertException("A new mouvementsStock cannot already have an ID", ENTITY_NAME,
+                    "idexists");
         }
         mouvementsStockDTO = mouvementsStockService.save(mouvementsStockDTO);
         return ResponseEntity.created(new URI("/api/mouvements-stocks/" + mouvementsStockDTO.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, mouvementsStockDTO.getId().toString()))
-            .body(mouvementsStockDTO);
+                .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME,
+                        mouvementsStockDTO.getId().toString()))
+                .body(mouvementsStockDTO);
     }
 
     /**
@@ -111,9 +115,8 @@ public class MouvementsStockResource {
      */
     @PutMapping("/{id}")
     public ResponseEntity<MouvementsStockDTO> updateMouvementsStock(
-        @PathVariable(value = "id", required = false) final UUID id,
-        @Valid @RequestBody MouvementsStockDTO mouvementsStockDTO
-    ) throws URISyntaxException {
+            @PathVariable(value = "id", required = false) final UUID id,
+            @Valid @RequestBody MouvementsStockDTO mouvementsStockDTO) throws URISyntaxException {
         LOG.debug("REST request to update MouvementsStock : {}, {}", id, mouvementsStockDTO);
         if (mouvementsStockDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -128,8 +131,9 @@ public class MouvementsStockResource {
 
         mouvementsStockDTO = mouvementsStockService.update(mouvementsStockDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, mouvementsStockDTO.getId().toString()))
-            .body(mouvementsStockDTO);
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME,
+                        mouvementsStockDTO.getId().toString()))
+                .body(mouvementsStockDTO);
     }
 
     /**
@@ -150,9 +154,8 @@ public class MouvementsStockResource {
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<MouvementsStockDTO> partialUpdateMouvementsStock(
-        @PathVariable(value = "id", required = false) final UUID id,
-        @NotNull @RequestBody MouvementsStockDTO mouvementsStockDTO
-    ) throws URISyntaxException {
+            @PathVariable(value = "id", required = false) final UUID id,
+            @NotNull @RequestBody MouvementsStockDTO mouvementsStockDTO) throws URISyntaxException {
         LOG.debug("REST request to partial update MouvementsStock partially : {}, {}", id, mouvementsStockDTO);
         if (mouvementsStockDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -168,9 +171,9 @@ public class MouvementsStockResource {
         Optional<MouvementsStockDTO> result = mouvementsStockService.partialUpdate(mouvementsStockDTO);
 
         return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, mouvementsStockDTO.getId().toString())
-        );
+                result,
+                HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME,
+                        mouvementsStockDTO.getId().toString()));
     }
 
     /**
@@ -183,23 +186,24 @@ public class MouvementsStockResource {
      */
     @GetMapping("")
     public ResponseEntity<List<MouvementsStockDTO>> getAllMouvementsStocks(
-        MouvementsStockCriteria criteria,
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable
-    ) {
+            MouvementsStockCriteria criteria,
+            @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         Page<MouvementsStockDTO> page = mouvementsStockQueryService.findByCriteria(criteria, pageable);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        HttpHeaders headers = PaginationUtil
+                .generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
     @GetMapping("/inventory")
     public ResponseEntity<Map<String, List<MouvementsStockDTO>>> findByInventory(
-        @RequestParam String vente,
-        @RequestParam Instant startDate,
-        @RequestParam Instant endDate,
-        @RequestParam float mouvement
-    ) {
-        List<MouvementsStockDTO> resultByCriteria = mouvementsStockService.findByVenteAndDateBetween(vente, startDate, endDate);
-        Map<String, List<MouvementsStockDTO>> result = mouvementsStockService.findByInventory(resultByCriteria, mouvement);
+            @RequestParam String vente,
+            @RequestParam Instant startDate,
+            @RequestParam Instant endDate,
+            @RequestParam float mouvement) {
+        List<MouvementsStockDTO> resultByCriteria = mouvementsStockService.findByVenteAndDateBetween(vente, startDate,
+                endDate);
+        Map<String, List<MouvementsStockDTO>> result = mouvementsStockService.findByInventory(resultByCriteria,
+                mouvement);
         return ResponseEntity.ok().body(result);
     }
 
@@ -240,8 +244,8 @@ public class MouvementsStockResource {
         LOG.debug("REST request to delete MouvementsStock : {}", id);
         mouvementsStockService.delete(id);
         return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+                .build();
     }
 
     /**
@@ -263,11 +267,13 @@ public class MouvementsStockResource {
 
     @GetMapping("/monthly-analysis")
     public ResponseEntity<Map<Integer, List<MonthlyAnalysisResult>>> getMonthlyAnalysis(
-        @RequestParam Instant startDate,
-        @RequestParam Instant endDate
-    ) {
-        List<MouvementsStockProjection> resultByCriteria = mouvementsStockService.findLegByDateBetween(startDate, endDate);
-        Map<Integer, List<MonthlyAnalysisResult>> monthlyAnalysis = mouvementsStockService.getMonthlyAnalysis(resultByCriteria, startDate, endDate);
+            @RequestParam List<String> codeProduitPrefixes,
+            @RequestParam Instant startDate,
+            @RequestParam Instant endDate) {
+        List<MouvementsStockProjection> mvts = mouvementsStockService
+                .findByCodeProduitStartingWithAnyAndDateBetween(codeProduitPrefixes, startDate, endDate);
+        Map<Integer, List<MonthlyAnalysisResult>> monthlyAnalysis = mouvementsStockService
+                .getMonthlyAnalysis(mvts, startDate, endDate);
         return ResponseEntity.ok().body(monthlyAnalysis);
     }
 

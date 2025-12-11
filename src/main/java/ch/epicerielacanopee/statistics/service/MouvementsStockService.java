@@ -320,9 +320,10 @@ public class MouvementsStockService {
                 .toList();
     }
 
-    public List<MouvementsStockProjection> findLegByDateBetween(Instant startDate, Instant endDate) {
+    public List<MouvementsStockProjection> findByCodeProduitStartingWithAnyAndDateBetween(
+            List<String> codeProduitPrefixes, Instant startDate, Instant endDate) {
         return mouvementsStockRepository
-                .findByCodeProduitStartingWithAndDateBetween("leg", startDate, endDate)
+                .findByCodeProduitStartingWithAnyAndDateBetween(codeProduitPrefixes, startDate, endDate)
                 .stream()
                 .toList();
     }
