@@ -418,7 +418,8 @@ public class MouvementsStockService {
         Map<Integer, List<MonthlyAnalysisResult>> productsByMonthNumber = aggregateStatisticsByMonth(
                 monthlyAverageByProduct);
 
-        return filterSeasonalProducts(startDate, endDate, productsByMonthNumber);
+        // return filterSeasonalProducts(startDate, endDate, productsByMonthNumber);
+        return productsByMonthNumber;
     }
 
     private Map<YearMonth, Map<ProductGroupingKey, List<MouvementsStockProjection>>> groupByYearMonthAndProduct(
@@ -559,7 +560,11 @@ public class MouvementsStockService {
                                 (float) quantityStats.getStandardDeviation(),
                                 key.getSaleType()));
             }
-            productsByMonthNumber.put(monthNum, aggregated);
+
+            List<MonthlyAnalysisResult> sortedAggregated = aggregated.stream()
+                    .sorted(Comparator.comparing(MonthlyAnalysisResult::getPercentageAverage).reversed())
+                    .collect(Collectors.toList());
+            productsByMonthNumber.put(monthNum, sortedAggregated);
         }
 
         return productsByMonthNumber;

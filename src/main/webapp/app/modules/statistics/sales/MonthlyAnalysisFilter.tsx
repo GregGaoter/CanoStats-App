@@ -38,7 +38,7 @@ export const MonthlyAnalysisFilter = (props: MonthlyAnalysisFilterProps) => {
         }
       />
       <LabelledControl
-        label="Type de produit"
+        label="Types de produit"
         control={
           <MultiSelect
             value={props.productTypes}
