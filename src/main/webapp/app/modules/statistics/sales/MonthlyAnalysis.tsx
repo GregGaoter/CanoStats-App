@@ -1,3 +1,4 @@
+import { useAppSelector } from 'app/config/store';
 import { apiUrl } from 'app/entities/mouvements-stock/mouvements-stock.reducer';
 import { Text } from 'app/shared/component/Text';
 import { MonthlyAnalysisResult } from 'app/shared/model/MonthlyAnalysisResult';
@@ -22,11 +23,31 @@ interface TableData extends MonthlyAnalysisResult {
   month: string;
 }
 
+export interface MovementTypeOption {
+  label: string;
+  value: string;
+}
+
+export interface ProductTypeOption {
+  label: string;
+  value: string;
+}
+
 export const MonthlyAnalysis = () => {
+  const productTypeOptions = useAppSelector(state => state.produit.productTypesByCode);
+  const mouvementsStockDateRange = useAppSelector(state => state.mouvementsStock.dateRange);
+
   const [dates, setDates] = useState<Date[]>([new Date(new Date().getFullYear(), 0, 1), new Date()]);
+  const [movementType, setMovementType] = useState<string>('');
+  const [productTypes, setProductTypes] = useState<string[]>([]);
   const [apiMapResponse, setApiMapResponse] = useState<ApiMapResponse>({});
   const [tableData, setTableData] = useState<TableData[]>([]);
   const [loadingData, setLoadingData] = useState<boolean>(false);
+
+  const movementTypeOptions: MovementTypeOption[] = [
+    { label: 'Vente', value: 'Vente' },
+    { label: 'Perte', value: 'Perte' },
+  ];
 
   dayjs.locale('fr');
 
@@ -42,12 +63,12 @@ export const MonthlyAnalysis = () => {
       })),
     );
 
-  const fetchWeeklyBestSellers = (): void => {
+  const getMonthlyAnalysis = (): void => {
     setLoadingData(true);
     setApiMapResponse({});
     setTableData([]);
     axios
-      .get<ApiMapResponse>(`${apiUrl}/monthly-analysis?${getMonthlyAnalysisQueryParams(dates)}`, {
+      .get<ApiMapResponse>(`${apiUrl}/monthly-analysis?${getMonthlyAnalysisQueryParams(movementType, productTypes, dates)}`, {
         timeout: 3600000,
       })
       .then(response => {
@@ -76,9 +97,15 @@ export const MonthlyAnalysis = () => {
         <BlockUI blocked={loadingData} template={<ProgressSpinner />}>
           <MonthlyAnalysisFilter
             dates={dates}
+            movementType={movementType}
+            productTypes={productTypes}
+            movementTypeOptions={movementTypeOptions}
+            productTypeOptions={productTypeOptions}
             loadingData={loadingData}
+            onMovementTypeChange={mt => setMovementType(mt)}
+            onProductTypesChange={pt => setProductTypes(pt)}
             onDatesChange={d => setDates(d)}
-            onApplyFilter={() => fetchWeeklyBestSellers()}
+            onApplyFilter={() => getMonthlyAnalysis()}
           />
         </BlockUI>
       </div>

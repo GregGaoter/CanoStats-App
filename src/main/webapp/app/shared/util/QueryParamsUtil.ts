@@ -44,7 +44,7 @@ export const getProduitsQueryParams = (pagination: Pagination<ProduitField>): st
   return searchParams.toString();
 };
 
-export const getMonthlyAnalysisQueryParams = (period: Date[]): string => {
+export const getMonthlyAnalysisQueryParams = (movementType: string, productTypes: string[], period: Date[]): string => {
   const startDate: string = period[0].toISOString();
 
   const year: number = period[1].getFullYear();
@@ -52,6 +52,10 @@ export const getMonthlyAnalysisQueryParams = (period: Date[]): string => {
   const endDate: string = new Date(year, month + 1, 0).toISOString();
 
   const searchParams: URLSearchParams = new URLSearchParams();
+  searchParams.set('movementType', movementType);
+  productTypes.forEach(type => {
+    searchParams.append('productTypes', type);
+  });
   searchParams.set('startDate', startDate);
   searchParams.set('endDate', endDate);
   searchParams.set('cacheBuster', `${new Date().getTime()}`);

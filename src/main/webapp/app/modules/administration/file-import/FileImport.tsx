@@ -1,5 +1,4 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useAppSelector } from 'app/config/store';
 import { apiUrl as mouvementsStockApiUrl } from 'app/entities/mouvements-stock/mouvements-stock.reducer';
 import { Icon } from 'app/shared/component/Icon';
 import { LabelledControl } from 'app/shared/component/LabelledControl';
@@ -38,9 +37,6 @@ export const FileImport = () => {
     { entity: EntityType.MOUVEMENTS_STOCK, remoteUrl: '/api/mouvements-stocks/import' },
     { entity: EntityType.PRODUITS, remoteUrl: '/api/produits/import' },
   ];
-
-  const productTypesByCode = useAppSelector(state => state.produit.productTypesByCode);
-  const mouvementsStockDateRange = useAppSelector(state => state.mouvementsStock.dateRange);
 
   const [totalSize, setTotalSize] = useState<number>(0);
   const [importEntity, setImportEntity] = useState<ImportEntity>(importEntities[0]);

@@ -267,14 +267,14 @@ public class MouvementsStockResource {
 
     @GetMapping("/monthly-analysis")
     public ResponseEntity<Map<Integer, List<MonthlyAnalysisResult>>> getMonthlyAnalysis(
-            @RequestParam List<String> codeProduitPrefixes,
-            @RequestParam String mouvementType,
+            @RequestParam String movementType,
+            @RequestParam List<String> productTypes,
             @RequestParam Instant startDate,
             @RequestParam Instant endDate) {
         List<MouvementsStockProjection> mvts = mouvementsStockService
-                .findByCodeProduitStartingWithAnyAndDateBetween(codeProduitPrefixes, startDate, endDate);
+                .findByCodeProduitStartingWithAnyAndDateBetween(productTypes, startDate, endDate);
         Map<Integer, List<MonthlyAnalysisResult>> monthlyAnalysis = mouvementsStockService
-                .getMonthlyAnalysis(mvts, mouvementType, startDate, endDate);
+                .getMonthlyAnalysis(mvts, movementType, startDate, endDate);
         return ResponseEntity.ok().body(monthlyAnalysis);
     }
 
