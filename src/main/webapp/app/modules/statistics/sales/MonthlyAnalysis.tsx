@@ -109,24 +109,24 @@ export const MonthlyAnalysis = () => {
           />
         </BlockUI>
       </div>
-      <div className="col-12">
-        <Card>
-          <DataTable
-            value={tableData}
-            rowGroupMode="subheader"
-            groupRowsBy="month"
-            rowGroupHeaderTemplate={headerTemplate}
-            dataKey="month"
-            // scrollable
-            // scrollHeight="600px"
+      {Object.entries(apiMapResponse).map(([key, results]) => (
+        <div className="col-12" key={key}>
+          <Card
+            title={capitalize(
+              dayjs()
+                .month(Number(key) - 1)
+                .format('MMMM'),
+            )}
           >
-            <Column field="productCode" header="Code"></Column>
-            <Column field="product" header="Produit"></Column>
-            <Column field="soldPercentageAverage" header="% moyen vendu" body={soldPercentageTemplate}></Column>
-            <Column field="soldQuantityAverage" header="Quantité moyenne vendu" body={soldQuantityTemplate}></Column>
-          </DataTable>
-        </Card>
-      </div>
+            <DataTable value={results} dataKey="productCode">
+              <Column field="productCode" header="Code"></Column>
+              <Column field="product" header="Produit"></Column>
+              <Column field="soldPercentageAverage" header="% moyen vendu" body={soldPercentageTemplate}></Column>
+              <Column field="soldQuantityAverage" header="Quantité moyenne vendu" body={soldQuantityTemplate}></Column>
+            </DataTable>
+          </Card>
+        </div>
+      ))}
     </div>
   );
 };
