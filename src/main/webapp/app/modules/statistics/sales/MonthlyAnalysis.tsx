@@ -16,7 +16,7 @@ import React, { useState } from 'react';
 import { MonthlyAnalysisFilter } from './MonthlyAnalysisFilter';
 
 interface ApiMapResponse {
-  [key: number]: MonthlyAnalysisResult[];
+  [month: number]: MonthlyAnalysisResult[];
 }
 
 export interface MovementTypeOption {
@@ -86,16 +86,16 @@ export const MonthlyAnalysis = () => {
           />
         </BlockUI>
       </div>
-      {Object.entries(apiMapResponse).map(([key, results]) => (
-        <div className="col-12" key={key}>
+      {Object.entries(apiMapResponse).map(([month, monthlyAnalysisResults]) => (
+        <div className="col-12" key={month}>
           <Card
             title={capitalize(
               dayjs()
-                .month(Number(key) - 1)
+                .month(Number(month) - 1)
                 .format('MMMM'),
             )}
           >
-            <DataTable value={results} dataKey="productCode">
+            <DataTable value={monthlyAnalysisResults} dataKey="productCode">
               <Column field="productCode" header="Code"></Column>
               <Column field="product" header="Produit"></Column>
               <Column field="soldPercentageAverage" header="% moyen vendu" body={soldPercentageTemplate}></Column>
