@@ -19,10 +19,6 @@ interface ApiMapResponse {
   [key: number]: MonthlyAnalysisResult[];
 }
 
-interface TableData extends MonthlyAnalysisResult {
-  month: string;
-}
-
 export interface MovementTypeOption {
   label: string;
   value: string;
@@ -41,7 +37,6 @@ export const MonthlyAnalysis = () => {
   const [movementType, setMovementType] = useState<string>('');
   const [productTypes, setProductTypes] = useState<string[]>([]);
   const [apiMapResponse, setApiMapResponse] = useState<ApiMapResponse>({});
-  const [tableData, setTableData] = useState<TableData[]>([]);
   const [loadingData, setLoadingData] = useState<boolean>(false);
 
   const movementTypeOptions: MovementTypeOption[] = [
@@ -51,40 +46,22 @@ export const MonthlyAnalysis = () => {
 
   dayjs.locale('fr');
 
-  const getTableData = (data: ApiMapResponse): TableData[] =>
-    Object.entries(data).flatMap(([key, results]) =>
-      results.map(result => ({
-        ...result,
-        month: capitalize(
-          dayjs()
-            .month(Number(key) - 1)
-            .format('MMMM'),
-        ),
-      })),
-    );
-
   const getMonthlyAnalysis = (): void => {
     setLoadingData(true);
     setApiMapResponse({});
-    setTableData([]);
     axios
       .get<ApiMapResponse>(`${apiUrl}/monthly-analysis?${getMonthlyAnalysisQueryParams(movementType, productTypes, dates)}`, {
         timeout: 3600000,
       })
-      .then(response => {
-        setApiMapResponse(response.data);
-        setTableData(getTableData(response.data));
-      })
+      .then(response => setApiMapResponse(response.data))
       .finally(() => setLoadingData(false));
   };
 
-  const headerTemplate = (data: TableData) => <Text className="font-bold">{data.month}</Text>;
-
-  const soldPercentageTemplate = (data: TableData) => (
+  const soldPercentageTemplate = (data: MonthlyAnalysisResult) => (
     <Text>{`${Math.round(data.percentageAverage).toString()} % ± ${Math.round(data.percentageStandardDeviation).toString()} %`}</Text>
   );
 
-  const soldQuantityTemplate = (data: TableData) => {
+  const soldQuantityTemplate = (data: MonthlyAnalysisResult) => {
     const unit: string = data.unit === 'Au poids' ? 'kg' : 'pièces';
     return (
       <Text>{`${Math.ceil(data.quantityAverage).toString()} ${unit} ± ${Math.ceil(data.quantityStandardDeviation).toString()} ${unit}`}</Text>
