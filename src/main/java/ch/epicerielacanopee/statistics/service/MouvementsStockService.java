@@ -491,16 +491,16 @@ public class MouvementsStockService {
             return Optional.empty();
         }
 
-        float soldQuantity = Math.abs(sumMovementsOfType(mvts, movementsType));
-        float soldPercentage = (soldQuantity / available) * 100f;
+        float quantity = Math.abs(sumMovementsOfType(mvts, movementsType));
+        float percentage = (quantity / available) * 100f;
 
         return Optional.of(
                 new MonthlyAnalysisResult(
                         productCode,
                         key.getProduit(),
-                        soldPercentage,
+                        percentage,
                         0f,
-                        soldQuantity,
+                        quantity,
                         0f,
                         mvts.get(0).getVente()));
     }
