@@ -2,6 +2,7 @@ import { useAppSelector } from 'app/config/store';
 import { apiUrl } from 'app/entities/mouvements-stock/mouvements-stock.reducer';
 import { Text } from 'app/shared/component/Text';
 import { MonthlyAnalysisResult } from 'app/shared/model/MonthlyAnalysisResult';
+import { transformMonthlyAnalysisToChartData } from 'app/shared/util/ChartDataTransformer';
 import { getMonthlyAnalysisQueryParams } from 'app/shared/util/QueryParamsUtil';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -9,6 +10,7 @@ import 'dayjs/locale/fr';
 import { capitalize } from 'lodash';
 import { BlockUI } from 'primereact/blockui';
 import { Card } from 'primereact/card';
+import { Chart } from 'primereact/chart';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { ProgressSpinner } from 'primereact/progressspinner';
@@ -17,6 +19,14 @@ import { MonthlyAnalysisFilter } from './MonthlyAnalysisFilter';
 
 interface ApiMapResponse {
   [month: number]: MonthlyAnalysisResult[];
+}
+
+interface ChartData {
+  labels: string[];
+  datasets: Array<{
+    label: string;
+    data: number[];
+  }>;
 }
 
 export interface MovementTypeOption {
@@ -30,7 +40,7 @@ export interface ProductTypeOption {
 }
 
 export const MonthlyAnalysis = () => {
-  const productTypeOptions = useAppSelector(state => state.produit.productTypesByCode);
+  const productTypesByCode: string[] = useAppSelector<string[]>(state => state.produit.productTypesByCode);
   const mouvementsStockDateRange = useAppSelector(state => state.mouvementsStock.dateRange);
 
   const [dates, setDates] = useState<Date[]>([new Date(new Date().getFullYear(), 0, 1), new Date()]);
@@ -38,22 +48,29 @@ export const MonthlyAnalysis = () => {
   const [productTypes, setProductTypes] = useState<string[]>([]);
   const [apiMapResponse, setApiMapResponse] = useState<ApiMapResponse>({});
   const [loadingData, setLoadingData] = useState<boolean>(false);
+  const [chartData, setChartData] = useState<ChartData>({ labels: [], datasets: [] });
 
   const movementTypeOptions: MovementTypeOption[] = [
     { label: 'Vente', value: 'Vente' },
     { label: 'Perte', value: 'Perte' },
   ];
 
+  const productTypeOptions: ProductTypeOption[] = productTypesByCode.map(pt => ({ label: pt, value: pt }));
+
   dayjs.locale('fr');
 
   const getMonthlyAnalysis = (): void => {
     setLoadingData(true);
     setApiMapResponse({});
+    setChartData({ labels: [], datasets: [] });
     axios
       .get<ApiMapResponse>(`${apiUrl}/monthly-analysis?${getMonthlyAnalysisQueryParams(movementType, productTypes, dates)}`, {
         timeout: 3600000,
       })
-      .then(response => setApiMapResponse(response.data))
+      .then(response => {
+        setApiMapResponse(response.data);
+        setChartData(transformMonthlyAnalysisToChartData(response.data, productTypes));
+      })
       .finally(() => setLoadingData(false));
   };
 
@@ -86,6 +103,13 @@ export const MonthlyAnalysis = () => {
           />
         </BlockUI>
       </div>
+      {chartData.labels.length > 0 && (
+        <div className="col-12">
+          <Card title="Analyse mensuelle - Graphique de tendance">
+            <Chart type="line" data={chartData} />
+          </Card>
+        </div>
+      )}
       {Object.entries(apiMapResponse).map(([month, monthlyAnalysisResults]) => (
         <div className="col-12" key={month}>
           <Card
