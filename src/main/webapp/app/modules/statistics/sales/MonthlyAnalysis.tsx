@@ -5,6 +5,7 @@ import { MonthlyAnalysisStats } from 'app/shared/model/MonthlyAnalysisStats';
 import { MouvementsStockDateRange } from 'app/shared/model/MouvementsStockDateRange';
 import { StatisticalQuantities } from 'app/shared/model/StatisticalQuantities';
 import { transformMonthlyAnalysisToChartData } from 'app/shared/util/ChartDataTransformer';
+import { lineOptions } from 'app/shared/util/ChartOptionsUtils';
 import { getMonthlyAnalysisQueryParams } from 'app/shared/util/QueryParamsUtil';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -18,6 +19,7 @@ import { ColumnGroup } from 'primereact/columngroup';
 import { DataTable } from 'primereact/datatable';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Row } from 'primereact/row';
+import { TabPanel, TabView } from 'primereact/tabview';
 import React, { useEffect, useState } from 'react';
 import { MonthlyAnalysisFilter } from './MonthlyAnalysisFilter';
 
@@ -153,36 +155,44 @@ export const MonthlyAnalysis = () => {
           />
         </BlockUI>
       </div>
-      {chartData.labels.length > 0 && (
-        <div className="col-12">
-          <Card title="Analyse mensuelle - Graphique de tendance">
-            <Chart type="line" data={chartData} />
-          </Card>
-        </div>
-      )}
-      {Object.entries(apiMapResponse).map(([month, monthlyAnalysisStats]) => (
-        <div className="col-12" key={month}>
-          <Card
-            title={capitalize(
-              dayjs()
-                .month(Number(month) - 1)
-                .format('MMMM'),
+      <div className="col-12">
+        <TabView>
+          <TabPanel header="Tableau">
+            {Object.entries(apiMapResponse).map(([month, monthlyAnalysisStats]) => (
+              <div className="col-12" key={month}>
+                <Card
+                  title={capitalize(
+                    dayjs()
+                      .month(Number(month) - 1)
+                      .format('MMMM'),
+                  )}
+                >
+                  <DataTable value={monthlyAnalysisStats} dataKey="productCode" headerColumnGroup={headerColumnGroup}>
+                    <Column field="productCode"></Column>
+                    <Column field="product"></Column>
+                    <Column field="percentageStats" body={percentageTemplate}></Column>
+                    <Column field="quantityStats" body={quantityTemplate}></Column>
+                    <Column field="availableStockStats" body={availableStockTemplate}></Column>
+                    <Column field="nbDeliveriesStats" body={nbDeliveriesTemplate}></Column>
+                    <Column field="nbSalesStats" body={nbSalesTemplate}></Column>
+                    <Column field="nbLossesStats" body={nbLossesTemplate}></Column>
+                    <Column field="nbInventoriesStats" body={nbInventoriesTemplate}></Column>
+                  </DataTable>
+                </Card>
+              </div>
+            ))}
+          </TabPanel>
+          <TabPanel header="Graphique">
+            {chartData.labels.length > 0 && (
+              <div className="col-12">
+                <Card>
+                  <Chart type="line" data={chartData} options={lineOptions} />
+                </Card>
+              </div>
             )}
-          >
-            <DataTable value={monthlyAnalysisStats} dataKey="productCode" headerColumnGroup={headerColumnGroup}>
-              <Column field="productCode"></Column>
-              <Column field="product"></Column>
-              <Column field="percentageStats" body={percentageTemplate}></Column>
-              <Column field="quantityStats" body={quantityTemplate}></Column>
-              <Column field="availableStockStats" body={availableStockTemplate}></Column>
-              <Column field="nbDeliveriesStats" body={nbDeliveriesTemplate}></Column>
-              <Column field="nbSalesStats" body={nbSalesTemplate}></Column>
-              <Column field="nbLossesStats" body={nbLossesTemplate}></Column>
-              <Column field="nbInventoriesStats" body={nbInventoriesTemplate}></Column>
-            </DataTable>
-          </Card>
-        </div>
-      ))}
+          </TabPanel>
+        </TabView>
+      </div>
     </div>
   );
 };
