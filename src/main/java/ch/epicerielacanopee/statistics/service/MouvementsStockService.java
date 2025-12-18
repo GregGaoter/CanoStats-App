@@ -33,12 +33,14 @@ import ch.epicerielacanopee.statistics.repository.MouvementsStockRepository;
 import ch.epicerielacanopee.statistics.repository.projection.MouvementsStockDateRangeProjection;
 import ch.epicerielacanopee.statistics.repository.projection.MouvementsStockProjection;
 import ch.epicerielacanopee.statistics.service.dto.EpicerioMouvementsStockDTO;
-import ch.epicerielacanopee.statistics.service.dto.MonthlyAnalysisResult;
 import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
 import ch.epicerielacanopee.statistics.service.mapper.MouvementsStockMapper;
 import ch.epicerielacanopee.statistics.service.util.AnalysisValues;
+import ch.epicerielacanopee.statistics.service.util.MonthlyAnalysisResult;
+import ch.epicerielacanopee.statistics.service.util.MonthlyAnalysisStats;
 import ch.epicerielacanopee.statistics.service.util.MouvementsStockDateRange;
 import ch.epicerielacanopee.statistics.service.util.ProductGroupingKey;
+import ch.epicerielacanopee.statistics.service.util.StatisticalQuantities;
 import ch.epicerielacanopee.statistics.service.util.YearMonth;
 
 /**
@@ -399,7 +401,7 @@ public class MouvementsStockService {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    public Map<Integer, List<MonthlyAnalysisResult>> getMonthlyAnalysis(
+    public Map<Integer, List<MonthlyAnalysisStats>> getMonthlyAnalysis(
             List<MouvementsStockProjection> movements,
             String movementsType,
             Instant startDate,
@@ -415,7 +417,7 @@ public class MouvementsStockService {
         Map<Integer, Map<ProductGroupingKey, List<AnalysisValues>>> monthlyAverageByProduct = buildMonthlyAverageByProduct(
                 yearMonthResults);
 
-        Map<Integer, List<MonthlyAnalysisResult>> productsByMonthNumber = aggregateStatisticsByMonth(
+        Map<Integer, List<MonthlyAnalysisStats>> productsByMonthNumber = aggregateStatisticsByMonth(
                 monthlyAverageByProduct);
 
         // return filterSeasonalProducts(startDate, endDate, productsByMonthNumber);
@@ -499,9 +501,12 @@ public class MouvementsStockService {
                         productCode,
                         key.getProduit(),
                         percentage,
-                        0f,
                         quantity,
-                        0f,
+                        available,
+                        countMovementsOfType(mvts, "Livraison"),
+                        countMovementsOfType(mvts, "Vente"),
+                        countMovementsOfType(mvts, "Perte"),
+                        countMovementsOfType(mvts, "Inventaire"),
                         mvts.get(0).getVente()));
     }
 
@@ -511,6 +516,14 @@ public class MouvementsStockService {
                 .filter(m -> m.getType().equals(type))
                 .map(m -> m.getMouvement() == null ? 0f : m.getMouvement())
                 .reduce(0f, Float::sum);
+    }
+
+    private int countMovementsOfType(List<MouvementsStockProjection> mvts, String type) {
+        return mvts
+                .stream()
+                .filter(m -> m.getType().equals(type))
+                .mapToInt(m -> 1)
+                .sum();
     }
 
     private Map<Integer, Map<ProductGroupingKey, List<AnalysisValues>>> buildMonthlyAverageByProduct(
@@ -524,45 +537,71 @@ public class MouvementsStockService {
                         .computeIfAbsent(monthNum, k -> new HashMap<>())
                         .computeIfAbsent(new ProductGroupingKey(pr.getProductCode(), pr.getProduct(), pr.getUnit()),
                                 k -> new ArrayList<>())
-                        .add(new AnalysisValues(pr.getPercentageAverage(), pr.getQuantityAverage()));
+                        .add(new AnalysisValues(pr.getPercentage(), pr.getQuantity(),
+                                pr.getAvailableStock(), pr.getNbDeliveries(), pr.getNbSales(), pr.getNbLosses(),
+                                pr.getNbInventories()));
             }
         }
 
         return monthlyAverageByProduct;
     }
 
-    private Map<Integer, List<MonthlyAnalysisResult>> aggregateStatisticsByMonth(
+    private Map<Integer, List<MonthlyAnalysisStats>> aggregateStatisticsByMonth(
             Map<Integer, Map<ProductGroupingKey, List<AnalysisValues>>> monthlyAverageByProduct) {
-        Map<Integer, List<MonthlyAnalysisResult>> productsByMonthNumber = new HashMap<>();
+        Map<Integer, List<MonthlyAnalysisStats>> productsByMonthNumber = new HashMap<>();
+        Comparator<MonthlyAnalysisStats> byPercentageMean = Comparator
+                .comparing(monthlyStats -> monthlyStats.getPercentageStats().getMean());
 
         for (Map.Entry<Integer, Map<ProductGroupingKey, List<AnalysisValues>>> entry : monthlyAverageByProduct
                 .entrySet()) {
             int monthNum = entry.getKey();
-            List<MonthlyAnalysisResult> aggregated = new ArrayList<>();
+            List<MonthlyAnalysisStats> aggregated = new ArrayList<>();
 
             for (Map.Entry<ProductGroupingKey, List<AnalysisValues>> productEntry : entry.getValue().entrySet()) {
                 ProductGroupingKey key = productEntry.getKey();
                 List<AnalysisValues> analysisValues = productEntry.getValue();
 
                 DescriptiveStatistics percentageStats = new DescriptiveStatistics();
-                analysisValues.forEach(v -> percentageStats.addValue(v.getPercentage()));
-
                 DescriptiveStatistics quantityStats = new DescriptiveStatistics();
-                analysisValues.forEach(v -> quantityStats.addValue(v.getQuantity()));
+                DescriptiveStatistics availableStockStats = new DescriptiveStatistics();
+                DescriptiveStatistics nbDeliveriesStats = new DescriptiveStatistics();
+                DescriptiveStatistics nbSalesStats = new DescriptiveStatistics();
+                DescriptiveStatistics nbLossesStats = new DescriptiveStatistics();
+                DescriptiveStatistics nbInventoriesStats = new DescriptiveStatistics();
+
+                analysisValues.forEach(v -> {
+                    percentageStats.addValue(v.getPercentage());
+                    quantityStats.addValue(v.getQuantity());
+                    availableStockStats.addValue(v.getAvailableStock());
+                    nbDeliveriesStats.addValue(v.getNbDeliveries());
+                    nbSalesStats.addValue(v.getNbSales());
+                    nbLossesStats.addValue(v.getNbLosses());
+                    nbInventoriesStats.addValue(v.getNbInventories());
+                });
 
                 aggregated.add(
-                        new MonthlyAnalysisResult(
+                        new MonthlyAnalysisStats(
                                 key.getCodeProduit(),
                                 key.getProduit(),
-                                (float) percentageStats.getMean(),
-                                (float) percentageStats.getStandardDeviation(),
-                                (float) quantityStats.getMean(),
-                                (float) quantityStats.getStandardDeviation(),
+                                new StatisticalQuantities((float) percentageStats.getMean(),
+                                        (float) percentageStats.getStandardDeviation()),
+                                new StatisticalQuantities((float) quantityStats.getMean(),
+                                        (float) quantityStats.getStandardDeviation()),
+                                new StatisticalQuantities((float) availableStockStats.getMean(),
+                                        (float) availableStockStats.getStandardDeviation()),
+                                new StatisticalQuantities((float) nbDeliveriesStats.getMean(),
+                                        (float) nbDeliveriesStats.getStandardDeviation()),
+                                new StatisticalQuantities((float) nbSalesStats.getMean(),
+                                        (float) nbSalesStats.getStandardDeviation()),
+                                new StatisticalQuantities((float) nbLossesStats.getMean(),
+                                        (float) nbLossesStats.getStandardDeviation()),
+                                new StatisticalQuantities((float) nbInventoriesStats.getMean(),
+                                        (float) nbInventoriesStats.getStandardDeviation()),
                                 key.getSaleType()));
             }
 
-            List<MonthlyAnalysisResult> sortedAggregated = aggregated.stream()
-                    .sorted(Comparator.comparing(MonthlyAnalysisResult::getPercentageAverage).reversed())
+            List<MonthlyAnalysisStats> sortedAggregated = aggregated.stream()
+                    .sorted(byPercentageMean.reversed())
                     .collect(Collectors.toList());
             productsByMonthNumber.put(monthNum, sortedAggregated);
         }
@@ -570,22 +609,24 @@ public class MouvementsStockService {
         return productsByMonthNumber;
     }
 
-    private Map<Integer, List<MonthlyAnalysisResult>> filterSeasonalProducts(
+    private Map<Integer, List<MonthlyAnalysisStats>> filterSeasonalProducts(
             Instant startDate,
             Instant endDate,
-            Map<Integer, List<MonthlyAnalysisResult>> productsByMonthNumber) {
-        Map<Integer, List<MonthlyAnalysisResult>> monthlyAnalysis = new HashMap<>();
+            Map<Integer, List<MonthlyAnalysisStats>> productsByMonthNumber) {
+        Map<Integer, List<MonthlyAnalysisStats>> monthlyAnalysis = new HashMap<>();
         Map<Month, List<String>> seasonalProductsOverPeriod = getSeasonalProductsOverPeriod(startDate, endDate);
+        Comparator<MonthlyAnalysisStats> byPercentageMean = Comparator
+                .comparing(monthlyStats -> monthlyStats.getPercentageStats().getMean());
 
         for (Map.Entry<Month, List<String>> entry : seasonalProductsOverPeriod.entrySet()) {
             int monthNumber = entry.getKey().getValue();
             List<String> seasonal = entry.getValue();
 
-            List<MonthlyAnalysisResult> seasonalProducts = productsByMonthNumber
+            List<MonthlyAnalysisStats> seasonalProducts = productsByMonthNumber
                     .getOrDefault(monthNumber, Collections.emptyList())
                     .stream()
                     .filter(pr -> seasonal.contains(pr.getProductCode()))
-                    .sorted(Comparator.comparing(MonthlyAnalysisResult::getPercentageAverage).reversed())
+                    .sorted(byPercentageMean.reversed())
                     .collect(Collectors.toList());
 
             monthlyAnalysis.put(monthNumber, seasonalProducts);

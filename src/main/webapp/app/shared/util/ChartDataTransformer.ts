@@ -1,4 +1,4 @@
-import { MonthlyAnalysisResult } from 'app/shared/model/MonthlyAnalysisResult';
+import { MonthlyAnalysisStats } from 'app/shared/model/MonthlyAnalysisStats';
 import dayjs from 'dayjs';
 
 interface ChartData {
@@ -16,7 +16,7 @@ interface ChartData {
  * @returns ChartData formatted for Chart.js with month labels and datasets per product code
  */
 export const transformMonthlyAnalysisToChartData = (
-  apiMapResponse: { [month: number]: MonthlyAnalysisResult[] },
+  apiMapResponse: { [month: number]: MonthlyAnalysisStats[] },
   productTypesByCode: string[],
 ): ChartData => {
   // Sort month keys to ensure proper order
@@ -45,7 +45,7 @@ export const transformMonthlyAnalysisToChartData = (
   // If multiple results exist for the same product type in a month, average them
   sortedMonths.forEach((month, monthIndex) => {
     const resultsForMonth = apiMapResponse[month];
-    const productGroupMap = new Map<string, MonthlyAnalysisResult[]>();
+    const productGroupMap = new Map<string, MonthlyAnalysisStats[]>();
 
     // Group results by product type prefix (first three letters of productCode)
     resultsForMonth.forEach(result => {
@@ -65,8 +65,8 @@ export const transformMonthlyAnalysisToChartData = (
     // Calculate average percentageAverage for each product type prefix
     productGroupMap.forEach((results, prefix) => {
       const validPercentages = results
-        .filter(r => r.percentageAverage !== null && r.percentageAverage !== undefined)
-        .map(r => r.percentageAverage);
+        .filter(r => r.percentageStats.mean !== null && r.percentageStats.mean !== undefined)
+        .map(r => r.percentageStats.mean);
 
       if (validPercentages.length > 0) {
         const average = validPercentages.reduce((sum, val) => sum + val, 0) / validPercentages.length;

@@ -35,8 +35,8 @@ import ch.epicerielacanopee.statistics.repository.projection.MouvementsStockProj
 import ch.epicerielacanopee.statistics.service.MouvementsStockQueryService;
 import ch.epicerielacanopee.statistics.service.MouvementsStockService;
 import ch.epicerielacanopee.statistics.service.criteria.MouvementsStockCriteria;
-import ch.epicerielacanopee.statistics.service.dto.MonthlyAnalysisResult;
 import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
+import ch.epicerielacanopee.statistics.service.util.MonthlyAnalysisStats;
 import ch.epicerielacanopee.statistics.service.util.MouvementsStockDateRange;
 import ch.epicerielacanopee.statistics.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
@@ -266,14 +266,14 @@ public class MouvementsStockResource {
     }
 
     @GetMapping("/monthly-analysis")
-    public ResponseEntity<Map<Integer, List<MonthlyAnalysisResult>>> getMonthlyAnalysis(
+    public ResponseEntity<Map<Integer, List<MonthlyAnalysisStats>>> getMonthlyAnalysis(
             @RequestParam String movementType,
             @RequestParam List<String> productTypes,
             @RequestParam Instant startDate,
             @RequestParam Instant endDate) {
         List<MouvementsStockProjection> mvts = mouvementsStockService
                 .findByCodeProduitStartingWithAnyAndDateBetween(productTypes, startDate, endDate);
-        Map<Integer, List<MonthlyAnalysisResult>> monthlyAnalysis = mouvementsStockService
+        Map<Integer, List<MonthlyAnalysisStats>> monthlyAnalysis = mouvementsStockService
                 .getMonthlyAnalysis(mvts, movementType, startDate, endDate);
         return ResponseEntity.ok().body(monthlyAnalysis);
     }
