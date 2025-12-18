@@ -1,22 +1,28 @@
 package ch.epicerielacanopee.statistics.service.util;
 
-import java.time.Instant;
-
 public class MouvementsStockDateRange {
 
-    private Instant startDate;
-    private Instant endDate;
+    private String startDate;
+    private String endDate;
 
-    public MouvementsStockDateRange(Instant startDate, Instant endDate) {
+    public MouvementsStockDateRange(String startDate, String endDate) {
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
-    public Instant getStartDate() {
+    public String getStartDate() {
         return startDate;
     }
 
-    public Instant getEndDate() {
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getEndDate() {
         return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 }

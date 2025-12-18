@@ -2,6 +2,7 @@ import { useAppSelector } from 'app/config/store';
 import { apiUrl } from 'app/entities/mouvements-stock/mouvements-stock.reducer';
 import { Text } from 'app/shared/component/Text';
 import { MonthlyAnalysisStats } from 'app/shared/model/MonthlyAnalysisStats';
+import { MouvementsStockDateRange } from 'app/shared/model/MouvementsStockDateRange';
 import { StatisticalQuantities } from 'app/shared/model/StatisticalQuantities';
 import { transformMonthlyAnalysisToChartData } from 'app/shared/util/ChartDataTransformer';
 import { getMonthlyAnalysisQueryParams } from 'app/shared/util/QueryParamsUtil';
@@ -17,7 +18,7 @@ import { ColumnGroup } from 'primereact/columngroup';
 import { DataTable } from 'primereact/datatable';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Row } from 'primereact/row';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MonthlyAnalysisFilter } from './MonthlyAnalysisFilter';
 
 interface ApiMapResponse {
@@ -44,9 +45,15 @@ export interface ProductTypeOption {
 
 export const MonthlyAnalysis = () => {
   const productTypesByCode: string[] = useAppSelector<string[]>(state => state.produit.productTypesByCode);
-  const mouvementsStockDateRange = useAppSelector(state => state.mouvementsStock.dateRange);
+  const mouvementsStockDateRange: MouvementsStockDateRange = useAppSelector<MouvementsStockDateRange>(
+    state => state.mouvementsStock.dateRange,
+  );
 
-  const [dates, setDates] = useState<Date[]>([new Date(new Date().getFullYear(), 0, 1), new Date()]);
+  const now: Date = new Date();
+
+  const [dates, setDates] = useState<Date[]>([new Date(now.getFullYear(), 0, 1), now]);
+  const [minDate, setMinDate] = useState<Date>(undefined);
+  const [maxDate, setMaxDate] = useState<Date>(undefined);
   const [movementType, setMovementType] = useState<string>('');
   const [productTypes, setProductTypes] = useState<string[]>([]);
   const [apiMapResponse, setApiMapResponse] = useState<ApiMapResponse>({});
@@ -61,6 +68,15 @@ export const MonthlyAnalysis = () => {
   const productTypeOptions: ProductTypeOption[] = productTypesByCode.map(pt => ({ label: pt, value: pt }));
 
   dayjs.locale('fr');
+
+  useEffect(() => {
+    if (mouvementsStockDateRange?.startDate) setMinDate(new Date(mouvementsStockDateRange.startDate));
+    if (mouvementsStockDateRange?.endDate) {
+      const endDate: Date = new Date(mouvementsStockDateRange.endDate);
+      setMaxDate(endDate);
+      setDates([new Date(endDate.getFullYear(), 0, 1), new Date(endDate.getFullYear(), endDate.getMonth(), 1)]);
+    }
+  }, [mouvementsStockDateRange]);
 
   const getMonthlyAnalysis = (): void => {
     setLoadingData(true);
@@ -127,6 +143,8 @@ export const MonthlyAnalysis = () => {
             productTypes={productTypes}
             movementTypeOptions={movementTypeOptions}
             productTypeOptions={productTypeOptions}
+            minDate={minDate}
+            maxDate={maxDate}
             loadingData={loadingData}
             onMovementTypeChange={mt => setMovementType(mt)}
             onProductTypesChange={pt => setProductTypes(pt)}

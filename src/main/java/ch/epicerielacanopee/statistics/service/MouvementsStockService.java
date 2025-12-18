@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -636,8 +637,9 @@ public class MouvementsStockService {
     }
 
     public MouvementsStockDateRange getDateRange() {
-        MouvementsStockDateRangeProjection dateRangeProjection = mouvementsStockRepository.findDateRange();
-        return new MouvementsStockDateRange(dateRangeProjection.getMinDate(), dateRangeProjection.getMaxDate());
+            MouvementsStockDateRangeProjection dateRangeProjection = mouvementsStockRepository.findDateRange();
+            return new MouvementsStockDateRange(dateRangeProjection.getMinDate().toString(),
+                            dateRangeProjection.getMaxDate().toString());
     }
 
     public Instant getMaxDate() {

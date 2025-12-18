@@ -14,6 +14,8 @@ interface MonthlyAnalysisFilterProps {
   productTypes: string[];
   movementTypeOptions: MovementTypeOption[];
   productTypeOptions: ProductTypeOption[];
+  minDate: Date;
+  maxDate: Date;
   loadingData: boolean;
   onMovementTypeChange: (movementType: string) => void;
   onProductTypesChange: (productTypes: string[]) => void;
@@ -61,6 +63,8 @@ export const MonthlyAnalysisFilter = (props: MonthlyAnalysisFilterProps) => {
             view="month"
             selectionMode="range"
             dateFormat="mm.yy"
+            minDate={props.minDate}
+            maxDate={props.maxDate}
             readOnlyInput
             hideOnRangeSelection
             showIcon
