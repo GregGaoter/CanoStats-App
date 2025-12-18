@@ -1,5 +1,6 @@
 import { useAppSelector } from 'app/config/store';
 import { apiUrl } from 'app/entities/mouvements-stock/mouvements-stock.reducer';
+import { Icon } from 'app/shared/component/Icon';
 import { Text } from 'app/shared/component/Text';
 import { MonthlyAnalysisStats } from 'app/shared/model/MonthlyAnalysisStats';
 import { MouvementsStockDateRange } from 'app/shared/model/MouvementsStockDateRange';
@@ -12,6 +13,7 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
 import { capitalize } from 'lodash';
 import { BlockUI } from 'primereact/blockui';
+import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Chart } from 'primereact/chart';
 import { Column } from 'primereact/column';
@@ -20,7 +22,7 @@ import { DataTable } from 'primereact/datatable';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Row } from 'primereact/row';
 import { TabPanel, TabView } from 'primereact/tabview';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { MonthlyAnalysisFilter } from './MonthlyAnalysisFilter';
 
 interface ApiMapResponse {
@@ -46,6 +48,8 @@ export interface ProductTypeOption {
 }
 
 export const MonthlyAnalysis = () => {
+  const chartRef = useRef(null);
+
   const productTypesByCode: string[] = useAppSelector<string[]>(state => state.produit.productTypesByCode);
   const mouvementsStockDateRange: MouvementsStockDateRange = useAppSelector<MouvementsStockDateRange>(
     state => state.mouvementsStock.dateRange,
@@ -135,6 +139,26 @@ export const MonthlyAnalysis = () => {
     </ColumnGroup>
   );
 
+  const formatFileNameDates = (): string => dates.map(date => dayjs(date).format('YYYY-MM')).join('-');
+
+  const downloadChartImage = () => {
+    const chart = chartRef.current?.getChart();
+    if (!chart) return;
+
+    const url = chart.toBase64Image();
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${formatFileNameDates()}-${movementType.toLowerCase()}-mensuelle-graphique.png`;
+    link.click();
+  };
+
+  const chartCardTitle: JSX.Element = (
+    <div className="flex justify-content-end">
+      <Button label="Télécharger" icon={<Icon icon="download" marginRight />} onClick={downloadChartImage} />
+    </div>
+  );
+
   return (
     <div className="grid align-items-center">
       <div className="col-12">
@@ -185,8 +209,8 @@ export const MonthlyAnalysis = () => {
           <TabPanel header="Graphique">
             {chartData.labels.length > 0 && (
               <div className="col-12">
-                <Card>
-                  <Chart type="line" data={chartData} options={lineOptions} />
+                <Card title={chartCardTitle}>
+                  <Chart ref={chartRef} type="line" data={chartData} options={lineOptions} />
                 </Card>
               </div>
             )}
