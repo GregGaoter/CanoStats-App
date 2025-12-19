@@ -17,10 +17,8 @@ import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Chart } from 'primereact/chart';
 import { Column } from 'primereact/column';
-import { ColumnGroup } from 'primereact/columngroup';
 import { DataTable } from 'primereact/datatable';
 import { ProgressSpinner } from 'primereact/progressspinner';
-import { Row } from 'primereact/row';
 import { TabPanel, TabView } from 'primereact/tabview';
 import React, { useEffect, useRef, useState } from 'react';
 import { MonthlyAnalysisFilter } from './MonthlyAnalysisFilter';
@@ -120,25 +118,6 @@ export const MonthlyAnalysis = () => {
 
   const nbInventoriesTemplate = (data: MonthlyAnalysisStats) => <Text>{formatStats(data.nbInventoriesStats, undefined)}</Text>;
 
-  const headerColumnGroup = (
-    <ColumnGroup>
-      <Row>
-        <Column header="Code" rowSpan={2} />
-        <Column header="Produit" rowSpan={2} />
-        <Column header="% moyen vendu" rowSpan={2} />
-        <Column header="Quantité moyenne vendu" rowSpan={2} />
-        <Column header="Stock disponible" rowSpan={2} />
-        <Column header="Nb de mouvements de type" colSpan={4} />
-      </Row>
-      <Row>
-        <Column header="Livraison" field="nbDeliveriesStats" />
-        <Column header="Vente" field="nbSalesStats" />
-        <Column header="Perte" field="nbLossesStats" />
-        <Column header="Inventaire" field="nbInventoriesStats" />
-      </Row>
-    </ColumnGroup>
-  );
-
   const formatFileNameDates = (): string => dates.map(date => dayjs(date).format('YYYY-MM')).join('-');
 
   const downloadChartImage = () => {
@@ -191,16 +170,16 @@ export const MonthlyAnalysis = () => {
                       .format('MMMM'),
                   )}
                 >
-                  <DataTable value={monthlyAnalysisStats} dataKey="productCode" headerColumnGroup={headerColumnGroup}>
-                    <Column field="productCode"></Column>
-                    <Column field="product"></Column>
-                    <Column field="percentageStats" body={percentageTemplate}></Column>
-                    <Column field="quantityStats" body={quantityTemplate}></Column>
-                    <Column field="availableStockStats" body={availableStockTemplate}></Column>
-                    <Column field="nbDeliveriesStats" body={nbDeliveriesTemplate}></Column>
-                    <Column field="nbSalesStats" body={nbSalesTemplate}></Column>
-                    <Column field="nbLossesStats" body={nbLossesTemplate}></Column>
-                    <Column field="nbInventoriesStats" body={nbInventoriesTemplate}></Column>
+                  <DataTable value={monthlyAnalysisStats} dataKey="productCode">
+                    <Column field="productCode" header="Code"></Column>
+                    <Column field="product" header="Produit"></Column>
+                    <Column field="percentageStats" header="% moyen vendu" body={percentageTemplate}></Column>
+                    <Column field="quantityStats" header="Quantité moyenne vendu" body={quantityTemplate}></Column>
+                    <Column field="availableStockStats" header="Stock disponible" body={availableStockTemplate}></Column>
+                    <Column field="nbDeliveriesStats" header="Nb Livraisons" body={nbDeliveriesTemplate}></Column>
+                    <Column field="nbSalesStats" header="Nb Ventes" body={nbSalesTemplate}></Column>
+                    <Column field="nbLossesStats" header="Nb Pertes" body={nbLossesTemplate}></Column>
+                    <Column field="nbInventoriesStats" header="Nb Inventaires" body={nbInventoriesTemplate}></Column>
                   </DataTable>
                 </Card>
               </div>
