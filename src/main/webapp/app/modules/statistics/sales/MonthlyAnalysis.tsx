@@ -19,7 +19,8 @@ import { Chart } from 'primereact/chart';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { ProgressSpinner } from 'primereact/progressspinner';
-import { TabPanel, TabView } from 'primereact/tabview';
+import { SelectButton, SelectButtonChangeEvent } from 'primereact/selectbutton';
+import { Toolbar } from 'primereact/toolbar';
 import React, { useEffect, useRef, useState } from 'react';
 import { MonthlyAnalysisFilter } from './MonthlyAnalysisFilter';
 
@@ -45,6 +46,16 @@ export interface ProductTypeOption {
   value: string;
 }
 
+enum ResultDisplay {
+  TABLE = 'TABLE',
+  CHART = 'CHART',
+}
+
+interface ResultDisplayOption {
+  icon: JSX.Element;
+  display: ResultDisplay;
+}
+
 export const MonthlyAnalysis = () => {
   const chartRef = useRef(null);
 
@@ -54,6 +65,14 @@ export const MonthlyAnalysis = () => {
   );
 
   const now: Date = new Date();
+  const movementTypeOptions: MovementTypeOption[] = [
+    { label: 'Vente', value: 'Vente' },
+    { label: 'Perte', value: 'Perte' },
+  ];
+  const resultDisplayOptions: ResultDisplayOption[] = [
+    { icon: <Icon icon="table-list" />, display: ResultDisplay.TABLE },
+    { icon: <Icon icon="chart-line" />, display: ResultDisplay.CHART },
+  ];
 
   const [dates, setDates] = useState<Date[]>([new Date(now.getFullYear(), 0, 1), now]);
   const [minDate, setMinDate] = useState<Date>(undefined);
@@ -63,11 +82,7 @@ export const MonthlyAnalysis = () => {
   const [apiMapResponse, setApiMapResponse] = useState<ApiMapResponse>({});
   const [loadingData, setLoadingData] = useState<boolean>(false);
   const [chartData, setChartData] = useState<ChartData>({ labels: [], datasets: [] });
-
-  const movementTypeOptions: MovementTypeOption[] = [
-    { label: 'Vente', value: 'Vente' },
-    { label: 'Perte', value: 'Perte' },
-  ];
+  const [resultDisplay, setResultDisplay] = useState<ResultDisplay>(ResultDisplay.TABLE);
 
   const productTypeOptions: ProductTypeOption[] = productTypesByCode.map(pt => ({ label: pt, value: pt }));
 
@@ -120,6 +135,8 @@ export const MonthlyAnalysis = () => {
 
   const formatFileNameDates = (): string => dates.map(date => dayjs(date).format('YYYY-MM')).join('-');
 
+  const downloadTablesPdf = () => {};
+
   const downloadChartImage = () => {
     const chart = chartRef.current?.getChart();
     if (!chart) return;
@@ -132,10 +149,29 @@ export const MonthlyAnalysis = () => {
     link.click();
   };
 
-  const chartCardTitle: JSX.Element = (
-    <div className="flex justify-content-end">
-      <Button label="Télécharger" icon={<Icon icon="download" marginRight />} onClick={downloadChartImage} />
+  const downloadDisplayedResult = () => {
+    if (resultDisplay === ResultDisplay.TABLE) {
+      downloadTablesPdf();
+    } else {
+      downloadChartImage();
+    }
+  };
+
+  const toolbarStartContent: JSX.Element = (
+    <div className="flex align-items-center gap-2">
+      <Text>Affichage</Text>
+      <SelectButton
+        value={resultDisplay}
+        onChange={(e: SelectButtonChangeEvent) => setResultDisplay(e.value)}
+        optionLabel="icon"
+        optionValue="display"
+        options={resultDisplayOptions}
+      />
     </div>
+  );
+
+  const toolbarEndContent: JSX.Element = (
+    <Button label="Télécharger" icon={<Icon icon="download" marginRight />} onClick={downloadDisplayedResult} />
   );
 
   return (
@@ -158,44 +194,46 @@ export const MonthlyAnalysis = () => {
           />
         </BlockUI>
       </div>
-      <div className="col-12">
-        <TabView>
-          <TabPanel header="Tableau">
-            {Object.entries(apiMapResponse).map(([month, monthlyAnalysisStats]) => (
-              <div className="col-12" key={month}>
-                <Card
-                  title={capitalize(
-                    dayjs()
-                      .month(Number(month) - 1)
-                      .format('MMMM'),
-                  )}
-                >
-                  <DataTable value={monthlyAnalysisStats} dataKey="productCode">
-                    <Column field="productCode" header="Code"></Column>
-                    <Column field="product" header="Produit"></Column>
-                    <Column field="percentageStats" header="% moyen vendu" body={percentageTemplate}></Column>
-                    <Column field="quantityStats" header="Quantité moyenne vendu" body={quantityTemplate}></Column>
-                    <Column field="availableStockStats" header="Stock disponible" body={availableStockTemplate}></Column>
-                    <Column field="nbDeliveriesStats" header="Nb Livraisons" body={nbDeliveriesTemplate}></Column>
-                    <Column field="nbSalesStats" header="Nb Ventes" body={nbSalesTemplate}></Column>
-                    <Column field="nbLossesStats" header="Nb Pertes" body={nbLossesTemplate}></Column>
-                    <Column field="nbInventoriesStats" header="Nb Inventaires" body={nbInventoriesTemplate}></Column>
-                  </DataTable>
-                </Card>
-              </div>
-            ))}
-          </TabPanel>
-          <TabPanel header="Graphique">
-            {chartData.labels.length > 0 && (
+      {chartData.labels.length > 0 && (
+        <>
+          <div className="col-12">
+            <Toolbar start={toolbarStartContent} end={toolbarEndContent} />
+          </div>
+          <div className="col-12">
+            {resultDisplay === ResultDisplay.TABLE ? (
+              Object.entries(apiMapResponse).map(([month, monthlyAnalysisStats]) => (
+                <div className="col-12" key={month}>
+                  <Card
+                    title={capitalize(
+                      dayjs()
+                        .month(Number(month) - 1)
+                        .format('MMMM'),
+                    )}
+                  >
+                    <DataTable value={monthlyAnalysisStats} dataKey="productCode">
+                      <Column field="productCode" header="Code"></Column>
+                      <Column field="product" header="Produit"></Column>
+                      <Column field="percentageStats" header="% moyen vendu" body={percentageTemplate}></Column>
+                      <Column field="quantityStats" header="Quantité moyenne vendu" body={quantityTemplate}></Column>
+                      <Column field="availableStockStats" header="Stock disponible" body={availableStockTemplate}></Column>
+                      <Column field="nbDeliveriesStats" header="Nb Livraisons" body={nbDeliveriesTemplate}></Column>
+                      <Column field="nbSalesStats" header="Nb Ventes" body={nbSalesTemplate}></Column>
+                      <Column field="nbLossesStats" header="Nb Pertes" body={nbLossesTemplate}></Column>
+                      <Column field="nbInventoriesStats" header="Nb Inventaires" body={nbInventoriesTemplate}></Column>
+                    </DataTable>
+                  </Card>
+                </div>
+              ))
+            ) : (
               <div className="col-12">
-                <Card title={chartCardTitle}>
+                <Card>
                   <Chart ref={chartRef} type="line" data={chartData} options={lineOptions} />
                 </Card>
               </div>
             )}
-          </TabPanel>
-        </TabView>
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
