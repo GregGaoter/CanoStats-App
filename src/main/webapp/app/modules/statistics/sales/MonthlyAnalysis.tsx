@@ -11,6 +11,8 @@ import { getMonthlyAnalysisQueryParams } from 'app/shared/util/QueryParamsUtil';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { capitalize } from 'lodash';
 import { BlockUI } from 'primereact/blockui';
 import { Button } from 'primereact/button';
@@ -54,6 +56,18 @@ enum ResultDisplay {
 interface ResultDisplayOption {
   icon: JSX.Element;
   display: ResultDisplay;
+}
+
+enum TableHeader {
+  PRODUCT_CODE = 'Code',
+  PRODUCT = 'Produit',
+  AVERAGE_PERCENTAGE = '% moyen',
+  AVERAGE_QUANTITY = 'Quantité moyenne',
+  AVAILABLE_STOCK = 'Stock disponible',
+  NB_DELIVERIES = 'Nb Livraisons',
+  NB_SALES = 'Nb Ventes',
+  NB_LOSSES = 'Nb Pertes',
+  NB_INVENTORIES = 'Nb Inventaires',
 }
 
 export const MonthlyAnalysis = () => {
@@ -135,7 +149,40 @@ export const MonthlyAnalysis = () => {
 
   const formatFileNameDates = (): string => dates.map(date => dayjs(date).format('YYYY-MM')).join('-');
 
-  const downloadTablesPdf = () => {};
+  const toMonthName = (monthNumber: string): string =>
+    capitalize(
+      dayjs()
+        .month(Number(monthNumber) - 1)
+        .format('MMMM'),
+    );
+
+  const downloadTablesPdf = () => {
+    const pdf = new jsPDF('p', 'mm', 'a4') as any;
+
+    Object.entries(apiMapResponse).forEach(([month, monthlyAnalysisStats]) => {
+      const startY = pdf.lastAutoTable ? pdf.lastAutoTable.finalY + 15 : 20;
+      pdf.text(toMonthName(month), 10, startY - 5);
+      autoTable(pdf, {
+        startY,
+        head: [Object.values(TableHeader)],
+        body: monthlyAnalysisStats.map(stats => [
+          stats.productCode,
+          stats.product,
+          formatStats(stats.percentageStats, '%'),
+          formatStats(stats.quantityStats, getUnit(stats.unit)),
+          formatStats(stats.availableStockStats, getUnit(stats.unit)),
+          formatStats(stats.nbDeliveriesStats, undefined),
+          formatStats(stats.nbSalesStats, undefined),
+          formatStats(stats.nbLossesStats, undefined),
+          formatStats(stats.nbInventoriesStats, undefined),
+        ]),
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [22, 160, 133] },
+      });
+    });
+
+    pdf.save(`${formatFileNameDates()}-${movementType.toLowerCase()}-mensuelle-tableau.pdf`);
+  };
 
   const downloadChartImage = () => {
     const chart = chartRef.current?.getChart();
@@ -203,23 +250,17 @@ export const MonthlyAnalysis = () => {
             {resultDisplay === ResultDisplay.TABLE ? (
               Object.entries(apiMapResponse).map(([month, monthlyAnalysisStats]) => (
                 <div className="col-12" key={month}>
-                  <Card
-                    title={capitalize(
-                      dayjs()
-                        .month(Number(month) - 1)
-                        .format('MMMM'),
-                    )}
-                  >
+                  <Card title={toMonthName(month)}>
                     <DataTable value={monthlyAnalysisStats} dataKey="productCode">
-                      <Column field="productCode" header="Code"></Column>
-                      <Column field="product" header="Produit"></Column>
-                      <Column field="percentageStats" header="% moyen vendu" body={percentageTemplate}></Column>
-                      <Column field="quantityStats" header="Quantité moyenne vendu" body={quantityTemplate}></Column>
-                      <Column field="availableStockStats" header="Stock disponible" body={availableStockTemplate}></Column>
-                      <Column field="nbDeliveriesStats" header="Nb Livraisons" body={nbDeliveriesTemplate}></Column>
-                      <Column field="nbSalesStats" header="Nb Ventes" body={nbSalesTemplate}></Column>
-                      <Column field="nbLossesStats" header="Nb Pertes" body={nbLossesTemplate}></Column>
-                      <Column field="nbInventoriesStats" header="Nb Inventaires" body={nbInventoriesTemplate}></Column>
+                      <Column field="productCode" header={TableHeader.PRODUCT_CODE}></Column>
+                      <Column field="product" header={TableHeader.PRODUCT}></Column>
+                      <Column field="percentageStats" header={TableHeader.AVERAGE_PERCENTAGE} body={percentageTemplate}></Column>
+                      <Column field="quantityStats" header={TableHeader.AVERAGE_QUANTITY} body={quantityTemplate}></Column>
+                      <Column field="availableStockStats" header={TableHeader.AVAILABLE_STOCK} body={availableStockTemplate}></Column>
+                      <Column field="nbDeliveriesStats" header={TableHeader.NB_DELIVERIES} body={nbDeliveriesTemplate}></Column>
+                      <Column field="nbSalesStats" header={TableHeader.NB_SALES} body={nbSalesTemplate}></Column>
+                      <Column field="nbLossesStats" header={TableHeader.NB_LOSSES} body={nbLossesTemplate}></Column>
+                      <Column field="nbInventoriesStats" header={TableHeader.NB_INVENTORIES} body={nbInventoriesTemplate}></Column>
                     </DataTable>
                   </Card>
                 </div>
