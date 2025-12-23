@@ -126,10 +126,10 @@ export const MonthlyAnalysis = () => {
       .finally(() => setLoadingData(false));
   };
 
-  const getUnit = (vente: string): string => (vente === 'Au poids' ? 'kg' : 'pièces');
+  const getUnit = (vente: string): string => (vente === 'Au poids' ? 'kg' : 'p');
 
   const formatStats = (stats: StatisticalQuantities, unit: string): string => {
-    const unitDisplayed: string = unit ? ` ${unit}` : '';
+    const unitDisplayed: string = unit ? `${unit}` : '';
     return `${Math.ceil(stats.mean).toString()}${unitDisplayed} ± ${Math.ceil(stats.standardDeviation).toString()}${unitDisplayed}`;
   };
 
@@ -176,8 +176,11 @@ export const MonthlyAnalysis = () => {
           formatStats(stats.nbLossesStats, undefined),
           formatStats(stats.nbInventoriesStats, undefined),
         ]),
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [22, 160, 133] },
+        theme: 'grid',
+        headStyles: { fontSize: 8, fontStyle: 'bold', textColor: 0, fillColor: 225 },
+        bodyStyles: { fontSize: 8, textColor: 0 },
+        columnStyles: { 2: { cellWidth: 20 } },
+        margin: 10,
       });
     });
 
