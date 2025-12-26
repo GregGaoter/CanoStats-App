@@ -7,6 +7,7 @@ import { MouvementsStockDateRange } from 'app/shared/model/MouvementsStockDateRa
 import { StatisticalQuantities } from 'app/shared/model/StatisticalQuantities';
 import { transformMonthlyAnalysisToChartData } from 'app/shared/util/ChartDataTransformer';
 import { lineOptions } from 'app/shared/util/ChartOptionsUtils';
+import { prefixWithDateTime } from 'app/shared/util/date-utils';
 import { getMonthlyAnalysisQueryParams } from 'app/shared/util/QueryParamsUtil';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -147,8 +148,6 @@ export const MonthlyAnalysis = () => {
 
   const nbInventoriesTemplate = (data: MonthlyAnalysisStats) => <Text>{formatStats(data.nbInventoriesStats, undefined)}</Text>;
 
-  const formatFileNameDates = (): string => dates.map(date => dayjs(date).format('YYYY-MM')).join('-');
-
   const toMonthName = (monthNumber: string): string =>
     capitalize(
       dayjs()
@@ -184,7 +183,7 @@ export const MonthlyAnalysis = () => {
       });
     });
 
-    pdf.save(`${formatFileNameDates()}-${movementType.toLowerCase()}-mensuelle-tableau.pdf`);
+    pdf.save(prefixWithDateTime(`${movementType.toLowerCase()}-mensuelle-tableau.pdf`));
   };
 
   const downloadChartImage = () => {
@@ -195,7 +194,7 @@ export const MonthlyAnalysis = () => {
 
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${formatFileNameDates()}-${movementType.toLowerCase()}-mensuelle-graphique.png`;
+    link.download = prefixWithDateTime(`${movementType.toLowerCase()}-mensuelle-graphique.png`);
     link.click();
   };
 
