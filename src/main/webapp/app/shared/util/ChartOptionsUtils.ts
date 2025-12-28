@@ -3,11 +3,20 @@ const textColor = documentStyle.getPropertyValue('--text-color');
 const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
 const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
 
-export const lineOptions = {
+export const lineOptions = (chartLabel: string, xLabel: string, yLabel: string) => ({
   plugins: {
     legend: {
       labels: {
-        color: textColor,
+        color: textColorSecondary,
+      },
+    },
+    title: {
+      display: true,
+      text: chartLabel,
+      color: textColorSecondary,
+      font: {
+        size: 16,
+        weight: 'bold',
       },
     },
   },
@@ -15,6 +24,14 @@ export const lineOptions = {
     x: {
       ticks: {
         color: textColorSecondary,
+      },
+      title: {
+        display: true,
+        text: xLabel,
+        color: textColorSecondary,
+        font: {
+          weight: 'bold',
+        },
       },
       grid: {
         color: surfaceBorder,
@@ -24,9 +41,17 @@ export const lineOptions = {
       ticks: {
         color: textColorSecondary,
       },
+      title: {
+        display: true,
+        text: yLabel,
+        color: textColorSecondary,
+        font: {
+          weight: 'bold',
+        },
+      },
       grid: {
         color: surfaceBorder,
       },
     },
   },
-};
+});

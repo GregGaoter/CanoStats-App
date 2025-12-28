@@ -255,7 +255,7 @@ export const MonthlyAnalysis = () => {
             ) : (
               <div className="col-12">
                 <Card>
-                  <Chart ref={chartRef} type="line" data={chartData} options={lineOptions} />
+                  <Chart ref={chartRef} type="line" data={chartData} options={lineOptions(movementType, '', '% du stock')} />
                 </Card>
               </div>
             )}
