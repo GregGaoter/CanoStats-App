@@ -2,30 +2,30 @@ import { useAppSelector } from 'app/config/store';
 import { apiUrl } from 'app/entities/mouvements-stock/mouvements-stock.reducer';
 import { Icon } from 'app/shared/component/Icon';
 import { Text } from 'app/shared/component/Text';
+import { MonthlyAnalysisTableHeader } from 'app/shared/model/enumeration/MonthlyAnalysisTableHeader';
 import { MonthlyAnalysisStats } from 'app/shared/model/MonthlyAnalysisStats';
 import { MouvementsStockDateRange } from 'app/shared/model/MouvementsStockDateRange';
-import { StatisticalQuantities } from 'app/shared/model/StatisticalQuantities';
 import { transformMonthlyAnalysisToChartData } from 'app/shared/util/ChartDataTransformer';
 import { lineOptions } from 'app/shared/util/ChartOptionsUtils';
 import { prefixWithDateTime } from 'app/shared/util/date-utils';
 import { getMonthlyAnalysisQueryParams } from 'app/shared/util/QueryParamsUtil';
+import { formatStats, getProductUnit } from 'app/shared/util/Utils';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { capitalize } from 'lodash';
+import { capitalize, groupBy } from 'lodash';
 import { BlockUI } from 'primereact/blockui';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Chart } from 'primereact/chart';
-import { Column } from 'primereact/column';
-import { DataTable } from 'primereact/datatable';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { SelectButton, SelectButtonChangeEvent } from 'primereact/selectbutton';
 import { Toolbar } from 'primereact/toolbar';
 import React, { useEffect, useRef, useState } from 'react';
 import { MonthlyAnalysisFilter } from './MonthlyAnalysisFilter';
+import { MonthlyAnalysisTable } from './MonthlyAnalysisTable';
 
 interface ApiMapResponse {
   [month: number]: MonthlyAnalysisStats[];
@@ -59,16 +59,9 @@ interface ResultDisplayOption {
   display: ResultDisplay;
 }
 
-enum TableHeader {
-  PRODUCT_CODE = 'Code',
-  PRODUCT = 'Produit',
-  AVERAGE_PERCENTAGE = '% moyen',
-  AVERAGE_QUANTITY = 'Quantité moyenne',
-  AVAILABLE_STOCK = 'Stock disponible',
-  NB_DELIVERIES = 'Nb Livraisons',
-  NB_SALES = 'Nb Ventes',
-  NB_LOSSES = 'Nb Pertes',
-  NB_INVENTORIES = 'Nb Inventaires',
+interface YearMonth {
+  year: number;
+  month: number;
 }
 
 export const MonthlyAnalysis = () => {
@@ -90,6 +83,7 @@ export const MonthlyAnalysis = () => {
   ];
 
   const [dates, setDates] = useState<Date[]>([new Date(now.getFullYear(), 0, 1), now]);
+  const [monthToYears, setMonthToYears] = useState<Map<number, number[]>>(new Map());
   const [minDate, setMinDate] = useState<Date>(undefined);
   const [maxDate, setMaxDate] = useState<Date>(undefined);
   const [movementType, setMovementType] = useState<string>('');
@@ -112,6 +106,23 @@ export const MonthlyAnalysis = () => {
     }
   }, [mouvementsStockDateRange]);
 
+  const getMonthsRange = (): YearMonth[] => {
+    const result: YearMonth[] = [];
+    const date: Date = new Date(dates[0].getFullYear(), dates[0].getMonth(), 1);
+    while (date <= dates[1]) {
+      result.push({ year: date.getFullYear(), month: date.getMonth() + 1 });
+      date.setMonth(date.getMonth() + 1);
+    }
+    return result;
+  };
+
+  const getMonthToIsMulti = (): Map<number, number[]> =>
+    new Map(
+      Object.entries(groupBy(getMonthsRange(), 'month')).map(([month, yearMonths]) => [Number(month), yearMonths.map(ym => ym.year)]),
+    );
+
+  const isMonthMulti = (month: number): boolean => (monthToYears.get(month)?.length ?? 0) > 1;
+
   const getMonthlyAnalysis = (): void => {
     setLoadingData(true);
     setApiMapResponse({});
@@ -121,59 +132,43 @@ export const MonthlyAnalysis = () => {
         timeout: 3600000,
       })
       .then(response => {
+        setMonthToYears(getMonthToIsMulti());
         setApiMapResponse(response.data);
         setChartData(transformMonthlyAnalysisToChartData(response.data, productTypes));
       })
       .finally(() => setLoadingData(false));
   };
 
-  const getUnit = (vente: string): string => (vente === 'Au poids' ? 'kg' : 'p');
-
-  const formatStats = (stats: StatisticalQuantities, unit: string): string => {
-    const unitDisplayed: string = unit ? `${unit}` : '';
-    return `${Math.ceil(stats.mean).toString()}${unitDisplayed} ± ${Math.ceil(stats.standardDeviation).toString()}${unitDisplayed}`;
-  };
-
-  const percentageTemplate = (data: MonthlyAnalysisStats) => <Text>{formatStats(data.percentageStats, '%')}</Text>;
-
-  const quantityTemplate = (data: MonthlyAnalysisStats) => <Text>{formatStats(data.quantityStats, getUnit(data.unit))}</Text>;
-
-  const availableStockTemplate = (data: MonthlyAnalysisStats) => <Text>{formatStats(data.availableStockStats, getUnit(data.unit))}</Text>;
-
-  const nbDeliveriesTemplate = (data: MonthlyAnalysisStats) => <Text>{formatStats(data.nbDeliveriesStats, undefined)}</Text>;
-
-  const nbSalesTemplate = (data: MonthlyAnalysisStats) => <Text>{formatStats(data.nbSalesStats, undefined)}</Text>;
-
-  const nbLossesTemplate = (data: MonthlyAnalysisStats) => <Text>{formatStats(data.nbLossesStats, undefined)}</Text>;
-
-  const nbInventoriesTemplate = (data: MonthlyAnalysisStats) => <Text>{formatStats(data.nbInventoriesStats, undefined)}</Text>;
-
-  const toMonthName = (monthNumber: string): string =>
+  const toMonthName = (month: number): string =>
     capitalize(
       dayjs()
-        .month(Number(monthNumber) - 1)
+        .month(month - 1)
         .format('MMMM'),
     );
+
+  const displayResultMonthHeader = (month: number): string =>
+    `${toMonthName(month)} ${monthToYears.get(month).join('-')} - ${movementType}`;
 
   const downloadTablesPdf = () => {
     const pdf = new jsPDF('p', 'mm', 'a4') as any;
 
     Object.entries(apiMapResponse).forEach(([month, monthlyAnalysisStats]) => {
       const startY = pdf.lastAutoTable ? pdf.lastAutoTable.finalY + 15 : 20;
-      pdf.text(toMonthName(month), 10, startY - 5);
+      const monthNumber: number = Number(month);
+      pdf.text(displayResultMonthHeader(monthNumber), 10, startY - 5);
       autoTable(pdf, {
         startY,
-        head: [Object.values(TableHeader)],
+        head: [Object.values(MonthlyAnalysisTableHeader)],
         body: monthlyAnalysisStats.map(stats => [
           stats.productCode,
           stats.product,
-          formatStats(stats.percentageStats, '%'),
-          formatStats(stats.quantityStats, getUnit(stats.unit)),
-          formatStats(stats.availableStockStats, getUnit(stats.unit)),
-          formatStats(stats.nbDeliveriesStats, undefined),
-          formatStats(stats.nbSalesStats, undefined),
-          formatStats(stats.nbLossesStats, undefined),
-          formatStats(stats.nbInventoriesStats, undefined),
+          formatStats(stats.percentageStats, '%', isMonthMulti(monthNumber)),
+          formatStats(stats.quantityStats, getProductUnit(stats.unit), isMonthMulti(monthNumber)),
+          formatStats(stats.availableStockStats, getProductUnit(stats.unit), isMonthMulti(monthNumber)),
+          formatStats(stats.nbDeliveriesStats, undefined, isMonthMulti(monthNumber)),
+          formatStats(stats.nbSalesStats, undefined, isMonthMulti(monthNumber)),
+          formatStats(stats.nbLossesStats, undefined, isMonthMulti(monthNumber)),
+          formatStats(stats.nbInventoriesStats, undefined, isMonthMulti(monthNumber)),
         ]),
         theme: 'grid',
         headStyles: { fontSize: 8, fontStyle: 'bold', textColor: 0, fillColor: 225 },
@@ -252,18 +247,8 @@ export const MonthlyAnalysis = () => {
             {resultDisplay === ResultDisplay.TABLE ? (
               Object.entries(apiMapResponse).map(([month, monthlyAnalysisStats]) => (
                 <div className="col-12" key={month}>
-                  <Card title={toMonthName(month)}>
-                    <DataTable value={monthlyAnalysisStats} dataKey="productCode">
-                      <Column field="productCode" header={TableHeader.PRODUCT_CODE}></Column>
-                      <Column field="product" header={TableHeader.PRODUCT}></Column>
-                      <Column field="percentageStats" header={TableHeader.AVERAGE_PERCENTAGE} body={percentageTemplate}></Column>
-                      <Column field="quantityStats" header={TableHeader.AVERAGE_QUANTITY} body={quantityTemplate}></Column>
-                      <Column field="availableStockStats" header={TableHeader.AVAILABLE_STOCK} body={availableStockTemplate}></Column>
-                      <Column field="nbDeliveriesStats" header={TableHeader.NB_DELIVERIES} body={nbDeliveriesTemplate}></Column>
-                      <Column field="nbSalesStats" header={TableHeader.NB_SALES} body={nbSalesTemplate}></Column>
-                      <Column field="nbLossesStats" header={TableHeader.NB_LOSSES} body={nbLossesTemplate}></Column>
-                      <Column field="nbInventoriesStats" header={TableHeader.NB_INVENTORIES} body={nbInventoriesTemplate}></Column>
-                    </DataTable>
+                  <Card title={displayResultMonthHeader(Number(month))}>
+                    <MonthlyAnalysisTable monthlyAnalysisStats={monthlyAnalysisStats} isMonthMulti={isMonthMulti(Number(month))} />
                   </Card>
                 </div>
               ))
