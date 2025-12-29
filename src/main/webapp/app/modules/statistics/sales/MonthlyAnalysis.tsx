@@ -20,6 +20,7 @@ import { BlockUI } from 'primereact/blockui';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Chart } from 'primereact/chart';
+import { Fieldset } from 'primereact/fieldset';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { SelectButton, SelectButtonChangeEvent } from 'primereact/selectbutton';
 import { Toolbar } from 'primereact/toolbar';
@@ -221,6 +222,16 @@ export const MonthlyAnalysis = () => {
 
   return (
     <div className="grid align-items-center">
+      <div className="col-12">
+        <Fieldset legend="Analyse des mouvements de stock mensuels" pt={{ legend: { className: 'bg-blue-800' } }}>
+          <div className="flex flex-column gap-1">
+            <Text>{`Cette analyse permet d'examiner l'évolution des stocks selon le type de mouvement (Vente ou Perte), la catégorie de produits et la période sélectionnée.`}</Text>
+            <Text>{`Pour chaque mois, un tableau détaille les indicateurs clés : pourcentage moyen de stock, quantités moyennes, stock disponible, ainsi que le nombre de livraisons, ventes, pertes et inventaires.`}</Text>
+            <Text>{`Lorsque plusieurs années sont incluses pour un même mois, les écarts‑types sont affichés pour visualiser la variabilité.`}</Text>
+            <Text>{`Un graphique complète l'analyse en montrant l'évolution du pourcentage moyen par type de produit au fil des mois.`}</Text>
+          </div>
+        </Fieldset>
+      </div>
       <div className="col-12">
         <BlockUI blocked={loadingData} template={<ProgressSpinner />}>
           <MonthlyAnalysisFilter
