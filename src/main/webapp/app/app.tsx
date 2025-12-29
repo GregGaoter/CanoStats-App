@@ -88,7 +88,7 @@ export const App = () => {
           <ErrorBoundary>
             <div className={appRoutesClass} style={appRoutesStyle}>
               <AppRoutes isAuthenticated={isAuthenticated} />
-              {isAuthenticated && <Footer />}
+              {/* {isAuthenticated && <Footer />} */}
             </div>
             {isAuthenticated && <Header isAdmin={isAdmin} />}
           </ErrorBoundary>
