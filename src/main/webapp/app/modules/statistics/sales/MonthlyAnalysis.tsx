@@ -116,7 +116,7 @@ export const MonthlyAnalysis = () => {
     return result;
   };
 
-  const getMonthToIsMulti = (): Map<number, number[]> =>
+  const getMonthToYears = (): Map<number, number[]> =>
     new Map(
       Object.entries(groupBy(getMonthsRange(), 'month')).map(([month, yearMonths]) => [Number(month), yearMonths.map(ym => ym.year)]),
     );
@@ -132,9 +132,10 @@ export const MonthlyAnalysis = () => {
         timeout: 3600000,
       })
       .then(response => {
-        setMonthToYears(getMonthToIsMulti());
+        const mty: Map<number, number[]> = getMonthToYears();
+        setMonthToYears(mty);
         setApiMapResponse(response.data);
-        setChartData(transformMonthlyAnalysisToChartData(response.data, productTypes));
+        setChartData(transformMonthlyAnalysisToChartData(response.data, productTypes, mty));
       })
       .finally(() => setLoadingData(false));
   };

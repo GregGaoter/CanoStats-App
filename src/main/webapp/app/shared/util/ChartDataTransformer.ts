@@ -18,6 +18,7 @@ interface ChartData {
 export const transformMonthlyAnalysisToChartData = (
   apiMapResponse: { [month: number]: MonthlyAnalysisStats[] },
   productTypesByCode: string[],
+  monthToYears: Map<number, number[]>,
 ): ChartData => {
   // Sort month keys to ensure proper order
   const sortedMonths = Object.keys(apiMapResponse)
@@ -27,7 +28,7 @@ export const transformMonthlyAnalysisToChartData = (
   // Map month numbers to month names
   const labels = sortedMonths.map(month => {
     const date = dayjs().month(month - 1);
-    return date.format('MMMM');
+    return `${date.format('MMMM')} ${monthToYears.get(month)?.join('-') ?? ''}`;
   });
 
   // Use provided product type prefixes (first three letters) to build consistent datasets
