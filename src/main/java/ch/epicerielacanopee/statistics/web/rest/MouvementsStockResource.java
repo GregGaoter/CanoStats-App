@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +33,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import ch.epicerielacanopee.statistics.repository.MouvementsStockRepository;
 import ch.epicerielacanopee.statistics.repository.projection.MouvementsStockProjection;
+import ch.epicerielacanopee.statistics.service.AnalysisProgressService;
 import ch.epicerielacanopee.statistics.service.MouvementsStockQueryService;
 import ch.epicerielacanopee.statistics.service.MouvementsStockService;
 import ch.epicerielacanopee.statistics.service.criteria.MouvementsStockCriteria;
@@ -41,6 +43,7 @@ import ch.epicerielacanopee.statistics.service.util.MouvementsStockDateRange;
 import ch.epicerielacanopee.statistics.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import reactor.core.publisher.Flux;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -66,13 +69,17 @@ public class MouvementsStockResource {
 
     private final MouvementsStockQueryService mouvementsStockQueryService;
 
+    private final AnalysisProgressService progressService;
+
     public MouvementsStockResource(
             MouvementsStockService mouvementsStockService,
             MouvementsStockRepository mouvementsStockRepository,
-            MouvementsStockQueryService mouvementsStockQueryService) {
+            MouvementsStockQueryService mouvementsStockQueryService,
+            AnalysisProgressService progressService) {
         this.mouvementsStockService = mouvementsStockService;
         this.mouvementsStockRepository = mouvementsStockRepository;
         this.mouvementsStockQueryService = mouvementsStockQueryService;
+        this.progressService = progressService;
     }
 
     /**
@@ -288,5 +295,10 @@ public class MouvementsStockResource {
     public ResponseEntity<Instant> getMaxDate() {
         Instant maxDate = mouvementsStockService.getMaxDate();
         return ResponseEntity.ok().body(maxDate);
+    }
+
+    @GetMapping(value = "/analysis/progress", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<Integer> streamProgress() {
+        return progressService.getProgressStream();
     }
 }

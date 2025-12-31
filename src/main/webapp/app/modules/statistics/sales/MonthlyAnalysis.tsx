@@ -16,12 +16,11 @@ import 'dayjs/locale/fr';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { capitalize, groupBy } from 'lodash';
-import { BlockUI } from 'primereact/blockui';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Chart } from 'primereact/chart';
 import { Fieldset } from 'primereact/fieldset';
-import { ProgressSpinner } from 'primereact/progressspinner';
+import { ProgressBar } from 'primereact/progressbar';
 import { SelectButton, SelectButtonChangeEvent } from 'primereact/selectbutton';
 import { Toolbar } from 'primereact/toolbar';
 import React, { useEffect, useRef, useState } from 'react';
@@ -93,10 +92,22 @@ export const MonthlyAnalysis = () => {
   const [loadingData, setLoadingData] = useState<boolean>(false);
   const [chartData, setChartData] = useState<ChartData>({ labels: [], datasets: [] });
   const [resultDisplay, setResultDisplay] = useState<ResultDisplay>(ResultDisplay.TABLE);
+  const [progress, setProgress] = useState<number>(0);
 
   const productTypeOptions: ProductTypeOption[] = productTypesByCode.map(pt => ({ label: pt, value: pt }));
 
   dayjs.locale('fr');
+
+  useEffect(() => {
+    const es = new EventSource(`http://localhost:8080/${apiUrl}/analysis/progress`);
+    es.onmessage = event => {
+      setProgress(parseInt(event.data, 10));
+    };
+    es.onerror = () => {
+      es.close();
+    };
+    return () => es.close();
+  }, []);
 
   useEffect(() => {
     if (mouvementsStockDateRange?.startDate) setMinDate(new Date(mouvementsStockDateRange.startDate));
@@ -233,22 +244,25 @@ export const MonthlyAnalysis = () => {
         </Fieldset>
       </div>
       <div className="col-12">
-        <BlockUI blocked={loadingData} template={<ProgressSpinner />}>
-          <MonthlyAnalysisFilter
-            dates={dates}
-            movementType={movementType}
-            productTypes={productTypes}
-            movementTypeOptions={movementTypeOptions}
-            productTypeOptions={productTypeOptions}
-            minDate={minDate}
-            maxDate={maxDate}
-            loadingData={loadingData}
-            onMovementTypeChange={mt => setMovementType(mt)}
-            onProductTypesChange={pt => setProductTypes(pt)}
-            onDatesChange={d => setDates(d)}
-            onApplyFilter={() => getMonthlyAnalysis()}
-          />
-        </BlockUI>
+        {/* <BlockUI blocked={loadingData} template={<ProgressBar value={progress}></ProgressBar>}> */}
+        <MonthlyAnalysisFilter
+          dates={dates}
+          movementType={movementType}
+          productTypes={productTypes}
+          movementTypeOptions={movementTypeOptions}
+          productTypeOptions={productTypeOptions}
+          minDate={minDate}
+          maxDate={maxDate}
+          loadingData={loadingData}
+          onMovementTypeChange={mt => setMovementType(mt)}
+          onProductTypesChange={pt => setProductTypes(pt)}
+          onDatesChange={d => setDates(d)}
+          onApplyFilter={() => getMonthlyAnalysis()}
+        />
+        {/* </BlockUI> */}
+      </div>
+      <div className="col-12">
+        <ProgressBar value={progress}></ProgressBar>
       </div>
       {chartData.labels.length > 0 && (
         <>

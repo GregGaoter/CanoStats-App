@@ -1,5 +1,7 @@
 package ch.epicerielacanopee.statistics.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
@@ -162,10 +164,13 @@ public class MouvementsStockService {
 
     private final MouvementsStockMapper mouvementsStockMapper;
 
+    private final AnalysisProgressService progressService;
+
     public MouvementsStockService(MouvementsStockRepository mouvementsStockRepository,
-            MouvementsStockMapper mouvementsStockMapper, ObjectMapper objectMapper) {
+            MouvementsStockMapper mouvementsStockMapper, ObjectMapper objectMapper, AnalysisProgressService progressService) {
         this.mouvementsStockRepository = mouvementsStockRepository;
         this.mouvementsStockMapper = mouvementsStockMapper;
+        this.progressService = progressService;
         this.objectMapper = objectMapper;
     }
 
@@ -443,6 +448,9 @@ public class MouvementsStockService {
             ZoneId zone) {
         Map<YearMonth, List<MonthlyAnalysisResult>> yearMonthResults = new HashMap<>();
 
+        int productKeyTotal = byYearMonthAndProduct.values().stream().mapToInt(byProduct -> byProduct.size()).sum();
+        int productKeyCount = 0;
+        int productKeyProgress = 0;
         for (Map.Entry<YearMonth, Map<ProductGroupingKey, List<MouvementsStockProjection>>> yearMonthEntry : byYearMonthAndProduct
                 .entrySet()) {
             YearMonth yearMonth = yearMonthEntry.getKey();
@@ -451,6 +459,9 @@ public class MouvementsStockService {
             List<MonthlyAnalysisResult> monthlyAnalysisResults = new ArrayList<>();
 
             for (Map.Entry<ProductGroupingKey, List<MouvementsStockProjection>> productEntry : byProduct.entrySet()) {
+                productKeyCount++;
+                productKeyProgress = BigDecimal.valueOf(productKeyCount).multiply(BigDecimal.valueOf(100)).divide(BigDecimal.valueOf(productKeyTotal), 0, RoundingMode.HALF_UP).intValue();
+                progressService.emitProgress(productKeyProgress);
                 analyzeProductMonth(yearMonth, productEntry.getKey(), productEntry.getValue(), movementsType, zone)
                         .ifPresent(monthlyAnalysisResults::add);
             }
