@@ -6,7 +6,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -451,6 +450,7 @@ public class MouvementsStockService {
         int productKeyTotal = byYearMonthAndProduct.values().stream().mapToInt(byProduct -> byProduct.size()).sum();
         int productKeyCount = 0;
         int productKeyProgress = 0;
+        String progressMessage = "Progression de l'analyse mensuelle...";
         for (Map.Entry<YearMonth, Map<ProductGroupingKey, List<MouvementsStockProjection>>> yearMonthEntry : byYearMonthAndProduct
                 .entrySet()) {
             YearMonth yearMonth = yearMonthEntry.getKey();
@@ -461,7 +461,7 @@ public class MouvementsStockService {
             for (Map.Entry<ProductGroupingKey, List<MouvementsStockProjection>> productEntry : byProduct.entrySet()) {
                 productKeyCount++;
                 productKeyProgress = BigDecimal.valueOf(productKeyCount).multiply(BigDecimal.valueOf(100)).divide(BigDecimal.valueOf(productKeyTotal), 0, RoundingMode.HALF_UP).intValue();
-                progressService.emitProgress(productKeyProgress);
+                progressService.emitProgress(productKeyProgress, progressMessage);
                 analyzeProductMonth(yearMonth, productEntry.getKey(), productEntry.getValue(), movementsType, zone)
                         .ifPresent(monthlyAnalysisResults::add);
             }

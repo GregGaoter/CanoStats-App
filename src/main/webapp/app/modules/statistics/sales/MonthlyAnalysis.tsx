@@ -16,6 +16,7 @@ import 'dayjs/locale/fr';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { capitalize, groupBy } from 'lodash';
+import { BlockUI } from 'primereact/blockui';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Chart } from 'primereact/chart';
@@ -92,7 +93,8 @@ export const MonthlyAnalysis = () => {
   const [loadingData, setLoadingData] = useState<boolean>(false);
   const [chartData, setChartData] = useState<ChartData>({ labels: [], datasets: [] });
   const [resultDisplay, setResultDisplay] = useState<ResultDisplay>(ResultDisplay.TABLE);
-  const [progress, setProgress] = useState<number>(0);
+  const [progressPercentage, setProgressPercentage] = useState<number>(0);
+  const [progressMessage, setProgressMessage] = useState<string>('');
 
   const productTypeOptions: ProductTypeOption[] = productTypesByCode.map(pt => ({ label: pt, value: pt }));
 
@@ -101,7 +103,9 @@ export const MonthlyAnalysis = () => {
   useEffect(() => {
     const es = new EventSource(`http://localhost:8080/${apiUrl}/analysis/progress`);
     es.onmessage = event => {
-      setProgress(parseInt(event.data, 10));
+      const data = JSON.parse(event.data);
+      setProgressPercentage(data.progress);
+      setProgressMessage(data.message);
     };
     es.onerror = () => {
       es.close();
@@ -234,7 +238,7 @@ export const MonthlyAnalysis = () => {
   return (
     <div className="grid align-items-center">
       <div className="col-12">
-        <Fieldset legend="Analyse des mouvements de stock mensuels" pt={{ legend: { className: 'bg-blue-800' } }}>
+        <Fieldset legend="Analyse des mouvements de stock mensuels" pt={{ legend: { className: 'bg-blue-800' } }} toggleable collapsed>
           <div className="flex flex-column gap-1">
             <Text>{`Cette analyse permet d'examiner l'évolution des stocks selon le type de mouvement (Vente ou Perte), la catégorie de produits et la période sélectionnée.`}</Text>
             <Text>{`Pour chaque mois, un tableau détaille les indicateurs clés : pourcentage moyen de stock, quantités moyennes, stock disponible, ainsi que le nombre de livraisons, ventes, pertes et inventaires.`}</Text>
@@ -244,26 +248,35 @@ export const MonthlyAnalysis = () => {
         </Fieldset>
       </div>
       <div className="col-12">
-        {/* <BlockUI blocked={loadingData} template={<ProgressBar value={progress}></ProgressBar>}> */}
-        <MonthlyAnalysisFilter
-          dates={dates}
-          movementType={movementType}
-          productTypes={productTypes}
-          movementTypeOptions={movementTypeOptions}
-          productTypeOptions={productTypeOptions}
-          minDate={minDate}
-          maxDate={maxDate}
-          loadingData={loadingData}
-          onMovementTypeChange={mt => setMovementType(mt)}
-          onProductTypesChange={pt => setProductTypes(pt)}
-          onDatesChange={d => setDates(d)}
-          onApplyFilter={() => getMonthlyAnalysis()}
-        />
-        {/* </BlockUI> */}
+        <BlockUI blocked={loadingData}>
+          <MonthlyAnalysisFilter
+            dates={dates}
+            movementType={movementType}
+            productTypes={productTypes}
+            movementTypeOptions={movementTypeOptions}
+            productTypeOptions={productTypeOptions}
+            minDate={minDate}
+            maxDate={maxDate}
+            loadingData={loadingData}
+            onMovementTypeChange={mt => setMovementType(mt)}
+            onProductTypesChange={pt => setProductTypes(pt)}
+            onDatesChange={d => setDates(d)}
+            onApplyFilter={() => getMonthlyAnalysis()}
+          />
+        </BlockUI>
       </div>
-      <div className="col-12">
-        <ProgressBar value={progress}></ProgressBar>
-      </div>
+      {loadingData && (
+        <div className="col-12 text-center mt-4">
+          <div className="mb-2">
+            <Text>{progressMessage}</Text>
+          </div>
+          {progressPercentage === 0 ? (
+            <ProgressBar mode="indeterminate"></ProgressBar>
+          ) : (
+            <ProgressBar value={progressPercentage}></ProgressBar>
+          )}
+        </div>
+      )}
       {chartData.labels.length > 0 && (
         <>
           <div className="col-12">

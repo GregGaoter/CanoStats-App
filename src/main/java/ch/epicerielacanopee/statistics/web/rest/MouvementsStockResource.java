@@ -37,6 +37,7 @@ import ch.epicerielacanopee.statistics.service.AnalysisProgressService;
 import ch.epicerielacanopee.statistics.service.MouvementsStockQueryService;
 import ch.epicerielacanopee.statistics.service.MouvementsStockService;
 import ch.epicerielacanopee.statistics.service.criteria.MouvementsStockCriteria;
+import ch.epicerielacanopee.statistics.service.dto.AnalysisProgressEvent;
 import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
 import ch.epicerielacanopee.statistics.service.util.MonthlyAnalysisStats;
 import ch.epicerielacanopee.statistics.service.util.MouvementsStockDateRange;
@@ -278,6 +279,7 @@ public class MouvementsStockResource {
             @RequestParam List<String> productTypes,
             @RequestParam Instant startDate,
             @RequestParam Instant endDate) {
+        progressService.emitProgress(0, "Extraction des mouvements de stock...");
         List<MouvementsStockProjection> mvts = mouvementsStockService
                 .findByCodeProduitStartingWithAnyAndDateBetween(productTypes, startDate, endDate);
         Map<Integer, List<MonthlyAnalysisStats>> monthlyAnalysis = mouvementsStockService
@@ -298,7 +300,7 @@ public class MouvementsStockResource {
     }
 
     @GetMapping(value = "/analysis/progress", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<Integer> streamProgress() {
+    public Flux<AnalysisProgressEvent> streamProgress() {
         return progressService.getProgressStream();
     }
 }
