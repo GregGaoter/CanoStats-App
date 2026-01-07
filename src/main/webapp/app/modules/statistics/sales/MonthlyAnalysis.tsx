@@ -2,14 +2,14 @@ import { useAppSelector } from 'app/config/store';
 import { apiUrl } from 'app/entities/mouvements-stock/mouvements-stock.reducer';
 import { Icon } from 'app/shared/component/Icon';
 import { Text } from 'app/shared/component/Text';
-import { MonthlyAnalysisTableHeader } from 'app/shared/model/enumeration/MonthlyAnalysisTableHeader';
 import { MonthlyAnalysisStats } from 'app/shared/model/MonthlyAnalysisStats';
+import { MonthlyAnalysisTableHeaders } from 'app/shared/model/MonthlyAnalysisTableHeaders';
 import { MouvementsStockDateRange } from 'app/shared/model/MouvementsStockDateRange';
 import { transformMonthlyAnalysisToChartData } from 'app/shared/util/ChartDataTransformer';
 import { lineOptions } from 'app/shared/util/ChartOptionsUtils';
 import { prefixWithDateTime } from 'app/shared/util/date-utils';
 import { getMonthlyAnalysisQueryParams } from 'app/shared/util/QueryParamsUtil';
-import { formatStats, getProductUnit } from 'app/shared/util/Utils';
+import { formatStats, getMonthlyAnalysisTableHeaders, getProductUnit } from 'app/shared/util/Utils';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
@@ -95,6 +95,7 @@ export const MonthlyAnalysis = () => {
   const [resultDisplay, setResultDisplay] = useState<ResultDisplay>(ResultDisplay.TABLE);
   const [progressPercentage, setProgressPercentage] = useState<number>(0);
   const [progressMessage, setProgressMessage] = useState<string>('');
+  const [tableHeaders, setTableHeaders] = useState<MonthlyAnalysisTableHeaders>(getMonthlyAnalysisTableHeaders(movementType));
 
   const productTypeOptions: ProductTypeOption[] = productTypesByCode.map(pt => ({ label: pt, value: pt }));
 
@@ -121,6 +122,10 @@ export const MonthlyAnalysis = () => {
       setDates([new Date(endDate.getFullYear(), 0, 1), new Date(endDate.getFullYear(), endDate.getMonth(), 1)]);
     }
   }, [mouvementsStockDateRange]);
+
+  useEffect(() => {
+    setTableHeaders(getMonthlyAnalysisTableHeaders(movementType));
+  }, [movementType]);
 
   const getMonthsRange = (): YearMonth[] => {
     const result: YearMonth[] = [];
@@ -175,7 +180,7 @@ export const MonthlyAnalysis = () => {
       pdf.text(displayResultMonthHeader(monthNumber), 10, startY - 5);
       autoTable(pdf, {
         startY,
-        head: [Object.values(MonthlyAnalysisTableHeader)],
+        head: [Object.values(tableHeaders)],
         body: monthlyAnalysisStats.map(stats => [
           stats.productCode,
           stats.product,
@@ -266,7 +271,7 @@ export const MonthlyAnalysis = () => {
         </BlockUI>
       </div>
       {loadingData && (
-        <div className="col-12 text-center mt-4">
+        <div className="col-6 col-offset-3 text-center mt-4">
           <div className="mb-2">
             <Text>{progressMessage}</Text>
           </div>
@@ -287,7 +292,11 @@ export const MonthlyAnalysis = () => {
               Object.entries(apiMapResponse).map(([month, monthlyAnalysisStats]) => (
                 <div className="col-12" key={month}>
                   <Card title={displayResultMonthHeader(Number(month))}>
-                    <MonthlyAnalysisTable monthlyAnalysisStats={monthlyAnalysisStats} isMonthMulti={isMonthMulti(Number(month))} />
+                    <MonthlyAnalysisTable
+                      monthlyAnalysisStats={monthlyAnalysisStats}
+                      isMonthMulti={isMonthMulti(Number(month))}
+                      headers={tableHeaders}
+                    />
                   </Card>
                 </div>
               ))

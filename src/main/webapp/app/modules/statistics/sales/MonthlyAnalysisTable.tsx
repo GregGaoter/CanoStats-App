@@ -1,6 +1,6 @@
 import { Text } from 'app/shared/component/Text';
-import { MonthlyAnalysisTableHeader } from 'app/shared/model/enumeration/MonthlyAnalysisTableHeader';
 import { MonthlyAnalysisStats } from 'app/shared/model/MonthlyAnalysisStats';
+import { MonthlyAnalysisTableHeaders } from 'app/shared/model/MonthlyAnalysisTableHeaders';
 import { formatStats, getProductUnit } from 'app/shared/util/Utils';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
@@ -9,6 +9,7 @@ import React from 'react';
 interface MonthlyAnalysisTableProps {
   monthlyAnalysisStats: MonthlyAnalysisStats[];
   isMonthMulti: boolean;
+  headers: MonthlyAnalysisTableHeaders;
 }
 
 export const MonthlyAnalysisTable = (props: MonthlyAnalysisTableProps) => {
@@ -36,15 +37,15 @@ export const MonthlyAnalysisTable = (props: MonthlyAnalysisTableProps) => {
 
   return (
     <DataTable value={props.monthlyAnalysisStats} dataKey="productCode">
-      <Column field="productCode" header={MonthlyAnalysisTableHeader.PRODUCT_CODE}></Column>
-      <Column field="product" header={MonthlyAnalysisTableHeader.PRODUCT}></Column>
-      <Column field="percentageStats" header={MonthlyAnalysisTableHeader.AVERAGE_PERCENTAGE} body={percentageTemplate}></Column>
-      <Column field="quantityStats" header={MonthlyAnalysisTableHeader.AVERAGE_QUANTITY} body={quantityTemplate}></Column>
-      <Column field="availableStockStats" header={MonthlyAnalysisTableHeader.AVAILABLE_STOCK} body={availableStockTemplate}></Column>
-      <Column field="nbDeliveriesStats" header={MonthlyAnalysisTableHeader.NB_DELIVERIES} body={nbDeliveriesTemplate}></Column>
-      <Column field="nbSalesStats" header={MonthlyAnalysisTableHeader.NB_SALES} body={nbSalesTemplate}></Column>
-      <Column field="nbLossesStats" header={MonthlyAnalysisTableHeader.NB_LOSSES} body={nbLossesTemplate}></Column>
-      <Column field="nbInventoriesStats" header={MonthlyAnalysisTableHeader.NB_INVENTORIES} body={nbInventoriesTemplate}></Column>
+      <Column field="productCode" header={props.headers.productCode}></Column>
+      <Column field="product" header={props.headers.product}></Column>
+      <Column field="percentageStats" header={props.headers.percentage} body={percentageTemplate}></Column>
+      <Column field="quantityStats" header={props.headers.quantity} body={quantityTemplate}></Column>
+      <Column field="availableStockStats" header={props.headers.availableStock} body={availableStockTemplate}></Column>
+      <Column field="nbDeliveriesStats" header={props.headers.nbDeliveries} body={nbDeliveriesTemplate}></Column>
+      <Column field="nbSalesStats" header={props.headers.nbSales} body={nbSalesTemplate}></Column>
+      <Column field="nbLossesStats" header={props.headers.nbLosses} body={nbLossesTemplate}></Column>
+      <Column field="nbInventoriesStats" header={props.headers.nbInventories} body={nbInventoriesTemplate}></Column>
     </DataTable>
   );
 };
