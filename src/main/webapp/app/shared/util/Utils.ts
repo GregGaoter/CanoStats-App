@@ -36,3 +36,14 @@ export const getMonthlyAnalysisTableHeaders = (movementType: string): MonthlyAna
     nbInventories: 'Nb Inventaires',
   };
 };
+
+export const getMonthlyAnalysisChartYLabel = (movementType: string): string => {
+  switch (movementType) {
+    case 'Vente':
+      return '% moyen vendu';
+    case 'Perte':
+      return '% moyen perdu';
+    default:
+      return '% moyen';
+  }
+};

@@ -9,7 +9,7 @@ import { transformMonthlyAnalysisToChartData } from 'app/shared/util/ChartDataTr
 import { lineOptions } from 'app/shared/util/ChartOptionsUtils';
 import { prefixWithDateTime } from 'app/shared/util/date-utils';
 import { getMonthlyAnalysisQueryParams } from 'app/shared/util/QueryParamsUtil';
-import { formatStats, getMonthlyAnalysisTableHeaders, getProductUnit } from 'app/shared/util/Utils';
+import { formatStats, getMonthlyAnalysisChartYLabel, getMonthlyAnalysisTableHeaders, getProductUnit } from 'app/shared/util/Utils';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
@@ -303,7 +303,12 @@ export const MonthlyAnalysis = () => {
             ) : (
               <div className="col-12">
                 <Card>
-                  <Chart ref={chartRef} type="line" data={chartData} options={lineOptions(movementType, '', '% du stock')} />
+                  <Chart
+                    ref={chartRef}
+                    type="line"
+                    data={chartData}
+                    options={lineOptions(movementType, '', getMonthlyAnalysisChartYLabel(movementType))}
+                  />
                 </Card>
               </div>
             )}
