@@ -64,110 +64,17 @@ const Header = (props: IHeaderProps) => {
       icon: <Icon icon="chart-simple" colorSecondary marginRight />,
       items: [
         {
-          label: 'Ventes',
+          label: 'Mouvements de stock',
           items: [
             {
-              label: `Chiffre d'affaires`,
-              icon: <Icon icon="sack-dollar" color={ventesColor} marginRight />,
-              command: () => navigate('/statistics/revenue', { replace: true }),
-            },
-            {
-              label: 'Volume',
-              icon: <Icon icon="cube" color={ventesColor} marginRight />,
-              command: () => navigate('/statistics/sales-volume', { replace: true }),
-            },
-            {
-              label: 'Tendances',
-              icon: <Icon icon="arrow-trend-up" color={ventesColor} marginRight />,
-              command: () => navigate('/statistics/sales-trends', { replace: true }),
-            },
-            {
-              label: 'Analyse mensuelle',
-              icon: <Icon icon="star" color={ventesColor} marginRight />,
+              label: 'Analyses mensuelles',
+              icon: <Icon icon="chart-line" colorSecondary marginRight />,
               command: () => navigate('/statistics/monthly-analysis', { replace: true }),
             },
-          ],
-        },
-        {
-          label: 'Achats',
-          items: [
             {
-              label: 'Coût',
-              icon: <Icon icon="file-invoice-dollar" color={achatsColor} marginRight />,
-            },
-            {
-              label: 'Fournisseurs',
-              icon: <Icon icon="truck" color={achatsColor} marginRight />,
-            },
-          ],
-        },
-        {
-          label: 'Pertes',
-          items: [
-            {
-              label: 'Pertes',
-              icon: <Icon icon="trash-can" color={pertesColor} marginRight />,
-            },
-            {
-              label: 'Inventaire',
-              icon: <Icon icon="arrow-trend-down" color={pertesColor} marginRight />,
+              label: 'Inventaires',
+              icon: <Icon icon="arrow-trend-down" colorSecondary marginRight />,
               command: () => navigate('/statistics/inventory', { replace: true }),
-            },
-          ],
-        },
-        {
-          label: 'Stocks',
-          items: [
-            {
-              label: 'Rotation',
-              icon: <Icon icon="arrows-rotate" color={stocksColor} marginRight />,
-            },
-            {
-              label: 'Stock moyen',
-              icon: <Icon icon="warehouse" color={stocksColor} marginRight />,
-            },
-            {
-              label: 'Prévisions',
-              icon: <Icon icon="boxes-stacked" color={stocksColor} marginRight />,
-            },
-          ],
-        },
-        {
-          label: 'Rentabilité',
-          items: [
-            {
-              label: 'Marge brute',
-              icon: <Icon icon="hand-holding-dollar" color={rentabiliteColor} marginRight />,
-            },
-            {
-              label: 'Produits les plus rentables',
-              icon: <Icon icon="medal" color={rentabiliteColor} marginRight />,
-            },
-          ],
-        },
-        {
-          label: 'Membres',
-          items: [
-            {
-              label: 'Nombre de membres',
-              icon: <Icon icon="users" color={membersColor} marginRight />,
-            },
-            {
-              label: 'Panier moyen',
-              icon: <Icon icon="cart-shopping" color={membersColor} marginRight />,
-            },
-            {
-              label: 'Adhésions',
-              icon: <Icon icon="address-card" color={membersColor} marginRight />,
-            },
-          ],
-        },
-        {
-          label: 'Tendances',
-          items: [
-            {
-              label: 'Évolution des prix',
-              icon: <Icon icon="arrow-trend-up" color={tendancesColor} marginRight />,
             },
           ],
         },
@@ -194,43 +101,9 @@ const Header = (props: IHeaderProps) => {
       icon: <Icon icon="users-cog" colorSecondary marginRight />,
       items: [
         {
-          label: 'Utilisateurs',
-          icon: <Icon icon="users" colorSecondary marginRight />,
-        },
-        {
           label: 'Importation',
           icon: <Icon icon="file-import" colorSecondary marginRight />,
           command: () => navigate('/admin/file-import', { replace: true }),
-        },
-        {
-          label: 'Métriques',
-          icon: <Icon icon="tachometer-alt" colorSecondary marginRight />,
-        },
-        {
-          label: 'Santé',
-          icon: <Icon icon="heart" colorSecondary marginRight />,
-        },
-        {
-          label: 'Configuration',
-          icon: <Icon icon="cogs" colorSecondary marginRight />,
-        },
-        {
-          label: 'Logs',
-          icon: <Icon icon="tasks" colorSecondary marginRight />,
-        },
-      ],
-    },
-    {
-      label: 'Compte',
-      icon: <Icon icon="user" colorSecondary marginRight />,
-      items: [
-        {
-          label: 'Paramètres',
-          icon: <Icon icon="wrench" colorSecondary marginRight />,
-        },
-        {
-          label: 'Mot de passe',
-          icon: <Icon icon="lock" colorSecondary marginRight />,
         },
       ],
     },
@@ -245,10 +118,10 @@ const Header = (props: IHeaderProps) => {
 
   const end = (
     <Button
-      icon={<Icon icon="sign-out-alt" colorSecondary marginRight />}
+      icon={<Icon icon="sign-out-alt" color="var(--red-600)" marginRight />}
       label="Se déconnecter"
       text
-      pt={{ label: { className: 'text-color-secondary' } }}
+      pt={{ label: { className: 'text-red-600' } }}
       onClick={() => callLogout()}
     />
   );
