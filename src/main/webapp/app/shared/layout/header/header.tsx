@@ -67,14 +67,14 @@ const Header = (props: IHeaderProps) => {
           label: 'Mouvements de stock',
           items: [
             {
-              label: 'Analyses mensuelles',
+              label: 'Mouvements mensuels',
               icon: <Icon icon="chart-line" colorSecondary marginRight />,
-              command: () => navigate('/statistics/monthly-analysis', { replace: true }),
+              command: () => navigate('/statistics/stock/movements-monthly', { replace: true }),
             },
             {
-              label: 'Inventaires',
+              label: 'Inventaires et anomalies',
               icon: <Icon icon="arrow-trend-down" colorSecondary marginRight />,
-              command: () => navigate('/statistics/inventory', { replace: true }),
+              command: () => navigate('/statistics/stock/inventory-anomalies', { replace: true }),
             },
           ],
         },

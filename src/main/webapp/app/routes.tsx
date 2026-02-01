@@ -12,9 +12,6 @@ import PageNotFound from 'app/shared/error/page-not-found';
 import React from 'react';
 import Loadable from 'react-loadable';
 import { Route } from 'react-router-dom';
-import { Revenue } from './modules/statistics/sales/Revenue';
-import { SalesVolume } from './modules/statistics/sales/SalesVolume';
-import { SalesTrends } from './modules/statistics/sales/SalesTrends';
 import { Inventory } from './modules/statistics/losses/inventory/Inventory';
 import { MonthlyAnalysis } from './modules/statistics/sales/MonthlyAnalysis';
 
@@ -65,11 +62,10 @@ const AppRoutes = (props: AppRoutesProps) => {
       />
       <Route path="statistics">
         <Route path="dashboard" element={<Dashboard />} />
-        <Route path="revenue" element={<Revenue />} />
-        <Route path="sales-volume" element={<SalesVolume />} />
-        <Route path="sales-trends" element={<SalesTrends />} />
-        <Route path="inventory" element={<Inventory />} />
-        <Route path="monthly-analysis" element={<MonthlyAnalysis />} />
+        <Route path="stock">
+          <Route path="movements-monthly" element={<MonthlyAnalysis />} />
+          <Route path="inventory-anomalies" element={<Inventory />} />
+        </Route>
       </Route>
       <Route
         path="*"
