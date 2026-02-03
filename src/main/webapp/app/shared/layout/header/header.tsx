@@ -78,6 +78,16 @@ const Header = (props: IHeaderProps) => {
             },
           ],
         },
+        {
+          label: 'Produits',
+          items: [
+            {
+              label: 'Produits les plus en perte',
+              icon: <Icon icon="arrow-trend-down" colorSecondary marginRight />,
+              command: () => navigate('/statistics/products/top-losses', { replace: true }),
+            },
+          ],
+        },
       ],
     },
     {

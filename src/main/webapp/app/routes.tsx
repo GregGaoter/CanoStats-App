@@ -14,6 +14,7 @@ import Loadable from 'react-loadable';
 import { Route } from 'react-router-dom';
 import { Inventory } from './modules/statistics/stock/inventory-anomalies/Inventory';
 import { MonthlyAnalysis } from './modules/statistics/stock/movements-monthly/MonthlyAnalysis';
+import { TopLosses } from './modules/statistics/products/top-losses/TopLosses';
 
 interface AppRoutesProps {
   isAuthenticated: boolean;
@@ -65,6 +66,9 @@ const AppRoutes = (props: AppRoutesProps) => {
         <Route path="stock">
           <Route path="movements-monthly" element={<MonthlyAnalysis />} />
           <Route path="inventory-anomalies" element={<Inventory />} />
+        </Route>
+        <Route path="products">
+          <Route path="top-losses" element={<TopLosses />} />
         </Route>
       </Route>
       <Route
