@@ -55,3 +55,56 @@ export const lineOptions = (chartLabel: string, xLabel: string, yLabel: string) 
     },
   },
 });
+
+export const topLossesOptions = (chartLabel: string, xLabel: string, yLabel: string) => ({
+  indexAxis: 'y',
+  plugins: {
+    legend: {
+      display: false,
+    },
+    title: {
+      display: true,
+      text: chartLabel,
+      color: textColorSecondary,
+      font: {
+        size: 16,
+        weight: 'bold',
+      },
+    },
+  },
+  scales: {
+    x: {
+      ticks: {
+        color: textColorSecondary,
+      },
+      title: {
+        display: true,
+        text: xLabel,
+        color: textColorSecondary,
+        font: {
+          weight: 'bold',
+        },
+      },
+      grid: {
+        color: surfaceBorder,
+      },
+    },
+    y: {
+      ticks: {
+        color: textColorSecondary,
+        autoSkip: false,
+      },
+      title: {
+        display: true,
+        text: yLabel,
+        color: textColorSecondary,
+        font: {
+          weight: 'bold',
+        },
+      },
+      grid: {
+        color: surfaceBorder,
+      },
+    },
+  },
+});

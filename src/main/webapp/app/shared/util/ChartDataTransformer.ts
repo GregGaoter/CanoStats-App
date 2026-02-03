@@ -1,7 +1,9 @@
 import { MonthlyAnalysisStats } from 'app/shared/model/MonthlyAnalysisStats';
+import { ChartData, ChartDataset } from 'chart.js';
 import dayjs from 'dayjs';
+import { TopLossesResult } from '../model/TopLossesResult';
 
-interface ChartData {
+interface GraphicData {
   labels: string[];
   datasets: Array<{
     label: string;
@@ -19,7 +21,7 @@ export const transformMonthlyAnalysisToChartData = (
   apiMapResponse: { [month: number]: MonthlyAnalysisStats[] },
   productTypesByCode: string[],
   monthToYears: Map<number, number[]>,
-): ChartData => {
+): GraphicData => {
   // Sort month keys to ensure proper order
   const sortedMonths = Object.keys(apiMapResponse)
     .map(Number)
@@ -96,6 +98,19 @@ export const transformMonthlyAnalysisToChartData = (
     labels,
     datasets,
   };
+};
+
+export const transformTopLossesToChartData = (results: TopLossesResult[]): ChartData<'bar'> => {
+  const documentStyle = getComputedStyle(document.documentElement);
+  const labels = results.map(r => r.product ?? 'N/A');
+  const data = results.map(r => r.percentage ?? 0);
+  const dataset: ChartDataset<'bar'> = {
+    label: 'Percentage',
+    data,
+    backgroundColor: documentStyle.getPropertyValue('--blue-600'),
+    borderColor: documentStyle.getPropertyValue('--surface-card'),
+  };
+  return { labels, datasets: [dataset] };
 };
 
 /**

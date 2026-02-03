@@ -61,3 +61,17 @@ export const getMonthlyAnalysisQueryParams = (movementType: string, productTypes
   searchParams.set('cacheBuster', `${new Date().getTime()}`);
   return searchParams.toString();
 };
+
+export const getTopLossesQueryParams = (period: Date[]): string => {
+  const startDate: string = period[0].toISOString();
+
+  const year: number = period[1].getFullYear();
+  const month: number = period[1].getMonth();
+  const endDate: string = new Date(year, month + 1, 0).toISOString();
+
+  const searchParams: URLSearchParams = new URLSearchParams();
+  searchParams.set('startDate', startDate);
+  searchParams.set('endDate', endDate);
+  searchParams.set('cacheBuster', `${new Date().getTime()}`);
+  return searchParams.toString();
+};

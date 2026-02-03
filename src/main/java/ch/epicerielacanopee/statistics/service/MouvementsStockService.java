@@ -683,18 +683,18 @@ public class MouvementsStockService {
                     Instant startDate,
                     Map<ProductGroupingKey, List<MouvementsStockProjection>> byProduct,
                     ZoneId zone) {
-            int mvtTotal = byProduct.values().stream().mapToInt(mvts -> mvts.size()).sum();
-            int mvtCount = 0;
-            int mvtProgress = 0;
+            int productTotal = byProduct.size();
+            int productCount = 0;
+            int productProgress = 0;
             String progressMessage = "Progression de l'analyse...";
 
             List<TopLossesResult> topLossesResult = new ArrayList<>();
 
             for (Map.Entry<ProductGroupingKey, List<MouvementsStockProjection>> productEntry : byProduct.entrySet()) {
-                    mvtCount++;
-                    mvtProgress = BigDecimal.valueOf(mvtCount).multiply(BigDecimal.valueOf(100))
-                                    .divide(BigDecimal.valueOf(mvtTotal), 0, RoundingMode.HALF_UP).intValue();
-                    progressService.emitProgress(mvtProgress, progressMessage);
+                    productCount++;
+                    productProgress = BigDecimal.valueOf(productCount).multiply(BigDecimal.valueOf(100))
+                                    .divide(BigDecimal.valueOf(productTotal), 0, RoundingMode.HALF_UP).intValue();
+                    progressService.emitProgress(productProgress, progressMessage);
                     analyzeTopLossesProduct(startDate, productEntry.getKey(), productEntry.getValue(), "Perte", zone)
                                     .ifPresent(topLossesResult::add);
             }
