@@ -12,8 +12,8 @@ import PageNotFound from 'app/shared/error/page-not-found';
 import React from 'react';
 import Loadable from 'react-loadable';
 import { Route } from 'react-router-dom';
-import { Inventory } from './modules/statistics/losses/inventory/Inventory';
-import { MonthlyAnalysis } from './modules/statistics/sales/MonthlyAnalysis';
+import { Inventory } from './modules/statistics/stock/inventory-anomalies/Inventory';
+import { MonthlyAnalysis } from './modules/statistics/stock/movements-monthly/MonthlyAnalysis';
 
 interface AppRoutesProps {
   isAuthenticated: boolean;
