@@ -23,6 +23,8 @@ import ch.epicerielacanopee.statistics.repository.specification.MouvementsStockS
 public interface MouvementsStockRepository
                 extends JpaRepository<MouvementsStock, UUID>, JpaSpecificationExecutor<MouvementsStock> {
 
+        public List<MouvementsStockProjection> findByDateBetween(Instant startDate, Instant endDate);
+
         public List<MouvementsStock> findByVenteAndDateBetween(String vente, Instant startDate, Instant endDate);
 
         public List<MouvementsStockProjection> findByCodeProduitStartingWithAndDateBetween(String codeProduitPrefix,

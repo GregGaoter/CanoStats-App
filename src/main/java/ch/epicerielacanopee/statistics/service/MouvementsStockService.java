@@ -43,6 +43,7 @@ import ch.epicerielacanopee.statistics.service.util.MonthlyAnalysisStats;
 import ch.epicerielacanopee.statistics.service.util.MouvementsStockDateRange;
 import ch.epicerielacanopee.statistics.service.util.ProductGroupingKey;
 import ch.epicerielacanopee.statistics.service.util.StatisticalQuantities;
+import ch.epicerielacanopee.statistics.service.util.TopLossesResult;
 import ch.epicerielacanopee.statistics.service.util.YearMonth;
 
 /**
@@ -319,6 +320,13 @@ public class MouvementsStockService {
         return mouvementsStock;
     }
 
+    public List<MouvementsStockProjection> findByDateBetween(Instant startDate, Instant endDate) {
+        return mouvementsStockRepository
+                .findByDateBetween(startDate, endDate)
+                .stream()
+                .toList();
+    }
+
     public List<MouvementsStockDTO> findByVenteAndDateBetween(String vente, Instant startDate, Instant endDate) {
         return mouvementsStockRepository
                 .findByVenteAndDateBetween(vente, startDate, endDate)
@@ -427,6 +435,12 @@ public class MouvementsStockService {
 
         // return filterSeasonalProducts(startDate, endDate, productsByMonthNumber);
         return productsByMonthNumber;
+    }
+
+    private Map<ProductGroupingKey, List<MouvementsStockProjection>> groupByProduct(
+                    List<MouvementsStockProjection> movements, ZoneId zone) {
+            return movements.stream().collect(Collectors
+                            .groupingBy(m -> new ProductGroupingKey(m.getCodeProduit(), m.getProduit(), m.getVente())));
     }
 
     private Map<YearMonth, Map<ProductGroupingKey, List<MouvementsStockProjection>>> groupByYearMonthAndProduct(
@@ -655,5 +669,81 @@ public class MouvementsStockService {
 
     public Instant getMaxDate() {
         return mouvementsStockRepository.findMaxDate();
+    }
+
+    public List<TopLossesResult> getTopLosses(List<MouvementsStockProjection> movements, Instant startDate) {
+        ZoneId zone = ZoneId.of(Constants.TIME_ZONE);
+
+        Map<ProductGroupingKey, List<MouvementsStockProjection>> byProduct = groupByProduct(movements, zone);
+
+        return buildTopLossesResults(startDate, byProduct, zone);
+    }
+
+    private List<TopLossesResult> buildTopLossesResults(
+                    Instant startDate,
+                    Map<ProductGroupingKey, List<MouvementsStockProjection>> byProduct,
+                    ZoneId zone) {
+            int mvtTotal = byProduct.values().stream().mapToInt(mvts -> mvts.size()).sum();
+            int mvtCount = 0;
+            int mvtProgress = 0;
+            String progressMessage = "Progression de l'analyse...";
+
+            List<TopLossesResult> topLossesResult = new ArrayList<>();
+
+            for (Map.Entry<ProductGroupingKey, List<MouvementsStockProjection>> productEntry : byProduct.entrySet()) {
+                    mvtCount++;
+                    mvtProgress = BigDecimal.valueOf(mvtCount).multiply(BigDecimal.valueOf(100))
+                                    .divide(BigDecimal.valueOf(mvtTotal), 0, RoundingMode.HALF_UP).intValue();
+                    progressService.emitProgress(mvtProgress, progressMessage);
+                    analyzeTopLossesProduct(startDate, productEntry.getKey(), productEntry.getValue(), "Perte", zone)
+                                    .ifPresent(topLossesResult::add);
+            }
+
+            Comparator<TopLossesResult> byPercentage = Comparator.comparing(topLosses -> topLosses.getPercentage());
+
+            return topLossesResult.stream().sorted(byPercentage.reversed()).limit(50).collect(Collectors.toList());
+    }
+
+    private Optional<TopLossesResult> analyzeTopLossesProduct(
+                    Instant startDate,
+                    ProductGroupingKey key,
+                    List<MouvementsStockProjection> mvts,
+                    String movementsType,
+                    ZoneId zone) {
+            if (mvts.isEmpty()) {
+                    return Optional.empty();
+            }
+            mvts.sort(Comparator.comparing(MouvementsStockProjection::getDate));
+
+            String productCode = key.getCodeProduit();
+            Optional<MouvementsStock> lastBeforeMonth = mouvementsStockRepository
+                            .findFirstByCodeProduitAndDateBeforeOrderByDateDesc(productCode, startDate);
+
+            float initialStock = lastBeforeMonth.map(MouvementsStock::getSolde).orElse(mvts.get(0).getSolde());
+            if (initialStock < 0f) {
+                    return Optional.empty();
+            }
+
+            float closingStock = mvts.get(mvts.size() - 1).getSolde();
+            if (closingStock < 0f) {
+                    return Optional.empty();
+            }
+
+            float deliveries = sumMovementsOfType(mvts, "Livraison");
+            float available = initialStock + deliveries;
+            if (available <= 0f) {
+                    return Optional.empty();
+            }
+
+            float quantity = Math.abs(sumMovementsOfType(mvts, movementsType));
+            float percentage = (quantity / available) * 100f;
+
+            return Optional.of(
+                            new TopLossesResult(
+                                            productCode,
+                                            key.getProduit(),
+                                            percentage,
+                                            quantity,
+                                            mvts.get(0).getVente()));
     }
 }

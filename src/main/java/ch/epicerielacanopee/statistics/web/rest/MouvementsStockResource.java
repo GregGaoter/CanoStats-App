@@ -41,6 +41,7 @@ import ch.epicerielacanopee.statistics.service.dto.AnalysisProgressEvent;
 import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
 import ch.epicerielacanopee.statistics.service.util.MonthlyAnalysisStats;
 import ch.epicerielacanopee.statistics.service.util.MouvementsStockDateRange;
+import ch.epicerielacanopee.statistics.service.util.TopLossesResult;
 import ch.epicerielacanopee.statistics.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -302,5 +303,13 @@ public class MouvementsStockResource {
     @GetMapping(value = "/analysis/progress", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<AnalysisProgressEvent> streamProgress() {
         return progressService.getProgressStream();
+    }
+
+    @GetMapping("/top-losses")
+    public ResponseEntity<List<TopLossesResult>> getTopLosses(@RequestParam Instant startDate, @RequestParam Instant endDate) {
+        progressService.emitProgress(0, "Extraction des mouvements de stock...");
+        List<MouvementsStockProjection> mvts = mouvementsStockService.findByDateBetween(startDate, endDate);
+        List<TopLossesResult> topLosses = mouvementsStockService.getTopLosses(mvts, startDate);
+        return ResponseEntity.ok().body(topLosses);
     }
 }
