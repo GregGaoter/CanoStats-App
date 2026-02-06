@@ -1,6 +1,8 @@
 import { useAppSelector } from 'app/config/store';
 import { apiUrl } from 'app/entities/mouvements-stock/mouvements-stock.reducer';
-import { Text } from 'app/shared/component/Text';
+import { AnalysisProgress } from 'app/shared/component/analysis/AnalysisProgress';
+import { StatisticsCard } from 'app/shared/component/StatisticsCard';
+import { StatisticsColor } from 'app/shared/model/enumeration/StatisticsColor';
 import { MouvementsStockDateRange } from 'app/shared/model/MouvementsStockDateRange';
 import { TopLossesResult } from 'app/shared/model/TopLossesResult';
 import { transformTopLossesToChartData } from 'app/shared/util/ChartDataTransformer';
@@ -12,7 +14,7 @@ import dayjs from 'dayjs';
 import { Card } from 'primereact/card';
 import { Chart } from 'primereact/chart';
 import { Fieldset } from 'primereact/fieldset';
-import { ProgressBar } from 'primereact/progressbar';
+import { TabPanel, TabView } from 'primereact/tabview';
 import React, { useEffect, useRef, useState } from 'react';
 import { TopLossesFilter } from './TopLossesFilter';
 
@@ -86,28 +88,44 @@ export const TopLosses = () => {
           />
         </Fieldset>
       </div>
-      {loadingData && (
-        <div className="col-6 col-offset-3 text-center mt-4">
-          <div className="mb-2">
-            <Text>{progressMessage}</Text>
-          </div>
-          {progressPercentage === 0 ? (
-            <ProgressBar mode="indeterminate"></ProgressBar>
-          ) : (
-            <ProgressBar value={progressPercentage}></ProgressBar>
-          )}
-        </div>
-      )}
+      {loadingData && <AnalysisProgress message={progressMessage} percentage={progressPercentage} />}
       {chartData.labels.length > 0 && (
         <div className="col-12">
-          <Card>
-            <Chart
-              ref={chartRef}
-              type="bar"
-              data={chartData}
-              options={topLossesOptions('Les 50 produits les plus en pertes', '', '% moyen perdu')}
-            />
-          </Card>
+          <TabView>
+            <TabPanel header="Indicateurs clés">
+              <div className="flex gap-3">
+                <StatisticsCard title="Pertes totales (quantité)" icon="arrow-trend-down" color={StatisticsColor.SALES} value="128.4 kg" />
+                <StatisticsCard title="Pertes totales (CHF)" icon="arrow-trend-down" color={StatisticsColor.SALES} value="1’245.50 CHF" />
+                <StatisticsCard
+                  title="Catégorie la plus touchée"
+                  icon="arrow-trend-down"
+                  color={StatisticsColor.SALES}
+                  value="Fruits & Légumes"
+                />
+                <StatisticsCard title="Produit le plus touché" icon="arrow-trend-down" color={StatisticsColor.SALES} value="Bananes" />
+              </div>
+            </TabPanel>
+            <TabPanel header="Graphique">
+              <Card>
+                <Chart
+                  ref={chartRef}
+                  type="bar"
+                  data={chartData}
+                  options={topLossesOptions('Les 50 produits les plus en pertes', '', '% moyen perdu')}
+                />
+              </Card>
+            </TabPanel>
+            <TabPanel header="Tableau">
+              <Card>
+                <p className="m-0">
+                  At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti
+                  quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia
+                  deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam
+                  libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus.
+                </p>
+              </Card>
+            </TabPanel>
+          </TabView>
         </div>
       )}
     </div>
