@@ -540,7 +540,8 @@ public class MouvementsStockService {
         return (float) mvts
                 .stream()
                 .filter(m -> m.getType().equals(type))
-                .map(m -> m.getMouvement() == null ? 0f : m.getMouvement())
+                // .map(m -> m.getMouvement() == null ? 0f : m.getMouvement())
+                .map(m -> m.getMouvement() == null ? 0f : (type.equals("Perte") && List.of(-4880f, -770f, -670f, -450f, -300f, -205f, -70f).contains(m.getMouvement()) ? m.getMouvement() / 1000f : m.getMouvement()))
                 .reduce(0f, Float::sum);
     }
 

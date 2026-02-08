@@ -8,7 +8,7 @@ interface AnalysisProgressProps {
 }
 
 export const AnalysisProgress = ({ message, percentage }: AnalysisProgressProps) => (
-  <div className="col-6 col-offset-3 text-center mt-4">
+  <div className="col-6 col-offset-3 text-center">
     <div className="mb-2">
       <Text>{message}</Text>
     </div>

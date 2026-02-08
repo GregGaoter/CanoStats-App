@@ -9,3 +9,11 @@ export const convertDateTimeToServer = (date?: string): dayjs.Dayjs | null => (d
 export const displayDefaultDateTime = () => dayjs().startOf('day').format(APP_LOCAL_DATETIME_FORMAT);
 
 export const prefixWithDateTime = (fileName: string): string => `${dayjs().format(FILENAME_DATETIME_FORMAT)}_${fileName}`;
+
+export const formatDateRange = (dates: Date[]): string => {
+  if (!dates || dates.length !== 2) {
+    throw new Error('The array must contain exactly two dates.');
+  }
+  const [start, end] = dates;
+  return `${dayjs(start).format('MM.YYYY')} - ${dayjs(end).format('MM.YYYY')}`;
+};
