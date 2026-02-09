@@ -38,6 +38,7 @@ import ch.epicerielacanopee.statistics.service.dto.EpicerioMouvementsStockDTO;
 import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
 import ch.epicerielacanopee.statistics.service.mapper.MouvementsStockMapper;
 import ch.epicerielacanopee.statistics.service.util.AnalysisValues;
+import ch.epicerielacanopee.statistics.service.util.LowestSalesResult;
 import ch.epicerielacanopee.statistics.service.util.MonthlyAnalysisResult;
 import ch.epicerielacanopee.statistics.service.util.MonthlyAnalysisStats;
 import ch.epicerielacanopee.statistics.service.util.MouvementsStockDateRange;
@@ -437,10 +438,13 @@ public class MouvementsStockService {
         return productsByMonthNumber;
     }
 
-    private Map<ProductGroupingKey, List<MouvementsStockProjection>> groupByProduct(
-                    List<MouvementsStockProjection> movements, ZoneId zone) {
+    private Map<ProductGroupingKey, List<MouvementsStockProjection>> groupByProduct(List<MouvementsStockProjection> movements) {
             return movements.stream().collect(Collectors
                             .groupingBy(m -> new ProductGroupingKey(m.getCodeProduit(), m.getProduit(), m.getVente())));
+    }
+
+    private Map<String, List<MouvementsStockProjection>> groupByProductCode(List<MouvementsStockProjection> movements) {
+            return movements.stream().collect(Collectors.groupingBy(m -> m.getCodeProduit()));
     }
 
     private Map<YearMonth, Map<ProductGroupingKey, List<MouvementsStockProjection>>> groupByYearMonthAndProduct(
@@ -540,8 +544,7 @@ public class MouvementsStockService {
         return (float) mvts
                 .stream()
                 .filter(m -> m.getType().equals(type))
-                // .map(m -> m.getMouvement() == null ? 0f : m.getMouvement())
-                .map(m -> m.getMouvement() == null ? 0f : (type.equals("Perte") && List.of(-4880f, -770f, -670f, -450f, -300f, -205f, -70f).contains(m.getMouvement()) ? m.getMouvement() / 1000f : m.getMouvement()))
+                .map(m -> m.getMouvement() == null ? 0f : m.getMouvement())
                 .reduce(0f, Float::sum);
     }
 
@@ -675,14 +678,14 @@ public class MouvementsStockService {
     public List<TopLossesResult> getTopLosses(List<MouvementsStockProjection> movements, Instant startDate) {
         ZoneId zone = ZoneId.of(Constants.TIME_ZONE);
 
-        Map<ProductGroupingKey, List<MouvementsStockProjection>> byProduct = groupByProduct(movements, zone);
+        Map<String, List<MouvementsStockProjection>> byProduct = groupByProductCode(movements);
 
         return buildTopLossesResults(startDate, byProduct, zone);
     }
 
     private List<TopLossesResult> buildTopLossesResults(
                     Instant startDate,
-                    Map<ProductGroupingKey, List<MouvementsStockProjection>> byProduct,
+                    Map<String, List<MouvementsStockProjection>> byProduct,
                     ZoneId zone) {
             int productTotal = byProduct.size();
             int productCount = 0;
@@ -691,7 +694,7 @@ public class MouvementsStockService {
 
             List<TopLossesResult> topLossesResult = new ArrayList<>();
 
-            for (Map.Entry<ProductGroupingKey, List<MouvementsStockProjection>> productEntry : byProduct.entrySet()) {
+            for (Map.Entry<String, List<MouvementsStockProjection>> productEntry : byProduct.entrySet()) {
                     productCount++;
                     productProgress = BigDecimal.valueOf(productCount).multiply(BigDecimal.valueOf(100))
                                     .divide(BigDecimal.valueOf(productTotal), 0, RoundingMode.HALF_UP).intValue();
@@ -707,7 +710,7 @@ public class MouvementsStockService {
 
     private Optional<TopLossesResult> analyzeTopLossesProduct(
                     Instant startDate,
-                    ProductGroupingKey key,
+                    String productCode,
                     List<MouvementsStockProjection> mvts,
                     String movementsType,
                     ZoneId zone) {
@@ -716,7 +719,6 @@ public class MouvementsStockService {
             }
             mvts.sort(Comparator.comparing(MouvementsStockProjection::getDate));
 
-            String productCode = key.getCodeProduit();
             Optional<MouvementsStock> lastBeforeMonth = mouvementsStockRepository
                             .findFirstByCodeProduitAndDateBeforeOrderByDateDesc(productCode, startDate);
 
@@ -742,7 +744,82 @@ public class MouvementsStockService {
             return Optional.of(
                             new TopLossesResult(
                                             productCode,
-                                            key.getProduit(),
+                                            mvts.get(mvts.size() - 1).getProduit(),
+                                            percentage,
+                                            quantity,
+                                            mvts.get(0).getVente()));
+    }
+
+    public List<LowestSalesResult> getLowestSales(List<MouvementsStockProjection> movements, Instant startDate) {
+        ZoneId zone = ZoneId.of(Constants.TIME_ZONE);
+
+        Map<String, List<MouvementsStockProjection>> byProduct = groupByProductCode(movements);
+
+        return buildLowestSalesResults(startDate, byProduct, zone);
+    }
+
+    private List<LowestSalesResult> buildLowestSalesResults(
+                    Instant startDate,
+                    Map<String, List<MouvementsStockProjection>> byProduct,
+                    ZoneId zone) {
+            int productTotal = byProduct.size();
+            int productCount = 0;
+            int productProgress = 0;
+            String progressMessage = "Progression de l'analyse...";
+
+            List<LowestSalesResult> lowestSalesResult = new ArrayList<>();
+
+            for (Map.Entry<String, List<MouvementsStockProjection>> productEntry : byProduct.entrySet()) {
+                    productCount++;
+                    productProgress = BigDecimal.valueOf(productCount).multiply(BigDecimal.valueOf(100))
+                                    .divide(BigDecimal.valueOf(productTotal), 0, RoundingMode.HALF_UP).intValue();
+                    progressService.emitProgress(productProgress, progressMessage);
+                    analyzeLowestSalesProduct(startDate, productEntry.getKey(), productEntry.getValue(), "Vente", zone)
+                                    .ifPresent(lowestSalesResult::add);
+            }
+
+            Comparator<LowestSalesResult> byPercentage = Comparator.comparing(lowestSales -> lowestSales.getPercentage());
+
+            return lowestSalesResult.stream().sorted(byPercentage).limit(50).collect(Collectors.toList());
+    }
+
+    private Optional<LowestSalesResult> analyzeLowestSalesProduct(
+                    Instant startDate,
+                    String productCode,
+                    List<MouvementsStockProjection> mvts,
+                    String movementsType,
+                    ZoneId zone) {
+            if (mvts.isEmpty()) {
+                    return Optional.empty();
+            }
+            mvts.sort(Comparator.comparing(MouvementsStockProjection::getDate));
+
+            Optional<MouvementsStock> lastBeforeMonth = mouvementsStockRepository
+                            .findFirstByCodeProduitAndDateBeforeOrderByDateDesc(productCode, startDate);
+
+            float initialStock = lastBeforeMonth.map(MouvementsStock::getSolde).orElse(mvts.get(0).getSolde());
+            if (initialStock < 0f) {
+                    return Optional.empty();
+            }
+
+            float closingStock = mvts.get(mvts.size() - 1).getSolde();
+            if (closingStock < 0f) {
+                    return Optional.empty();
+            }
+
+            float deliveries = sumMovementsOfType(mvts, "Livraison");
+            float available = initialStock + deliveries;
+            if (available <= 0f) {
+                    return Optional.empty();
+            }
+
+            float quantity = Math.abs(sumMovementsOfType(mvts, movementsType));
+            float percentage = (quantity / available) * 100f;
+
+            return Optional.of(
+                            new LowestSalesResult(
+                                            productCode,
+                                            mvts.get(mvts.size() - 1).getProduit(),
                                             percentage,
                                             quantity,
                                             mvts.get(0).getVente()));

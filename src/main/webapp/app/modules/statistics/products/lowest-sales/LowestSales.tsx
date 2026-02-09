@@ -3,13 +3,13 @@ import { apiUrl } from 'app/entities/mouvements-stock/mouvements-stock.reducer';
 import { Icon } from 'app/shared/component/Icon';
 import { StatisticsCard } from 'app/shared/component/StatisticsCard';
 import { StatisticsColor } from 'app/shared/model/enumeration/StatisticsColor';
+import { LowestSalesResult } from 'app/shared/model/LowestSalesResult';
+import { LowestSalesTableHeaders } from 'app/shared/model/LowestSalesTableHeaders';
 import { MouvementsStockDateRange } from 'app/shared/model/MouvementsStockDateRange';
-import { TopLossesResult } from 'app/shared/model/TopLossesResult';
-import { TopLossesTableHeaders } from 'app/shared/model/TopLossesTableHeaders';
-import { transformTopLossesToChartData } from 'app/shared/util/ChartDataTransformer';
+import { transformLowestSalesToChartData } from 'app/shared/util/ChartDataTransformer';
 import { topLossesOptions } from 'app/shared/util/ChartOptionsUtils';
 import { formatDateRange, prefixWithDateTime } from 'app/shared/util/date-utils';
-import { getTopLossesQueryParams } from 'app/shared/util/QueryParamsUtil';
+import { getLowestSalesQueryParams } from 'app/shared/util/QueryParamsUtil';
 import { getProductUnit } from 'app/shared/util/Utils';
 import axios from 'axios';
 import { ChartData } from 'chart.js';
@@ -22,10 +22,10 @@ import { Chart } from 'primereact/chart';
 import { Fieldset } from 'primereact/fieldset';
 import { TabPanel, TabView } from 'primereact/tabview';
 import React, { useEffect, useRef, useState } from 'react';
-import { TopLossesFilter } from './TopLossesFilter';
-import { TopLossesTable } from './TopLossesTable';
+import { LowestSalesFilter } from './LowestSalesFilter';
+import { LowestSalesTable } from './LowestSalesTable';
 
-export const TopLosses = () => {
+export const LowestSales = () => {
   const chartRef = useRef(null);
 
   const mouvementsStockDateRange: MouvementsStockDateRange = useAppSelector<MouvementsStockDateRange>(
@@ -33,17 +33,17 @@ export const TopLosses = () => {
   );
 
   const now: Date = new Date();
-  const tableHeaders: TopLossesTableHeaders = {
+  const tableHeaders: LowestSalesTableHeaders = {
     productCode: 'Code',
     product: 'Produit',
-    percentage: '% du stock perdu',
-    quantity: 'Quantité du stock perdu',
+    percentage: '% du stock vendu',
+    quantity: 'Quantité du stock vendu',
   };
 
   const [dates, setDates] = useState<Date[]>([new Date(now.getFullYear(), 0, 1), now]);
   const [minDate, setMinDate] = useState<Date>(undefined);
   const [maxDate, setMaxDate] = useState<Date>(undefined);
-  const [topLosses, setTopLosses] = useState<TopLossesResult[]>([]);
+  const [lowestSales, setLowestSales] = useState<LowestSalesResult[]>([]);
   const [loadingData, setLoadingData] = useState<boolean>(false);
   const [chartData, setChartData] = useState<ChartData<'bar'>>({ labels: [], datasets: [] });
   const [progressPercentage, setProgressPercentage] = useState<number>(0);
@@ -73,16 +73,16 @@ export const TopLosses = () => {
     }
   }, [mouvementsStockDateRange]);
 
-  const getTopLosses = (): void => {
+  const getLowestSales = (): void => {
     setLoadingData(true);
-    setTopLosses([]);
+    setLowestSales([]);
     axios
-      .get<TopLossesResult[]>(`${apiUrl}/top-losses?${getTopLossesQueryParams(dates)}`, {
+      .get<LowestSalesResult[]>(`${apiUrl}/lowest-sales?${getLowestSalesQueryParams(dates)}`, {
         timeout: 3600000,
       })
       .then(response => {
-        setTopLosses(response.data);
-        setChartData(transformTopLossesToChartData(response.data));
+        setLowestSales(response.data);
+        setChartData(transformLowestSalesToChartData(response.data));
       })
       .finally(() => setLoadingData(false));
   };
@@ -95,7 +95,7 @@ export const TopLosses = () => {
 
     const link = document.createElement('a');
     link.href = url;
-    link.download = prefixWithDateTime('produits-les-plus-en-perte-graphique.png');
+    link.download = prefixWithDateTime('produits-les-moins-vendus-graphique.png');
     link.click();
   };
 
@@ -103,15 +103,15 @@ export const TopLosses = () => {
     const pdf = new jsPDF('p', 'mm', 'a4') as any;
 
     const startY = pdf.lastAutoTable ? pdf.lastAutoTable.finalY + 15 : 20;
-    pdf.text(`Produits les plus en perte sur la période ${formatDateRange(dates)}`, 10, startY - 5);
+    pdf.text(`Produits les moins vendus sur la période ${formatDateRange(dates)}`, 10, startY - 5);
     autoTable(pdf, {
       startY,
       head: [Object.values(tableHeaders)],
-      body: topLosses.map(tl => [
-        tl.productCode,
-        tl.product,
-        `${Math.round(tl.percentage).toString()}%`,
-        `${Math.round(tl.quantity).toString()}${getProductUnit(tl.unit)}`,
+      body: lowestSales.map(ls => [
+        ls.productCode,
+        ls.product,
+        `${Math.round(ls.percentage).toString()}%`,
+        `${Math.round(ls.quantity).toString()}${getProductUnit(ls.unit)}`,
       ]),
       theme: 'grid',
       headStyles: { fontStyle: 'bold', textColor: 0, fillColor: 225 },
@@ -119,14 +119,14 @@ export const TopLosses = () => {
       margin: 10,
     });
 
-    pdf.save(prefixWithDateTime('produits-les-plus-en-perte-tableau.pdf'));
+    pdf.save(prefixWithDateTime('produits-les-moins-vendus-tableau.pdf'));
   };
 
   return (
     <div className="grid align-items-center">
       <div className="col-12">
-        <Fieldset legend="Analyse des produits les plus en perte" pt={{ legend: { className: 'bg-blue-800' } }}>
-          <TopLossesFilter
+        <Fieldset legend="Analyse des produits les moins vendus" pt={{ legend: { className: 'bg-blue-800' } }}>
+          <LowestSalesFilter
             dates={dates}
             minDate={minDate}
             maxDate={maxDate}
@@ -134,7 +134,7 @@ export const TopLosses = () => {
             progressMessage={progressMessage}
             progressPercentage={progressPercentage}
             onDatesChange={d => setDates(d)}
-            onApplyFilter={() => getTopLosses()}
+            onApplyFilter={() => getLowestSales()}
           />
         </Fieldset>
       </div>
@@ -142,15 +142,19 @@ export const TopLosses = () => {
         <TabView>
           <TabPanel header="Indicateurs clés" disabled={chartData.labels.length === 0}>
             <div className="flex gap-3">
-              <StatisticsCard title="Pertes totales (quantité)" icon="arrow-trend-down" color={StatisticsColor.SALES} value="128.4 kg" />
-              <StatisticsCard title="Pertes totales (CHF)" icon="arrow-trend-down" color={StatisticsColor.SALES} value="1’245.50 CHF" />
+              <StatisticsCard title="Ventes totales" icon="arrow-trend-down" color={StatisticsColor.SALES} value="128.4 kg" />
               <StatisticsCard
-                title="Catégorie la plus touchée"
+                title="Produits à risque (faible rotation)"
+                icon="arrow-trend-down"
+                color={StatisticsColor.SALES}
+                value="P1, P2"
+              />
+              <StatisticsCard
+                title="Catégories les plus concernées"
                 icon="arrow-trend-down"
                 color={StatisticsColor.SALES}
                 value="Fruits & Légumes"
               />
-              <StatisticsCard title="Produit le plus touché" icon="arrow-trend-down" color={StatisticsColor.SALES} value="Bananes" />
             </div>
           </TabPanel>
           <TabPanel header="Graphique" disabled={chartData.labels.length === 0}>
@@ -160,7 +164,7 @@ export const TopLosses = () => {
                   ref={chartRef}
                   type="bar"
                   data={chartData}
-                  options={topLossesOptions(`Produits les plus en perte sur la période ${formatDateRange(dates)}`, '% du stock perdu', '')}
+                  options={topLossesOptions(`Produits les moins vendus sur la période ${formatDateRange(dates)}`, '% du stock vendu', '')}
                 />
                 <Button
                   label="Télécharger l'image du graphique"
@@ -174,7 +178,7 @@ export const TopLosses = () => {
           <TabPanel header="Tableau" disabled={chartData.labels.length === 0}>
             <Card>
               <div className="flex flex-column gap-2">
-                <TopLossesTable topLossesResults={topLosses} headers={tableHeaders} />
+                <LowestSalesTable lowestSalesResults={lowestSales} headers={tableHeaders} />
                 <Button
                   label="Télécharger le tableau en PDF"
                   icon={<Icon icon="download" marginRight />}

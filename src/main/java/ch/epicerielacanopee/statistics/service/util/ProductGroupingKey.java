@@ -43,7 +43,7 @@ public class ProductGroupingKey {
         if (this == o) return true;
         if (!(o instanceof ProductGroupingKey)) return false;
         ProductGroupingKey that = (ProductGroupingKey) o;
-        return codeProduit.equals(that.codeProduit) && produit.equals(that.produit);
+        return codeProduit.equals(that.codeProduit);
     }
 
     @Override

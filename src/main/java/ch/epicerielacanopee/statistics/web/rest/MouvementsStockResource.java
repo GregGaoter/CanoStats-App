@@ -39,6 +39,7 @@ import ch.epicerielacanopee.statistics.service.MouvementsStockService;
 import ch.epicerielacanopee.statistics.service.criteria.MouvementsStockCriteria;
 import ch.epicerielacanopee.statistics.service.dto.AnalysisProgressEvent;
 import ch.epicerielacanopee.statistics.service.dto.MouvementsStockDTO;
+import ch.epicerielacanopee.statistics.service.util.LowestSalesResult;
 import ch.epicerielacanopee.statistics.service.util.MonthlyAnalysisStats;
 import ch.epicerielacanopee.statistics.service.util.MouvementsStockDateRange;
 import ch.epicerielacanopee.statistics.service.util.TopLossesResult;
@@ -311,5 +312,13 @@ public class MouvementsStockResource {
         List<MouvementsStockProjection> mvts = mouvementsStockService.findByDateBetween(startDate, endDate);
         List<TopLossesResult> topLosses = mouvementsStockService.getTopLosses(mvts, startDate);
         return ResponseEntity.ok().body(topLosses);
+    }
+
+    @GetMapping("/lowest-sales")
+    public ResponseEntity<List<LowestSalesResult>> getLowestSales(@RequestParam Instant startDate, @RequestParam Instant endDate) {
+        progressService.emitProgress(0, "Extraction des mouvements de stock...");
+        List<MouvementsStockProjection> mvts = mouvementsStockService.findByDateBetween(startDate, endDate);
+        List<LowestSalesResult> lowestSales = mouvementsStockService.getLowestSales(mvts, startDate);
+        return ResponseEntity.ok().body(lowestSales);
     }
 }

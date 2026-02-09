@@ -86,6 +86,11 @@ const Header = (props: IHeaderProps) => {
               icon: <Icon icon="arrow-trend-down" colorSecondary marginRight />,
               command: () => navigate('/statistics/products/top-losses', { replace: true }),
             },
+            {
+              label: 'Produits les moins vendus',
+              icon: <Icon icon="arrow-trend-down" colorSecondary marginRight />,
+              command: () => navigate('/statistics/products/lowest-sales', { replace: true }),
+            },
           ],
         },
       ],

@@ -15,6 +15,7 @@ import { Route } from 'react-router-dom';
 import { Inventory } from './modules/statistics/stock/inventory-anomalies/Inventory';
 import { MonthlyAnalysis } from './modules/statistics/stock/movements-monthly/MonthlyAnalysis';
 import { TopLosses } from './modules/statistics/products/top-losses/TopLosses';
+import { LowestSales } from './modules/statistics/products/lowest-sales/LowestSales';
 
 interface AppRoutesProps {
   isAuthenticated: boolean;
@@ -69,6 +70,7 @@ const AppRoutes = (props: AppRoutesProps) => {
         </Route>
         <Route path="products">
           <Route path="top-losses" element={<TopLosses />} />
+          <Route path="lowest-sales" element={<LowestSales />} />
         </Route>
       </Route>
       <Route
