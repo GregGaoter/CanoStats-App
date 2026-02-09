@@ -5,13 +5,17 @@ import { StatisticsCard } from 'app/shared/component/StatisticsCard';
 import { StatisticsColor } from 'app/shared/model/enumeration/StatisticsColor';
 import { MouvementsStockDateRange } from 'app/shared/model/MouvementsStockDateRange';
 import { TopLossesResult } from 'app/shared/model/TopLossesResult';
+import { TopLossesTableHeaders } from 'app/shared/model/TopLossesTableHeaders';
 import { transformTopLossesToChartData } from 'app/shared/util/ChartDataTransformer';
 import { topLossesOptions } from 'app/shared/util/ChartOptionsUtils';
 import { formatDateRange, prefixWithDateTime } from 'app/shared/util/date-utils';
 import { getTopLossesQueryParams } from 'app/shared/util/QueryParamsUtil';
+import { getProductUnit } from 'app/shared/util/Utils';
 import axios from 'axios';
 import { ChartData } from 'chart.js';
 import dayjs from 'dayjs';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Chart } from 'primereact/chart';
@@ -19,6 +23,7 @@ import { Fieldset } from 'primereact/fieldset';
 import { TabPanel, TabView } from 'primereact/tabview';
 import React, { useEffect, useRef, useState } from 'react';
 import { TopLossesFilter } from './TopLossesFilter';
+import { TopLossesTable } from './TopLossesTable';
 
 export const TopLosses = () => {
   const chartRef = useRef(null);
@@ -28,6 +33,12 @@ export const TopLosses = () => {
   );
 
   const now: Date = new Date();
+  const tableHeaders: TopLossesTableHeaders = {
+    productCode: 'Code',
+    product: 'Produit',
+    percentage: '% du stock perdu',
+    quantity: 'Quantité du stock perdu',
+  };
 
   const [dates, setDates] = useState<Date[]>([new Date(now.getFullYear(), 0, 1), now]);
   const [minDate, setMinDate] = useState<Date>(undefined);
@@ -88,6 +99,29 @@ export const TopLosses = () => {
     link.click();
   };
 
+  const downloadTablesPdf = () => {
+    const pdf = new jsPDF('p', 'mm', 'a4') as any;
+
+    const startY = pdf.lastAutoTable ? pdf.lastAutoTable.finalY + 15 : 20;
+    pdf.text(`Produits les plus en perte sur la période ${formatDateRange(dates)}`, 10, startY - 5);
+    autoTable(pdf, {
+      startY,
+      head: [Object.values(tableHeaders)],
+      body: topLosses.map(tl => [
+        tl.productCode,
+        tl.product,
+        `${Math.round(tl.percentage).toString()}%`,
+        `${Math.round(tl.quantity).toString()}${getProductUnit(tl.unit)}`,
+      ]),
+      theme: 'grid',
+      headStyles: { fontStyle: 'bold', textColor: 0, fillColor: 225 },
+      bodyStyles: { textColor: 0 },
+      margin: 10,
+    });
+
+    pdf.save(prefixWithDateTime('produits-les-plus-en-perte-tableau.pdf'));
+  };
+
   return (
     <div className="grid align-items-center">
       <div className="col-12">
@@ -139,12 +173,18 @@ export const TopLosses = () => {
           </TabPanel>
           <TabPanel header="Tableau" disabled={chartData.labels.length === 0}>
             <Card>
-              <p className="m-0">
-                At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti
-                quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia
-                deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam
-                libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus.
-              </p>
+              <div className="flex flex-column gap-2">
+                <TopLossesTable
+                  topLossesResults={topLosses}
+                  headers={{ productCode: 'Code', product: 'Produit', percentage: '% du stock perdu', quantity: 'Quantité du stock perdu' }}
+                />
+                <Button
+                  label="Télécharger le tableau en PDF"
+                  icon={<Icon icon="download" marginRight />}
+                  className="align-self-end"
+                  onClick={downloadTablesPdf}
+                />
+              </div>
             </Card>
           </TabPanel>
         </TabView>
