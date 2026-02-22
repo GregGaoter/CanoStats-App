@@ -422,11 +422,11 @@ public class MouvementsStockService {
             Instant endDate) {
         ZoneId zone = ZoneId.of(Constants.TIME_ZONE);
 
-        Map<YearMonth, Map<ProductGroupingKey, List<MouvementsStockProjection>>> byYearMonthAndProduct = groupByYearMonthAndProduct(
+        Map<YearMonth, Map<String, List<MouvementsStockProjection>>> byYearMonthAndProductCode = groupByYearMonthAndProductCode(
                 movements, zone);
 
         Map<YearMonth, List<MonthlyAnalysisResult>> yearMonthResults = buildMonthlyAnalysisResults(
-                byYearMonthAndProduct, movementsType, zone);
+                byYearMonthAndProductCode, movementsType, zone);
 
         Map<Integer, Map<ProductGroupingKey, List<AnalysisValues>>> monthlyAverageByProduct = buildMonthlyAverageByProduct(
                 yearMonthResults);
@@ -438,16 +438,11 @@ public class MouvementsStockService {
         return productsByMonthNumber;
     }
 
-    private Map<ProductGroupingKey, List<MouvementsStockProjection>> groupByProduct(List<MouvementsStockProjection> movements) {
-            return movements.stream().collect(Collectors
-                            .groupingBy(m -> new ProductGroupingKey(m.getCodeProduit(), m.getProduit(), m.getVente())));
-    }
-
     private Map<String, List<MouvementsStockProjection>> groupByProductCode(List<MouvementsStockProjection> movements) {
             return movements.stream().collect(Collectors.groupingBy(m -> m.getCodeProduit()));
     }
 
-    private Map<YearMonth, Map<ProductGroupingKey, List<MouvementsStockProjection>>> groupByYearMonthAndProduct(
+    private Map<YearMonth, Map<String, List<MouvementsStockProjection>>> groupByYearMonthAndProductCode(
             List<MouvementsStockProjection> movements,
             ZoneId zone) {
         return movements
@@ -455,28 +450,26 @@ public class MouvementsStockService {
                 .collect(
                         Collectors.groupingBy(
                                 m -> YearMonth.from(m.getDate(), zone),
-                                Collectors.groupingBy(m -> new ProductGroupingKey(m.getCodeProduit(), m.getProduit(),
-                                        m.getVente()))));
+                                Collectors.groupingBy(m -> m.getCodeProduit())));
     }
 
     private Map<YearMonth, List<MonthlyAnalysisResult>> buildMonthlyAnalysisResults(
-            Map<YearMonth, Map<ProductGroupingKey, List<MouvementsStockProjection>>> byYearMonthAndProduct,
+            Map<YearMonth, Map<String, List<MouvementsStockProjection>>> byYearMonthAndProductCode,
             String movementsType,
             ZoneId zone) {
         Map<YearMonth, List<MonthlyAnalysisResult>> yearMonthResults = new HashMap<>();
 
-        int productKeyTotal = byYearMonthAndProduct.values().stream().mapToInt(byProduct -> byProduct.size()).sum();
+        int productKeyTotal = byYearMonthAndProductCode.values().stream().mapToInt(byProduct -> byProduct.size()).sum();
         int productKeyCount = 0;
         int productKeyProgress = 0;
         String progressMessage = "Progression de l'analyse mensuelle...";
-        for (Map.Entry<YearMonth, Map<ProductGroupingKey, List<MouvementsStockProjection>>> yearMonthEntry : byYearMonthAndProduct
-                .entrySet()) {
+        for (Map.Entry<YearMonth, Map<String, List<MouvementsStockProjection>>> yearMonthEntry : byYearMonthAndProductCode.entrySet()) {
             YearMonth yearMonth = yearMonthEntry.getKey();
-            Map<ProductGroupingKey, List<MouvementsStockProjection>> byProduct = yearMonthEntry.getValue();
+            Map<String, List<MouvementsStockProjection>> byProduct = yearMonthEntry.getValue();
 
             List<MonthlyAnalysisResult> monthlyAnalysisResults = new ArrayList<>();
 
-            for (Map.Entry<ProductGroupingKey, List<MouvementsStockProjection>> productEntry : byProduct.entrySet()) {
+            for (Map.Entry<String, List<MouvementsStockProjection>> productEntry : byProduct.entrySet()) {
                 productKeyCount++;
                 productKeyProgress = BigDecimal.valueOf(productKeyCount).multiply(BigDecimal.valueOf(100)).divide(BigDecimal.valueOf(productKeyTotal), 0, RoundingMode.HALF_UP).intValue();
                 progressService.emitProgress(productKeyProgress, progressMessage);
@@ -492,7 +485,7 @@ public class MouvementsStockService {
 
     private Optional<MonthlyAnalysisResult> analyzeProductMonth(
             YearMonth yearMonth,
-            ProductGroupingKey key,
+            String productCode,
             List<MouvementsStockProjection> mvts,
             String movementsType,
             ZoneId zone) {
@@ -501,7 +494,6 @@ public class MouvementsStockService {
         }
         mvts.sort(Comparator.comparing(MouvementsStockProjection::getDate));
 
-        String productCode = key.getCodeProduit();
         Optional<MouvementsStock> lastBeforeMonth = mouvementsStockRepository
                 .findFirstByCodeProduitAndDateBeforeOrderByDateDesc(
                         productCode,
@@ -529,7 +521,7 @@ public class MouvementsStockService {
         return Optional.of(
                 new MonthlyAnalysisResult(
                         productCode,
-                        key.getProduit(),
+                        mvts.get(mvts.size() - 1).getProduit(),
                         percentage,
                         quantity,
                         available,
