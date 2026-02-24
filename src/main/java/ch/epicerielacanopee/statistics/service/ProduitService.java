@@ -188,4 +188,14 @@ public class ProduitService {
         return produits.stream().map(ProduitCodeProjection::getCode).map(String::trim)
                 .map(s -> s.replaceAll("\\d+", "")).filter(s -> s.matches("[A-Za-z]+")).distinct().sorted().toList();
     }
+
+    public Optional<String> getProductType(List<String> productTypes, String productCode) {
+        String trimmedCode = productCode.trim();
+        for (String productType : productTypes) {
+            if (trimmedCode.startsWith(productType)) {
+                return Optional.of(productType);
+            }
+        }
+        return Optional.empty();
+    }
 }

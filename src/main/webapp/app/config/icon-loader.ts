@@ -13,6 +13,7 @@ import {
   faBell,
   faBook,
   faBoxesStacked,
+  faCarrot,
   faCartShopping,
   faChartLine,
   faChartSimple,
@@ -22,6 +23,7 @@ import {
   faCube,
   faDatabase,
   faDollarSign,
+  faDownload,
   faEnvelope,
   faEye,
   faFileExcel,
@@ -34,6 +36,7 @@ import {
   faHeart,
   faHome,
   faImage,
+  faLayerGroup,
   faList,
   faLock,
   faMedal,
@@ -50,6 +53,7 @@ import {
   faSignInAlt,
   faSignOutAlt,
   faSort,
+  faStar,
   faSync,
   faTableList,
   faTachometerAlt,
@@ -65,9 +69,6 @@ import {
   faWarehouse,
   faWrench,
   faXmark,
-  faStar,
-  faCarrot,
-  faDownload,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -144,5 +145,6 @@ export const loadIcons = () => {
     faStar,
     faCarrot,
     faDownload,
+    faLayerGroup,
   );
 };

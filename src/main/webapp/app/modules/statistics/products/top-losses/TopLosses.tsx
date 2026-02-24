@@ -4,6 +4,8 @@ import { Icon } from 'app/shared/component/Icon';
 import { StatisticsCard } from 'app/shared/component/StatisticsCard';
 import { StatisticsColor } from 'app/shared/model/enumeration/StatisticsColor';
 import { MouvementsStockDateRange } from 'app/shared/model/MouvementsStockDateRange';
+import { TopLossesAnalysis } from 'app/shared/model/TopLossesAnalysis';
+import { TopLossesKpis } from 'app/shared/model/TopLossesKpis';
 import { TopLossesResult } from 'app/shared/model/TopLossesResult';
 import { TopLossesTableHeaders } from 'app/shared/model/TopLossesTableHeaders';
 import { transformTopLossesToChartData } from 'app/shared/util/ChartDataTransformer';
@@ -40,10 +42,17 @@ export const TopLosses = () => {
     quantity: 'Quantité du stock perdu',
   };
 
+  const defaultKpis: TopLossesKpis = {
+    totalLosses: '',
+    mostImpactedCategories: '',
+    mostImpactedProduct: '',
+  };
+
   const [dates, setDates] = useState<Date[]>([new Date(now.getFullYear(), 0, 1), now]);
   const [minDate, setMinDate] = useState<Date>(undefined);
   const [maxDate, setMaxDate] = useState<Date>(undefined);
   const [topLosses, setTopLosses] = useState<TopLossesResult[]>([]);
+  const [kpis, setKpis] = useState<TopLossesKpis>(defaultKpis);
   const [loadingData, setLoadingData] = useState<boolean>(false);
   const [chartData, setChartData] = useState<ChartData<'bar'>>({ labels: [], datasets: [] });
   const [progressPercentage, setProgressPercentage] = useState<number>(0);
@@ -76,13 +85,15 @@ export const TopLosses = () => {
   const getTopLosses = (): void => {
     setLoadingData(true);
     setTopLosses([]);
+    setKpis(defaultKpis);
     axios
-      .get<TopLossesResult[]>(`${apiUrl}/top-losses?${getTopLossesQueryParams(dates)}`, {
+      .get<TopLossesAnalysis>(`${apiUrl}/top-losses?${getTopLossesQueryParams(dates)}`, {
         timeout: 3600000,
       })
       .then(response => {
-        setTopLosses(response.data);
-        setChartData(transformTopLossesToChartData(response.data));
+        setTopLosses(response.data.topLossesResults);
+        setKpis(response.data.kpis || defaultKpis);
+        setChartData(transformTopLossesToChartData(response.data.topLossesResults));
       })
       .finally(() => setLoadingData(false));
   };
@@ -141,17 +152,28 @@ export const TopLosses = () => {
       <div className="col-12">
         <TabView>
           <TabPanel header="Indicateurs clés" disabled={chartData.labels.length === 0}>
-            <div className="flex gap-3">
-              <StatisticsCard title="Pertes totales (quantité)" icon="arrow-trend-down" color={StatisticsColor.SALES} value="128.4 kg" />
-              <StatisticsCard title="Pertes totales (CHF)" icon="arrow-trend-down" color={StatisticsColor.SALES} value="1’245.50 CHF" />
-              <StatisticsCard
-                title="Catégorie la plus touchée"
-                icon="arrow-trend-down"
-                color={StatisticsColor.SALES}
-                value="Fruits & Légumes"
-              />
-              <StatisticsCard title="Produit le plus touché" icon="arrow-trend-down" color={StatisticsColor.SALES} value="Bananes" />
-            </div>
+            {chartData.labels.length === 0 || (
+              <div className="flex gap-3">
+                <StatisticsCard
+                  title="Pertes totales (quantité)"
+                  icon="arrow-trend-down"
+                  color={StatisticsColor.SALES}
+                  value={kpis.totalLosses}
+                />
+                <StatisticsCard
+                  title="Catégories les plus touchées (fréquence)"
+                  icon="layer-group"
+                  color={StatisticsColor.SALES}
+                  value={kpis.mostImpactedCategories}
+                />
+                <StatisticsCard
+                  title="Produit le plus touché"
+                  icon="carrot"
+                  color={StatisticsColor.SALES}
+                  value={kpis.mostImpactedProduct}
+                />
+              </div>
+            )}
           </TabPanel>
           <TabPanel header="Graphique" disabled={chartData.labels.length === 0}>
             <Card>

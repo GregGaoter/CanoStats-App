@@ -44,7 +44,10 @@ import ch.epicerielacanopee.statistics.service.util.MonthlyAnalysisStats;
 import ch.epicerielacanopee.statistics.service.util.MouvementsStockDateRange;
 import ch.epicerielacanopee.statistics.service.util.ProductGroupingKey;
 import ch.epicerielacanopee.statistics.service.util.StatisticalQuantities;
+import ch.epicerielacanopee.statistics.service.util.TopLossesAnalysis;
+import ch.epicerielacanopee.statistics.service.util.TopLossesKpis;
 import ch.epicerielacanopee.statistics.service.util.TopLossesResult;
+import ch.epicerielacanopee.statistics.service.util.Utils;
 import ch.epicerielacanopee.statistics.service.util.YearMonth;
 
 /**
@@ -167,12 +170,15 @@ public class MouvementsStockService {
 
     private final AnalysisProgressService progressService;
 
+    private final ProduitService produitService;
+
     public MouvementsStockService(MouvementsStockRepository mouvementsStockRepository,
-            MouvementsStockMapper mouvementsStockMapper, ObjectMapper objectMapper, AnalysisProgressService progressService) {
+            MouvementsStockMapper mouvementsStockMapper, ObjectMapper objectMapper, AnalysisProgressService progressService, ProduitService produitService) {
         this.mouvementsStockRepository = mouvementsStockRepository;
         this.mouvementsStockMapper = mouvementsStockMapper;
         this.progressService = progressService;
         this.objectMapper = objectMapper;
+        this.produitService = produitService;
     }
 
     /**
@@ -667,12 +673,37 @@ public class MouvementsStockService {
         return mouvementsStockRepository.findMaxDate();
     }
 
-    public List<TopLossesResult> getTopLosses(List<MouvementsStockProjection> movements, Instant startDate) {
+    public TopLossesAnalysis getTopLosses(List<MouvementsStockProjection> movements, Instant startDate) {
         ZoneId zone = ZoneId.of(Constants.TIME_ZONE);
 
         Map<String, List<MouvementsStockProjection>> byProduct = groupByProductCode(movements);
 
-        return buildTopLossesResults(startDate, byProduct, zone);
+        List<TopLossesResult> topLossesResults = buildTopLossesResults(startDate, byProduct, zone);
+        TopLossesKpis kpis = buildTopLossesKpis(topLossesResults);
+        
+        return new TopLossesAnalysis(kpis, topLossesResults);
+    }
+
+    private TopLossesKpis buildTopLossesKpis(List<TopLossesResult> topLossesResults) {
+            String totalLosses = topLossesResults.stream()
+                            .collect(Collectors.groupingBy(
+                                            TopLossesResult::getUnit,
+                                            Collectors.summingDouble(TopLossesResult::getQuantity)))
+                            .entrySet().stream()
+                            .map(e -> Utils.roundByUnit(e.getValue(), Utils.getProductUnit(e.getKey())) + Utils.getProductUnit(e.getKey()))
+                            .collect(Collectors.joining(", "));
+
+            List<String> productTypes = produitService.getProductTypesByCode();
+            List<String> topLossesTypes = topLossesResults.stream()
+                            .map(topLosses -> produitService.getProductType(productTypes, topLosses.getProductCode()))
+                            .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+            String mostImpactedCategories = String.join(", ", Utils.commonestAll(topLossesTypes));
+
+            String mostImpactedProduct = topLossesResults.stream()
+                            .max(Comparator.comparing(TopLossesResult::getPercentage)).map(TopLossesResult::getProduct)
+                            .orElse("Inconnu");
+
+            return new TopLossesKpis(totalLosses, mostImpactedCategories, mostImpactedProduct);
     }
 
     private List<TopLossesResult> buildTopLossesResults(
