@@ -12,7 +12,7 @@ export const Dashboard = () => {
       sticky: true,
       severity: 'info',
       summary: 'Info',
-      detail: 'Le contenu du tableau de bord est à définir.',
+      detail: 'Fonctionnalité bientôt disponible.',
       closable: false,
     });
   });

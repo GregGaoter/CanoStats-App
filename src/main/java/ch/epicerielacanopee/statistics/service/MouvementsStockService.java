@@ -334,11 +334,10 @@ public class MouvementsStockService {
                 .toList();
     }
 
-    public List<MouvementsStockDTO> findByVenteAndDateBetween(String vente, Instant startDate, Instant endDate) {
+    public List<MouvementsStockProjection> findByVenteAndDateBetween(String vente, Instant startDate, Instant endDate) {
         return mouvementsStockRepository
                 .findByVenteAndDateBetween(vente, startDate, endDate)
                 .stream()
-                .map(mouvementsStockMapper::toDto)
                 .toList();
     }
 
@@ -350,16 +349,16 @@ public class MouvementsStockService {
                 .toList();
     }
 
-    public Map<String, List<MouvementsStockDTO>> findByInventory(List<MouvementsStockDTO> mouvementsStocks,
+    public Map<String, List<MouvementsStockProjection>> findByInventory(List<MouvementsStockProjection> mouvementsStocks,
             float mouvement) {
         return mouvementsStocks
                 .stream()
-                .collect(Collectors.groupingBy(MouvementsStockDTO::getCodeProduit))
+                .collect(Collectors.groupingBy(MouvementsStockProjection::getCodeProduit))
                 .entrySet()
                 .stream()
                 .map(entry -> {
                     entry.setValue(
-                            entry.getValue().stream().sorted(Comparator.comparing(MouvementsStockDTO::getEpicerioId))
+                            entry.getValue().stream().sorted(Comparator.comparing(MouvementsStockProjection::getEpicerioId))
                                     .collect(Collectors.toList()));
                     return entry;
                 })
@@ -376,7 +375,7 @@ public class MouvementsStockService {
                                                 optionalPreviousSolde = Optional
                                                         .of(entry.getValue().get(index - 1).getSolde());
                                             } else {
-                                                Optional<MouvementsStock> optionalPreviousM = mouvementsStockRepository
+                                                Optional<MouvementsStockProjection> optionalPreviousM = mouvementsStockRepository
                                                         .findFirstByCodeProduitAndVenteAndEpicerioIdLessThanOrderByEpicerioIdDesc(
                                                                 m.getCodeProduit(),
                                                                 m.getVente(),
@@ -391,7 +390,7 @@ public class MouvementsStockService {
                                             return false;
                                         }
                                     })
-                                    .sorted(Comparator.comparing(MouvementsStockDTO::getMouvement))
+                                    .sorted(Comparator.comparing(MouvementsStockProjection::getMouvement))
                                     .collect(Collectors.toList()));
                     return entry;
                 })
@@ -500,12 +499,12 @@ public class MouvementsStockService {
         }
         mvts.sort(Comparator.comparing(MouvementsStockProjection::getDate));
 
-        Optional<MouvementsStock> lastBeforeMonth = mouvementsStockRepository
+        Optional<MouvementsStockProjection> lastBeforeMonth = mouvementsStockRepository
                 .findFirstByCodeProduitAndDateBeforeOrderByDateDesc(
                         productCode,
                         LocalDate.of(yearMonth.getYear(), yearMonth.getMonth(), 1).atStartOfDay(zone).toInstant());
 
-        float initialStock = lastBeforeMonth.map(MouvementsStock::getSolde).orElse(mvts.get(0).getSolde());
+        float initialStock = lastBeforeMonth.map(MouvementsStockProjection::getSolde).orElse(mvts.get(0).getSolde());
         if (initialStock < 0f) {
             return Optional.empty();
         }
@@ -742,10 +741,10 @@ public class MouvementsStockService {
             }
             mvts.sort(Comparator.comparing(MouvementsStockProjection::getDate));
 
-            Optional<MouvementsStock> lastBeforeMonth = mouvementsStockRepository
+            Optional<MouvementsStockProjection> lastBeforeMonth = mouvementsStockRepository
                             .findFirstByCodeProduitAndDateBeforeOrderByDateDesc(productCode, startDate);
 
-            float initialStock = lastBeforeMonth.map(MouvementsStock::getSolde).orElse(mvts.get(0).getSolde());
+            float initialStock = lastBeforeMonth.map(MouvementsStockProjection::getSolde).orElse(mvts.get(0).getSolde());
             if (initialStock < 0f) {
                     return Optional.empty();
             }
@@ -817,10 +816,10 @@ public class MouvementsStockService {
             }
             mvts.sort(Comparator.comparing(MouvementsStockProjection::getDate));
 
-            Optional<MouvementsStock> lastBeforeMonth = mouvementsStockRepository
+            Optional<MouvementsStockProjection> lastBeforeMonth = mouvementsStockRepository
                             .findFirstByCodeProduitAndDateBeforeOrderByDateDesc(productCode, startDate);
 
-            float initialStock = lastBeforeMonth.map(MouvementsStock::getSolde).orElse(mvts.get(0).getSolde());
+            float initialStock = lastBeforeMonth.map(MouvementsStockProjection::getSolde).orElse(mvts.get(0).getSolde());
             if (initialStock < 0f) {
                     return Optional.empty();
             }

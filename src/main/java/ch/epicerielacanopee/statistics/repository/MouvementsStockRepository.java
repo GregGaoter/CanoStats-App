@@ -25,7 +25,7 @@ public interface MouvementsStockRepository
 
         public List<MouvementsStockProjection> findByDateBetween(Instant startDate, Instant endDate);
 
-        public List<MouvementsStock> findByVenteAndDateBetween(String vente, Instant startDate, Instant endDate);
+        public List<MouvementsStockProjection> findByVenteAndDateBetween(String vente, Instant startDate, Instant endDate);
 
         public List<MouvementsStockProjection> findByCodeProduitStartingWithAndDateBetween(String codeProduitPrefix,
                         Instant startDate, Instant endDate);
@@ -36,10 +36,10 @@ public interface MouvementsStockRepository
                                 endDate), q -> q.as(MouvementsStockProjection.class).all());
         }
 
-        public Optional<MouvementsStock> findFirstByCodeProduitAndVenteAndEpicerioIdLessThanOrderByEpicerioIdDesc(
+        public Optional<MouvementsStockProjection> findFirstByCodeProduitAndVenteAndEpicerioIdLessThanOrderByEpicerioIdDesc(
                         String codeProduit, String vente, Integer epicerioId);
 
-        Optional<MouvementsStock> findFirstByCodeProduitAndDateBeforeOrderByDateDesc(String codeProduit,
+        Optional<MouvementsStockProjection> findFirstByCodeProduitAndDateBeforeOrderByDateDesc(String codeProduit,
                         Instant instant);
 
         @Query("SELECT MIN(date) AS minDate, MAX(date) AS maxDate FROM MouvementsStock")
