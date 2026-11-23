@@ -1,4 +1,10 @@
-# statistics
+# CanoStats
+
+Application de statistiques sur les activités de l'épicerie La Canopée (JHipster 8.7.3, Spring Boot, React, PostgreSQL).
+
+> **Reprise du projet : commencer par le [guide d'installation](docs/INSTALLATION.md).** Il explique comment installer et configurer un PC depuis zéro, préparer la base de données, renseigner les variables d'environnement (modèle : [docs/cano-stats-env.source.example](docs/cano-stats-env.source.example)) et lancer l'application.
+
+La suite de ce fichier est la documentation générée par JHipster.
 
 This application was generated using JHipster 8.7.3, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v8.7.3](https://www.jhipster.tech/documentation-archive/v8.7.3).
 
