@@ -1,0 +1,44 @@
+# =====================================================================
+# CanoStats — modèle du fichier de variables d'environnement
+# =====================================================================
+#
+# 1. Copier ce fichier dans le dossier PARENT du projet, sous le nom exact :
+#        cano-stats-env.source
+#    (le script `npm run backend` fait `source ../cano-stats-env.source`)
+#
+#        C:\dev\canostats\
+#        ├── cano-stats-env.source      <- ici
+#        └── CanoStats-App\             <- le dépôt cloné
+#
+# 2. Remplacer chaque valeur <...> par la vraie valeur.
+#
+# 3. Enregistrer le fichier avec des fins de ligne LF (Unix), PAS CRLF.
+#    Avec CRLF, bash garde un "\r" invisible à la fin de chaque valeur
+#    et la connexion à la base échoue (mot de passe "faux").
+#
+# 4. NE JAMAIS committer ce fichier : le dépôt GitHub est public.
+# =====================================================================
+
+# --- Base de données PostgreSQL (obligatoire) -------------------------
+# Format JDBC : jdbc:postgresql://<hôte>:<port>/<nom_de_la_base>
+export DATABASE_URL=jdbc:postgresql://localhost:5432/statistics
+export DATABASE_USERNAME=statistics
+export DATABASE_PASSWORD=<mot_de_passe_postgres>
+
+# --- Sécurité JWT, profil "dev" (obligatoire) -------------------------
+# Clé encodée en Base64, d'au moins 256 bits. Pour en générer une :
+#   Git Bash   : openssl rand -base64 64 | tr -d '\n'
+#   PowerShell : $b = New-Object byte[] 64; [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($b); [Convert]::ToBase64String($b)
+export JWT_BASE64_SECRET_DEV=<cle_base64_generee>
+
+# --- E-mails via SendGrid (obligatoire au démarrage) ------------------
+# L'application refuse de démarrer si ces variables sont absentes.
+# Des valeurs factices suffisent pour démarrer ; il faut des valeurs
+# réelles pour que les e-mails partent (activation de compte,
+# réinitialisation du mot de passe).
+export SENDGRID_API_KEY=<cle_api_sendgrid_ou_valeur_factice>
+export SENDGRID_FROM_EMAIL=<adresse_expediteur_verifiee_dans_sendgrid>
+
+# --- Production uniquement (facultatif en dev) ------------------------
+# Remplace la clé JWT écrite en dur dans application-prod.yml (publique).
+# export JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET=<autre_cle_base64>
